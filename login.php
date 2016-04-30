@@ -36,6 +36,10 @@
     // changes the form being shown and clears the values from both
     function changeForm() {
         $('.form').slideToggle(100);
+        clearForm();
+    }
+
+    function clearForm() {
         $('input').not('.button').val('');
     }
 
@@ -75,18 +79,22 @@
             }
             // remove the repeated key and call the login function
             delete credentials.identifier;
-            login(credentials);
+            if(login(credentials)) {
+                // go somewhere
+            } else {
+                error('username/email and password do not match')
+            }
         });
 
         // click listener for the finish button
         $('#finish').on('click', function() {
-            var valid = true;
             var info = {
                 username: $(this).siblings('#ruser').val().trim(),
                 email: $(this).siblings('#remail').val().trim(),
                 password: $(this).siblings('#rpassword').val().trim(),
                 checkpassword: $(this).siblings('#rrpassword').val().trim()
             };
+            /*
             //checking that all fields are filled (with characters)
             for(var key in info) {
                 if (info.hasOwnProperty(key)) {
@@ -114,6 +122,7 @@
                 error('passwords do not match');
                 return;
             }
+            */
             // call the register function if all fields are entered correctly and removing unnecessary info
             // return to login form if registration is successful
             delete info.checkpassword;

@@ -1,315 +1,473 @@
 /*
-CryptoJS v3.1.2
-code.google.com/p/crypto-js
-(c) 2009-2013 by Jeff Mott. All rights reserved.
-code.google.com/p/crypto-js/wiki/License
-*/
+ * js-sha3 v0.5.1
+ * https://github.com/emn178/js-sha3
+ *
+ * Copyright 2015, emn178@gmail.com
+ *
+ * Licensed under the MIT license:
+ * http://www.opensource.org/licenses/MIT
+ */
+;(function(root, undefined) {
+  'use strict';
 
+  var NODE_JS = typeof(module) != 'undefined';
+  if(NODE_JS) {
+    root = global;
+    if(root.JS_SHA3_TEST) {
+      root.navigator = { userAgent: 'Chrome'};
+    }
+  }
+  var HEX_CHARS = '0123456789abcdef'.split('');
+  var SHAKE_PADDING = [31, 7936, 2031616, 520093696];
+  var KECCAK_PADDING = [1, 256, 65536, 16777216];
+  var PADDING = [6, 1536, 393216, 100663296];
+  var SHIFT = [0, 8, 16, 24];
+  var RC = [1, 0, 32898, 0, 32906, 2147483648, 2147516416, 2147483648, 32907, 0, 2147483649,
+            0, 2147516545, 2147483648, 32777, 2147483648, 138, 0, 136, 0, 2147516425, 0,
+            2147483658, 0, 2147516555, 0, 139, 2147483648, 32905, 2147483648, 32771,
+            2147483648, 32770, 2147483648, 128, 2147483648, 32778, 0, 2147483658, 2147483648,
+            2147516545, 2147483648, 32896, 2147483648, 2147483649, 0, 2147516424, 2147483648];
+  var BITS = [224, 256, 384, 512];
+  var SHAKE_BITS = [128, 256];
+  var OUTPUT_TYPES = ['hex', 'buffer', 'array'];
 
-//var hash = CryptoJS.SHA256("Message")
-//hash.toString(CryptoJS.enc.Hex >> hex no.
+  var createOutputMethod = function(bits, padding, outputType) {
+    return function(message) {
+      return new Keccak(bits, padding, bits).update(message)[outputType]();
+    }
+  };
 
+  var createShakeOutputMethod = function(bits, padding, outputType) {
+    return function(message, outputBits) {
+      return new Keccak(bits, padding, outputBits).update(message)[outputType]();
+    }
+  };
 
-(function (Math) {
-    // Shortcuts
-    var C = CryptoJS;
-    var C_lib = C.lib;
-    var WordArray = C_lib.WordArray;
-    var Hasher = C_lib.Hasher;
-    var C_x64 = C.x64;
-    var X64Word = C_x64.Word;
-    var C_algo = C.algo;
+  var createMethod = function(bits, padding) {
+    var method = createOutputMethod(bits, padding, 'hex');
+    method.create = function() {
+      return new Keccak(bits, padding, bits);
+    };
+    method.update = function(message) {
+      return method.create().update(message);
+    };
+    for(var i = 0;i < OUTPUT_TYPES.length;++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createOutputMethod(bits, padding, type);
+    }
+    return method;
+  };
 
-    // Constants tables
-    var RHO_OFFSETS = [];
-    var PI_INDEXES  = [];
-    var ROUND_CONSTANTS = [];
+  var createShakeMethod = function(bits, padding) {
+    var method = createShakeOutputMethod(bits, padding, 'hex');
+    method.create = function(outputBits) {
+      return new Keccak(bits, padding, outputBits);
+    };
+    method.update = function(message, outputBits) {
+      return method.create(outputBits).update(message);
+    };
+    for(var i = 0;i < OUTPUT_TYPES.length;++i) {
+      var type = OUTPUT_TYPES[i];
+      method[type] = createShakeOutputMethod(bits, padding, type);
+    }
+    return method;
+  };
 
-    // Compute Constants
-    (function () {
-        // Compute rho offset constants
-        var x = 1, y = 0;
-        for (var t = 0; t < 24; t++) {
-            RHO_OFFSETS[x + 5 * y] = ((t + 1) * (t + 2) / 2) % 64;
+  var algorithms = [
+    {name: 'keccak', padding: KECCAK_PADDING, bits: BITS, createMethod: createMethod},
+    {name: 'sha3', padding: PADDING, bits: BITS, createMethod: createMethod},
+    {name: 'shake', padding: SHAKE_PADDING, bits: SHAKE_BITS, createMethod: createShakeMethod}
+  ];
 
-            var newX = y % 5;
-            var newY = (2 * x + 3 * y) % 5;
-            x = newX;
-            y = newY;
+  var methods = {};
+
+  for(var i = 0;i < algorithms.length;++i) {
+    var algorithm = algorithms[i];
+    var bits  = algorithm.bits;
+    var createMethod = algorithm.createMethod;
+    for(var j = 0;j < bits.length;++j) {
+      var method = algorithm.createMethod(bits[j], algorithm.padding);
+      methods[algorithm.name +'_' + bits[j]] = method;
+    }
+  }
+
+  function Keccak(bits, padding, outputBits) {
+    this.blocks = [];
+    this.s = [];
+    this.padding = padding;
+    this.outputBits = outputBits;
+    this.reset = true;
+    this.block = 0;
+    this.start = 0;
+    this.blockCount = (1600 - (bits << 1)) >> 5;
+    this.byteCount = this.blockCount << 2;
+    this.outputBlocks = outputBits >> 5;
+    this.extraBytes = (outputBits & 31) >> 3;
+
+    for(var i = 0;i < 50;++i) {
+      this.s[i] = 0;
+    }
+  };
+
+  Keccak.prototype.update = function(message) {
+    var notString = typeof(message) != 'string';
+    if(notString && message.constructor == root.ArrayBuffer) {
+      message = new Uint8Array(message);
+    }
+    var length = message.length, blocks = this.blocks, byteCount = this.byteCount,
+        blockCount = this.blockCount, index = 0, s = this.s, i, code;
+
+    while(index < length) {
+      if(this.reset) {
+        this.reset = false;
+        blocks[0] = this.block;
+        for(i = 1;i < blockCount + 1;++i) {
+          blocks[i] = 0;
         }
-
-        // Compute pi index constants
-        for (var x = 0; x < 5; x++) {
-            for (var y = 0; y < 5; y++) {
-                PI_INDEXES[x + 5 * y] = y + ((2 * x + 3 * y) % 5) * 5;
-            }
+      }
+      if(notString) {
+        for (i = this.start;index < length && i < byteCount; ++index) {
+          blocks[i >> 2] |= message[index] << SHIFT[i++ & 3];
         }
-
-        // Compute round constants
-        var LFSR = 0x01;
-        for (var i = 0; i < 24; i++) {
-            var roundConstantMsw = 0;
-            var roundConstantLsw = 0;
-
-            for (var j = 0; j < 7; j++) {
-                if (LFSR & 0x01) {
-                    var bitPosition = (1 << j) - 1;
-                    if (bitPosition < 32) {
-                        roundConstantLsw ^= 1 << bitPosition;
-                    } else /* if (bitPosition >= 32) */ {
-                        roundConstantMsw ^= 1 << (bitPosition - 32);
-                    }
-                }
-
-                // Compute next LFSR
-                if (LFSR & 0x80) {
-                    // Primitive polynomial over GF(2): x^8 + x^6 + x^5 + x^4 + 1
-                    LFSR = (LFSR << 1) ^ 0x71;
-                } else {
-                    LFSR <<= 1;
-                }
-            }
-
-            ROUND_CONSTANTS[i] = X64Word.create(roundConstantMsw, roundConstantLsw);
+      } else {
+        for (i = this.start;index < length && i < byteCount; ++index) {
+          code = message.charCodeAt(index);
+          if (code < 0x80) {
+            blocks[i >> 2] |= code << SHIFT[i++ & 3];
+          } else if (code < 0x800) {
+            blocks[i >> 2] |= (0xc0 | (code >> 6)) << SHIFT[i++ & 3];
+            blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+          } else if (code < 0xd800 || code >= 0xe000) {
+            blocks[i >> 2] |= (0xe0 | (code >> 12)) << SHIFT[i++ & 3];
+            blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
+            blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+          } else {
+            code = 0x10000 + (((code & 0x3ff) << 10) | (message.charCodeAt(++index) & 0x3ff));
+            blocks[i >> 2] |= (0xf0 | (code >> 18)) << SHIFT[i++ & 3];
+            blocks[i >> 2] |= (0x80 | ((code >> 12) & 0x3f)) << SHIFT[i++ & 3];
+            blocks[i >> 2] |= (0x80 | ((code >> 6) & 0x3f)) << SHIFT[i++ & 3];
+            blocks[i >> 2] |= (0x80 | (code & 0x3f)) << SHIFT[i++ & 3];
+          }
         }
-    }());
-
-    // Reusable objects for temporary values
-    var T = [];
-    (function () {
-        for (var i = 0; i < 25; i++) {
-            T[i] = X64Word.create();
+      }
+      this.lastByteIndex = i;
+      if(i >= byteCount) {
+        this.start = i - byteCount;
+        this.block = blocks[blockCount];
+        for(i = 0;i < blockCount;++i) {
+          s[i] ^= blocks[i];
         }
-    }());
+        f(s);
+        this.reset = true;
+      } else {
+        this.start = i;
+      }
+    }
+    return this;
+  };
 
-    /**
-     * SHA-3 hash algorithm.
-     */
-    var SHA3 = C_algo.SHA3 = Hasher.extend({
-        /**
-         * Configuration options.
-         *
-         * @property {number} outputLength
-         *   The desired number of bits in the output hash.
-         *   Only values permitted are: 224, 256, 384, 512.
-         *   Default: 512
-         */
-        cfg: Hasher.cfg.extend({
-            outputLength: 512
-        }),
+  Keccak.prototype.finalize = function() {
+    var blocks = this.blocks, i = this.lastByteIndex, blockCount = this.blockCount, s = this.s;
+    blocks[i >> 2] |= this.padding[i & 3];
+    if(this.lastByteIndex == this.byteCount) {
+      blocks[0] = blocks[blockCount];
+      for(i = 1;i < blockCount + 1;++i) {
+        blocks[i] = 0;
+      }
+    }
+    blocks[blockCount - 1] |= 0x80000000;
+    for(i = 0;i < blockCount;++i) {
+      s[i] ^= blocks[i];
+    }
+    f(s);
+  };
 
-        _doReset: function () {
-            var state = this._state = []
-            for (var i = 0; i < 25; i++) {
-                state[i] = new X64Word.init();
-            }
+  Keccak.prototype.toString = Keccak.prototype.hex = function() {
+    this.finalize();
 
-            this.blockSize = (1600 - 2 * this.cfg.outputLength) / 32;
-        },
+    var blockCount = this.blockCount, s = this.s, outputBlocks = this.outputBlocks,
+        extraBytes = this.extraBytes, i = 0, j = 0;
+    var hex = '', block;
+    while(j < outputBlocks) {
+      for(i = 0;i < blockCount && j < outputBlocks;++i, ++j) {
+        block = s[i];
+        hex += HEX_CHARS[(block >> 4) & 0x0F] + HEX_CHARS[block & 0x0F] +
+               HEX_CHARS[(block >> 12) & 0x0F] + HEX_CHARS[(block >> 8) & 0x0F] +
+               HEX_CHARS[(block >> 20) & 0x0F] + HEX_CHARS[(block >> 16) & 0x0F] +
+               HEX_CHARS[(block >> 28) & 0x0F] + HEX_CHARS[(block >> 24) & 0x0F];
+      }
+      if(j % blockCount == 0) {
+        f(s);
+      }
+    }
+    if(extraBytes) {
+      block = s[i];
+      if(extraBytes > 0) {
+        hex += HEX_CHARS[(block >> 4) & 0x0F] + HEX_CHARS[block & 0x0F];
+      }
+      if(extraBytes > 1) {
+        hex += HEX_CHARS[(block >> 12) & 0x0F] + HEX_CHARS[(block >> 8) & 0x0F];
+      }
+      if(extraBytes > 2) {
+        hex += HEX_CHARS[(block >> 20) & 0x0F] + HEX_CHARS[(block >> 16) & 0x0F];
+      }
+    }
+    return hex;
+  };
 
-        _doProcessBlock: function (M, offset) {
-            // Shortcuts
-            var state = this._state;
-            var nBlockSizeLanes = this.blockSize / 2;
+  Keccak.prototype.buffer = function() {
+    this.finalize();
 
-            // Absorb
-            for (var i = 0; i < nBlockSizeLanes; i++) {
-                // Shortcuts
-                var M2i  = M[offset + 2 * i];
-                var M2i1 = M[offset + 2 * i + 1];
+    var blockCount = this.blockCount, s = this.s, outputBlocks = this.outputBlocks,
+        extraBytes = this.extraBytes, i = 0, j = 0;
+    var bytes = this.outputBits >> 3;
+    var buffer;
+    if(extraBytes) {
+      buffer = new ArrayBuffer((outputBlocks + 1) << 2);
+    } else {
+      buffer = new ArrayBuffer(bytes);
+    }
+    var array = new Uint32Array(buffer);
+    while(j < outputBlocks) {
+      for(i = 0;i < blockCount && j < outputBlocks;++i, ++j) {
+        array[j] = s[i];
+      }
+      if(j % blockCount == 0) {
+        f(s);
+      }
+    }
+    if(extraBytes) {
+      array[i] = s[i];
+      buffer = buffer.slice(0, bytes);
+    }
+    return buffer;
+  };
 
-                // Swap endian
-                M2i = (
-                    (((M2i << 8)  | (M2i >>> 24)) & 0x00ff00ff) |
-                    (((M2i << 24) | (M2i >>> 8))  & 0xff00ff00)
-                );
-                M2i1 = (
-                    (((M2i1 << 8)  | (M2i1 >>> 24)) & 0x00ff00ff) |
-                    (((M2i1 << 24) | (M2i1 >>> 8))  & 0xff00ff00)
-                );
+  Keccak.prototype.digest = Keccak.prototype.array = function() {
+    this.finalize();
 
-                // Absorb message into state
-                var lane = state[i];
-                lane.high ^= M2i1;
-                lane.low  ^= M2i;
-            }
+    var blockCount = this.blockCount, s = this.s, outputBlocks = this.outputBlocks,
+        extraBytes = this.extraBytes, i = 0, j = 0;
+    var array = [], offset, block;
+    while(j < outputBlocks) {
+      for(i = 0;i < blockCount && j < outputBlocks;++i, ++j) {
+        offset = j << 2;
+        block = s[i];
+        array[offset] = block & 0xFF;
+        array[offset + 1] = (block >> 8) & 0xFF;
+        array[offset + 2] = (block >> 16) & 0xFF;
+        array[offset + 3] = (block >> 24) & 0xFF;
+      }
+      if(j % blockCount == 0) {
+        f(s);
+      }
+    }
+    if(extraBytes) {
+      offset = j << 2;
+      block = s[i];
+      if(extraBytes > 0) {
+        array[offset] = block & 0xFF;
+      }
+      if(extraBytes > 1) {
+        array[offset + 1] = (block >> 8) & 0xFF;
+      }
+      if(extraBytes > 2) {
+        array[offset + 2] = (block >> 16) & 0xFF;
+      }
+    }
+    return array;
+  };
 
-            // Rounds
-            for (var round = 0; round < 24; round++) {
-                // Theta
-                for (var x = 0; x < 5; x++) {
-                    // Mix column lanes
-                    var tMsw = 0, tLsw = 0;
-                    for (var y = 0; y < 5; y++) {
-                        var lane = state[x + 5 * y];
-                        tMsw ^= lane.high;
-                        tLsw ^= lane.low;
-                    }
+  var f = function(s) {
+    var h, l, n, c0, c1, c2, c3, c4, c5, c6, c7, c8, c9,
+        b0, b1, b2, b3, b4, b5, b6, b7, b8, b9, b10, b11, b12, b13, b14, b15, b16, b17,
+        b18, b19, b20, b21, b22, b23, b24, b25, b26, b27, b28, b29, b30, b31, b32, b33,
+        b34, b35, b36, b37, b38, b39, b40, b41, b42, b43, b44, b45, b46, b47, b48, b49;
+    for(n = 0; n < 48; n += 2) {
+      c0 = s[0] ^ s[10] ^ s[20] ^ s[30] ^ s[40];
+      c1 = s[1] ^ s[11] ^ s[21] ^ s[31] ^ s[41];
+      c2 = s[2] ^ s[12] ^ s[22] ^ s[32] ^ s[42];
+      c3 = s[3] ^ s[13] ^ s[23] ^ s[33] ^ s[43];
+      c4 = s[4] ^ s[14] ^ s[24] ^ s[34] ^ s[44];
+      c5 = s[5] ^ s[15] ^ s[25] ^ s[35] ^ s[45];
+      c6 = s[6] ^ s[16] ^ s[26] ^ s[36] ^ s[46];
+      c7 = s[7] ^ s[17] ^ s[27] ^ s[37] ^ s[47];
+      c8 = s[8] ^ s[18] ^ s[28] ^ s[38] ^ s[48];
+      c9 = s[9] ^ s[19] ^ s[29] ^ s[39] ^ s[49];
 
-                    // Temporary values
-                    var Tx = T[x];
-                    Tx.high = tMsw;
-                    Tx.low  = tLsw;
-                }
-                for (var x = 0; x < 5; x++) {
-                    // Shortcuts
-                    var Tx4 = T[(x + 4) % 5];
-                    var Tx1 = T[(x + 1) % 5];
-                    var Tx1Msw = Tx1.high;
-                    var Tx1Lsw = Tx1.low;
+      h = c8 ^ ((c2 << 1) | (c3 >>> 31));
+      l = c9 ^ ((c3 << 1) | (c2 >>> 31));
+      s[0] ^= h;
+      s[1] ^= l;
+      s[10] ^= h;
+      s[11] ^= l;
+      s[20] ^= h;
+      s[21] ^= l;
+      s[30] ^= h;
+      s[31] ^= l;
+      s[40] ^= h;
+      s[41] ^= l;
+      h = c0 ^ ((c4 << 1) | (c5 >>> 31));
+      l = c1 ^ ((c5 << 1) | (c4 >>> 31));
+      s[2] ^= h;
+      s[3] ^= l;
+      s[12] ^= h;
+      s[13] ^= l;
+      s[22] ^= h;
+      s[23] ^= l;
+      s[32] ^= h;
+      s[33] ^= l;
+      s[42] ^= h;
+      s[43] ^= l;
+      h = c2 ^ ((c6 << 1) | (c7 >>> 31));
+      l = c3 ^ ((c7 << 1) | (c6 >>> 31));
+      s[4] ^= h;
+      s[5] ^= l;
+      s[14] ^= h;
+      s[15] ^= l;
+      s[24] ^= h;
+      s[25] ^= l;
+      s[34] ^= h;
+      s[35] ^= l;
+      s[44] ^= h;
+      s[45] ^= l;
+      h = c4 ^ ((c8 << 1) | (c9 >>> 31));
+      l = c5 ^ ((c9 << 1) | (c8 >>> 31));
+      s[6] ^= h;
+      s[7] ^= l;
+      s[16] ^= h;
+      s[17] ^= l;
+      s[26] ^= h;
+      s[27] ^= l;
+      s[36] ^= h;
+      s[37] ^= l;
+      s[46] ^= h;
+      s[47] ^= l;
+      h = c6 ^ ((c0 << 1) | (c1 >>> 31));
+      l = c7 ^ ((c1 << 1) | (c0 >>> 31));
+      s[8] ^= h;
+      s[9] ^= l;
+      s[18] ^= h;
+      s[19] ^= l;
+      s[28] ^= h;
+      s[29] ^= l;
+      s[38] ^= h;
+      s[39] ^= l;
+      s[48] ^= h;
+      s[49] ^= l;
 
-                    // Mix surrounding columns
-                    var tMsw = Tx4.high ^ ((Tx1Msw << 1) | (Tx1Lsw >>> 31));
-                    var tLsw = Tx4.low  ^ ((Tx1Lsw << 1) | (Tx1Msw >>> 31));
-                    for (var y = 0; y < 5; y++) {
-                        var lane = state[x + 5 * y];
-                        lane.high ^= tMsw;
-                        lane.low  ^= tLsw;
-                    }
-                }
+      b0 = s[0];
+      b1 = s[1];
+      b32 = (s[11] << 4) | (s[10] >>> 28);
+      b33 = (s[10] << 4) | (s[11] >>> 28);
+      b14 = (s[20] << 3) | (s[21] >>> 29);
+      b15 = (s[21] << 3) | (s[20] >>> 29);
+      b46 = (s[31] << 9) | (s[30] >>> 23);
+      b47 = (s[30] << 9) | (s[31] >>> 23);
+      b28 = (s[40] << 18) | (s[41] >>> 14);
+      b29 = (s[41] << 18) | (s[40] >>> 14);
+      b20 = (s[2] << 1) | (s[3] >>> 31);
+      b21 = (s[3] << 1) | (s[2] >>> 31);
+      b2 = (s[13] << 12) | (s[12] >>> 20);
+      b3 = (s[12] << 12) | (s[13] >>> 20);
+      b34 = (s[22] << 10) | (s[23] >>> 22);
+      b35 = (s[23] << 10) | (s[22] >>> 22);
+      b16 = (s[33] << 13) | (s[32] >>> 19);
+      b17 = (s[32] << 13) | (s[33] >>> 19);
+      b48 = (s[42] << 2) | (s[43] >>> 30);
+      b49 = (s[43] << 2) | (s[42] >>> 30);
+      b40 = (s[5] << 30) | (s[4] >>> 2);
+      b41 = (s[4] << 30) | (s[5] >>> 2);
+      b22 = (s[14] << 6) | (s[15] >>> 26);
+      b23 = (s[15] << 6) | (s[14] >>> 26);
+      b4 = (s[25] << 11) | (s[24] >>> 21);
+      b5 = (s[24] << 11) | (s[25] >>> 21);
+      b36 = (s[34] << 15) | (s[35] >>> 17);
+      b37 = (s[35] << 15) | (s[34] >>> 17);
+      b18 = (s[45] << 29) | (s[44] >>> 3);
+      b19 = (s[44] << 29) | (s[45] >>> 3);
+      b10 = (s[6] << 28) | (s[7] >>> 4);
+      b11 = (s[7] << 28) | (s[6] >>> 4);
+      b42 = (s[17] << 23) | (s[16] >>> 9);
+      b43 = (s[16] << 23) | (s[17] >>> 9);
+      b24 = (s[26] << 25) | (s[27] >>> 7);
+      b25 = (s[27] << 25) | (s[26] >>> 7);
+      b6 = (s[36] << 21) | (s[37] >>> 11);
+      b7 = (s[37] << 21) | (s[36] >>> 11);
+      b38 = (s[47] << 24) | (s[46] >>> 8);
+      b39 = (s[46] << 24) | (s[47] >>> 8);
+      b30 = (s[8] << 27) | (s[9] >>> 5);
+      b31 = (s[9] << 27) | (s[8] >>> 5);
+      b12 = (s[18] << 20) | (s[19] >>> 12);
+      b13 = (s[19] << 20) | (s[18] >>> 12);
+      b44 = (s[29] << 7) | (s[28] >>> 25);
+      b45 = (s[28] << 7) | (s[29] >>> 25);
+      b26 = (s[38] << 8) | (s[39] >>> 24);
+      b27 = (s[39] << 8) | (s[38] >>> 24);
+      b8 = (s[48] << 14) | (s[49] >>> 18);
+      b9 = (s[49] << 14) | (s[48] >>> 18);
 
-                // Rho Pi
-                for (var laneIndex = 1; laneIndex < 25; laneIndex++) {
-                    // Shortcuts
-                    var lane = state[laneIndex];
-                    var laneMsw = lane.high;
-                    var laneLsw = lane.low;
-                    var rhoOffset = RHO_OFFSETS[laneIndex];
+      s[0] = b0 ^ (~b2 & b4);
+      s[1] = b1 ^ (~b3 & b5);
+      s[10] = b10 ^ (~b12 & b14);
+      s[11] = b11 ^ (~b13 & b15);
+      s[20] = b20 ^ (~b22 & b24);
+      s[21] = b21 ^ (~b23 & b25);
+      s[30] = b30 ^ (~b32 & b34);
+      s[31] = b31 ^ (~b33 & b35);
+      s[40] = b40 ^ (~b42 & b44);
+      s[41] = b41 ^ (~b43 & b45);
+      s[2] = b2 ^ (~b4 & b6);
+      s[3] = b3 ^ (~b5 & b7);
+      s[12] = b12 ^ (~b14 & b16);
+      s[13] = b13 ^ (~b15 & b17);
+      s[22] = b22 ^ (~b24 & b26);
+      s[23] = b23 ^ (~b25 & b27);
+      s[32] = b32 ^ (~b34 & b36);
+      s[33] = b33 ^ (~b35 & b37);
+      s[42] = b42 ^ (~b44 & b46);
+      s[43] = b43 ^ (~b45 & b47);
+      s[4] = b4 ^ (~b6 & b8);
+      s[5] = b5 ^ (~b7 & b9);
+      s[14] = b14 ^ (~b16 & b18);
+      s[15] = b15 ^ (~b17 & b19);
+      s[24] = b24 ^ (~b26 & b28);
+      s[25] = b25 ^ (~b27 & b29);
+      s[34] = b34 ^ (~b36 & b38);
+      s[35] = b35 ^ (~b37 & b39);
+      s[44] = b44 ^ (~b46 & b48);
+      s[45] = b45 ^ (~b47 & b49);
+      s[6] = b6 ^ (~b8 & b0);
+      s[7] = b7 ^ (~b9 & b1);
+      s[16] = b16 ^ (~b18 & b10);
+      s[17] = b17 ^ (~b19 & b11);
+      s[26] = b26 ^ (~b28 & b20);
+      s[27] = b27 ^ (~b29 & b21);
+      s[36] = b36 ^ (~b38 & b30);
+      s[37] = b37 ^ (~b39 & b31);
+      s[46] = b46 ^ (~b48 & b40);
+      s[47] = b47 ^ (~b49 & b41);
+      s[8] = b8 ^ (~b0 & b2);
+      s[9] = b9 ^ (~b1 & b3);
+      s[18] = b18 ^ (~b10 & b12);
+      s[19] = b19 ^ (~b11 & b13);
+      s[28] = b28 ^ (~b20 & b22);
+      s[29] = b29 ^ (~b21 & b23);
+      s[38] = b38 ^ (~b30 & b32);
+      s[39] = b39 ^ (~b31 & b33);
+      s[48] = b48 ^ (~b40 & b42);
+      s[49] = b49 ^ (~b41 & b43);
 
-                    // Rotate lanes
-                    if (rhoOffset < 32) {
-                        var tMsw = (laneMsw << rhoOffset) | (laneLsw >>> (32 - rhoOffset));
-                        var tLsw = (laneLsw << rhoOffset) | (laneMsw >>> (32 - rhoOffset));
-                    } else /* if (rhoOffset >= 32) */ {
-                        var tMsw = (laneLsw << (rhoOffset - 32)) | (laneMsw >>> (64 - rhoOffset));
-                        var tLsw = (laneMsw << (rhoOffset - 32)) | (laneLsw >>> (64 - rhoOffset));
-                    }
+      s[0] ^= RC[n];
+      s[1] ^= RC[n + 1];
+    }
+  }
 
-                    // Transpose lanes
-                    var TPiLane = T[PI_INDEXES[laneIndex]];
-                    TPiLane.high = tMsw;
-                    TPiLane.low  = tLsw;
-                }
-
-                // Rho pi at x = y = 0
-                var T0 = T[0];
-                var state0 = state[0];
-                T0.high = state0.high;
-                T0.low  = state0.low;
-
-                // Chi
-                for (var x = 0; x < 5; x++) {
-                    for (var y = 0; y < 5; y++) {
-                        // Shortcuts
-                        var laneIndex = x + 5 * y;
-                        var lane = state[laneIndex];
-                        var TLane = T[laneIndex];
-                        var Tx1Lane = T[((x + 1) % 5) + 5 * y];
-                        var Tx2Lane = T[((x + 2) % 5) + 5 * y];
-
-                        // Mix rows
-                        lane.high = TLane.high ^ (~Tx1Lane.high & Tx2Lane.high);
-                        lane.low  = TLane.low  ^ (~Tx1Lane.low  & Tx2Lane.low);
-                    }
-                }
-
-                // Iota
-                var lane = state[0];
-                var roundConstant = ROUND_CONSTANTS[round];
-                lane.high ^= roundConstant.high;
-                lane.low  ^= roundConstant.low;;
-            }
-        },
-
-        _doFinalize: function () {
-            // Shortcuts
-            var data = this._data;
-            var dataWords = data.words;
-            var nBitsTotal = this._nDataBytes * 8;
-            var nBitsLeft = data.sigBytes * 8;
-            var blockSizeBits = this.blockSize * 32;
-
-            // Add padding
-            dataWords[nBitsLeft >>> 5] |= 0x1 << (24 - nBitsLeft % 32);
-            dataWords[((Math.ceil((nBitsLeft + 1) / blockSizeBits) * blockSizeBits) >>> 5) - 1] |= 0x80;
-            data.sigBytes = dataWords.length * 4;
-
-            // Hash final blocks
-            this._process();
-
-            // Shortcuts
-            var state = this._state;
-            var outputLengthBytes = this.cfg.outputLength / 8;
-            var outputLengthLanes = outputLengthBytes / 8;
-
-            // Squeeze
-            var hashWords = [];
-            for (var i = 0; i < outputLengthLanes; i++) {
-                // Shortcuts
-                var lane = state[i];
-                var laneMsw = lane.high;
-                var laneLsw = lane.low;
-
-                // Swap endian
-                laneMsw = (
-                    (((laneMsw << 8)  | (laneMsw >>> 24)) & 0x00ff00ff) |
-                    (((laneMsw << 24) | (laneMsw >>> 8))  & 0xff00ff00)
-                );
-                laneLsw = (
-                    (((laneLsw << 8)  | (laneLsw >>> 24)) & 0x00ff00ff) |
-                    (((laneLsw << 24) | (laneLsw >>> 8))  & 0xff00ff00)
-                );
-
-                // Squeeze state to retrieve hash
-                hashWords.push(laneLsw);
-                hashWords.push(laneMsw);
-            }
-
-            // Return final computed hash
-            return new WordArray.init(hashWords, outputLengthBytes);
-        },
-
-        clone: function () {
-            var clone = Hasher.clone.call(this);
-
-            var state = clone._state = this._state.slice(0);
-            for (var i = 0; i < 25; i++) {
-                state[i] = state[i].clone();
-            }
-
-            return clone;
-        }
-    });
-
-    /**
-     * Shortcut function to the hasher's object interface.
-     *
-     * @param {WordArray|string} message The message to hash.
-     *
-     * @return {WordArray} The hash.
-     *
-     * @static
-     *
-     * @example
-     *
-     *     var hash = CryptoJS.SHA3('message');
-     *     var hash = CryptoJS.SHA3(wordArray);
-     */
-    C.SHA3 = Hasher._createHelper(SHA3);
-
-    /**
-     * Shortcut function to the HMAC's object interface.
-     *
-     * @param {WordArray|string} message The message to hash.
-     * @param {WordArray|string} key The secret key.
-     *
-     * @return {WordArray} The HMAC.
-     *
-     * @static
-     *
-     * @example
-     *
-     *     var hmac = CryptoJS.HmacSHA3(message, key);
-     */
-    C.HmacSHA3 = Hasher._createHmacHelper(SHA3);
-}(Math));
+  if(!root.JS_SHA3_TEST && NODE_JS) {
+    module.exports = methods;
+  } else if(root) {
+    for(var key in methods) {
+      root[key] = methods[key];
+    }
+  }
+}(this));
