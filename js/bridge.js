@@ -1,5 +1,5 @@
 //variable to remove form validation for easier testing
-var validate = false;
+var validate = true;
 
 //salt added to the passwords
 var salt = '691f17c48fc12fc506188f063a5849562a6804c4af868aad72205bf54341fc67';
@@ -24,9 +24,22 @@ function clearForm() {
     $('input').not('.button').val('');
 }
 
+function hash(user) {
+    // [[username + password] + [time + salt + password]]
+    var part1 = sha3_256(user.username + user.password);
+    var part2 = sha3_256(user.time + salt + user.password);
+    return sha3_256(part1 + part2);
+    /* for testing
+    console.log(hash({
+        username: 'oneu',
+        time: '1',
+        password: ''
+    }));
+    */
+}
+
 // on document ready function to set up the page and create button listeners
 $(function() {
-
     // toggle which for is shown with the .utility buttons (signup and back)
     $('.utility').on('click', function() {
         changeForm();
@@ -34,42 +47,42 @@ $(function() {
 
     // click listener for the signin button
     $('#signin').on('click', function() {
-        var credentials = {
+        var info = {
             identifier: $(this).siblings('#lidentifier').val().trim(),
             password: $(this).siblings('#lpassword').val().trim()
         };
 
         if(validate) {
             // check that the form is filled
-            for(var key in credentials) {
-                if (credentials.hasOwnProperty(key)) {
-                    if(credentials[key] === '') {
+            /*for(var key in info) {
+                if (info.hasOwnProperty(key)) {
+                    if(info[key] === '') {
                         error('please fill in all the fields');
                         return;
                     }
                 }
-            }
+            }*/
             //check that the format of the username/email is correct
-            if(credentials.identifier.match(emailRegEx)) {
-                credentials.email = credentials.identifier;
-                credentials.username = null;
-            } else if(credentials.identifier.match(usernameRegEx)) {
-                credentials.email = null;
-                credentials.username = credentials.identifier;
+            if(info.identifier.match(emailRegEx)) {
+                info.email = info.identifier;
+                info.username = null;
+            } else if(info.identifier.match(usernameRegEx)) {
+                info.email = null;
+                info.username = info.identifier;
             } else {
                 error('invalid username/email');
                 return
             }
-
-            // remove the repeated key and call the login function
-            //delete credentials.identifier;
         }
 
-        console.log(credentials);
-        $.post('../phpSQL/login.php', credentials, function(response) {
+        console.log(info);
+        $.post('../phpSQL/login.php', info, function(response) {
             console.log(response);
-            if(response.status == 'success') {
-                //go somewhere
+            info.time = response.time;
+            info.username = response.username;
+            console.log(hash(info));
+            if(response.status == 'success' && response.hash == hash(info)) {
+                console.log('signed in!');
             } else {
                 error('username/email and password do not match :: ' + response.status);
             }
@@ -118,10 +131,8 @@ $(function() {
 
         info.time = (new Date()).getMilliseconds();
 
-        // [[username + password] + [time + salt + password]]
-        var part1 = sha3_256(info.username + info.password);
-        var part2 = sha3_256(info.time + salt + info.password);
-        info.hash = sha3_256(part1 + part2);
+        info.hash = hash(info);
+
         delete info.password;
 
         console.log(info);

@@ -1,6 +1,6 @@
 <?php
 
-$conn = mysqli_connect('localhost', 'root', '');
+$conn = @mysqli_connect('localhost', 'root', '');
 mysqli_select_db($conn, 'agenda_users');
 
 ?>
