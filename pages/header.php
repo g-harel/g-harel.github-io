@@ -11,4 +11,4 @@
     </head>
     <body>
         <div id='header'></div>
-        <div id='error'></div>
+        <div id='message'></div>

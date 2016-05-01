@@ -1,5 +1,5 @@
 //variable to remove form validation for easier testing
-var validate = true;
+var validate = false;
 
 //salt added to the passwords
 var salt = '691f17c48fc12fc506188f063a5849562a6804c4af868aad72205bf54341fc67';
@@ -10,8 +10,8 @@ var emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g;
 var passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g;
 
 // function to show errors to the user
-function error(message) {
-    $('#error').stop().html(message).slideToggle(50).delay(2000).slideToggle(50);
+function message(message) {
+    $('#message').stop().html(message).slideToggle(50).delay(2000).slideToggle(50);
 }
 
 // changes the form being shown and clears the values from both
@@ -57,7 +57,7 @@ $(function() {
             /*for(var key in info) {
                 if (info.hasOwnProperty(key)) {
                     if(info[key] === '') {
-                        error('please fill in all the fields');
+                        message('please fill in all the fields');
                         return;
                     }
                 }
@@ -70,21 +70,19 @@ $(function() {
                 info.email = null;
                 info.username = info.identifier;
             } else {
-                error('invalid username/email');
-                return
+                message('invalid username/email');
+                return;
             }
         }
 
-        console.log(info);
         $.post('../phpSQL/login.php', info, function(response) {
-            console.log(response);
             info.time = response.time;
             info.username = response.username;
-            console.log(hash(info));
             if(response.status == 'success' && response.hash == hash(info)) {
                 console.log('signed in!');
+                message('signed in!');
             } else {
-                error('username/email and password do not match :: ' + response.status);
+                message('username/email and password do not match :: ' + response.status);
             }
         }, 'json');
     });
@@ -103,30 +101,29 @@ $(function() {
             for(var key in info) {
                 if (info.hasOwnProperty(key)) {
                     if(info[key] === '') {
-                        error('please fill in all the fields');
+                        message('please fill in all the fields');
                         return;
                     }
                 }
             }
             // checking that the field inputs are in the correct format
             if(!info.username.match(usernameRegEx)) {
-                error('wrong username format');
+                message('wrong username format');
                 return;
             }
             if(!info.email.match(emailRegEx)) {
-                error('wrong email format');
+                message('wrong email format');
                 return;
             }
             if(!info.password.match(passwordRegEx)) {
-                error('wrong password format');
+                message('wrong password format');
                 return;
             }
             // checking that the passwords match
             if(info.password != info.checkpassword) {
-                error('passwords do not match');
+                message('passwords do not match');
                 return;
             }
-            delete info.checkpassword;
         }
 
         info.time = (new Date()).getMilliseconds();
@@ -134,14 +131,15 @@ $(function() {
         info.hash = hash(info);
 
         delete info.password;
+        delete info.checkpassword;
 
-        console.log(info);
         $.post('../phpSQL/register.php', info, function(response) {
-            console.log(response);
             if(response.status == 'success') {
                 changeForm();
+                console.log('success');
+                message('account created');
             } else {
-                error('username and/or email already taken :: ' + response.status);
+                message('username and/or email already taken :: ' + response.status);
             }
         }, 'json');
     });
