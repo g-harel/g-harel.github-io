@@ -1,6 +1,3 @@
-//variable to remove form validation for easier testing
-var validate = true;
-
 //salt added to the passwords
 var salt = '691f17c48fc12fc506188f063a5849562a6804c4af868aad72205bf54341fc67';
 
