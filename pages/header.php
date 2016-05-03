@@ -10,5 +10,4 @@
         <link rel='stylesheet' href='../css/style.css'>
     </head>
     <body>
-        <div id='header'></div>
         <div id='message'></div>

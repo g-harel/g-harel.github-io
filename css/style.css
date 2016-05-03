@@ -1,6 +1,5 @@
 /*
-    main color #02ea75
-    dark grey #222222
+    old style https://i.gyazo.com/924753ad92b2155fb6dade8d21b9feb9.png
 */
 
 /* some preferred defaults */
@@ -22,43 +21,26 @@ html, body {
 }
 
 body {
-    background-color: #0f0f0f;
+    background-color: white;
     overflow: hidden;
 }
 
-#background_image {
-    position: absolute;
-    height: 130%;
-    width: auto;
-    z-index: -999;
-    opacity: 0.03;
-    /* horizontal alignment */
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-#header, #footer, #message {
-    position: fixed;
-    width: 100%;
-    height: 10px;
-    background-color: #02ea75;
-    z-index: 999;
-}
 #footer {
     bottom: 0px;
 }
 
 #message {
+    position: fixed;
+    width: 100%;
+    z-index: 999;
     padding: 5px;
     height: auto;
     text-align: center;
     display: none;
     text-transform: uppercase;
-    font-weight: 800;
-    /*background-color: red;
-    color: white;*/
-    background-color: #02ea75;
-    color: #222222;
+    font-weight: 700;
+    background-color: #222222;
+    color: white;
 }
 
 .form {
@@ -67,9 +49,9 @@ body {
     padding: 15px;
     padding-bottom: 24px;
     border-radius: 2px;
-    background-color: #02ea75;
+    background-color: white;
     text-align: center;
-    top: 30%;
+    top: 20%;
 }
 
 #register_form {
@@ -78,7 +60,7 @@ body {
 
 label {
     font-size: 25px;
-    font-weight: 800;
+    font-weight: 600;
 }
 
 input.login {
@@ -87,10 +69,10 @@ input.login {
     height: 35px;
     width: 430px;
     font-weight: 600;
-    border-radius: 2px;
+    border-radius: 1px;
     /*background-color: #05bd61;*/
-    background-color: rgba(34,34,34,0.3);
-    color: white;
+    background-color: rgba(34,34,34,0.2);
+    color: #222222;
 }
 
 /* placeholder text in text inputs (might not work on all browsers) */
@@ -103,15 +85,9 @@ input.login {
     padding-left: 0px;
     margin-left: 0px;
     font-size: 20px;
-    font-weight: 700;
     background-color: #222222;
-    width: 212px;
-}
-
-#spacer {
-    width:5px;
-    height:auto;
-    display:inline-block;
+    width: 438px;
+    color: white;
 }
 
 /* clicked buttons */
@@ -120,5 +96,11 @@ input.login {
 }
 
 .button:hover {
-    opacity: 0.95;
+    opacity: 0.9;
+}
+
+hr {
+    border-top: 1px solid rgba(34, 34, 34, 0.2);
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
