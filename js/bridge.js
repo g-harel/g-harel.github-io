@@ -1,4 +1,4 @@
-//salt added to the passwords
+// salt added to the passwords
 var salt = '691f17c48fc12fc506188f063a5849562a6804c4af868aad72205bf54341fc67';
 
 // three regex objects for username, password and email
@@ -24,17 +24,27 @@ function clearForm() {
 }
 
 // hashes the contents of the object being passed to it
-function hash(user) {
-    // [[username + password] + [time + salt + password]] where the hash of x is shown as [x]
-    var part1 = sha3_256(user.username + user.password);
-    var part2 = sha3_256(user.time + salt + user.password);
-    return sha3_256(part1 + part2);
+function hash(user, part1, part2) {
+    // 10000x[[username + password] + [time + salt + password]] where the hash of x is shown as [x]
+    // if part1 and 2 are defined, then this part is skipped
+    if((!part1 || !part2) && user) {
+        part1 = sha3_256(user.username + user.password);
+        part2 = sha3_256(user.time + salt + user.password);
+    }
+    // hashing the sum of part1 and 2
+    var hash = sha3_256(part1 + part2);
+    // hasing the hash itself and salt 10000 times
+    var rehash = 10000;
+    while(rehash--) {
+        hash = sha3_256(hash + salt + rehash);
+    }
+    return hash;
 }
 
-// on document ready function for buton listeners
+// on document ready function for button listeners
 $(function() {
 
-    // toggle which for is shown with the .utility buttons
+    // toggle which form is shown with the .utility buttons
     $('.utility').on('click', function() {
         changeForm();
     });
@@ -71,19 +81,34 @@ $(function() {
         delete info.password;
 
         // sending a post request to the specified file with the info object
-        $.post('../phpSQL/login.php', info, function(response) {
+        $.post('../php_helper/find_user.php', info, function(find_response) {
             // adding back the password to the received JSON object
-            response.password = password;
+            find_response.password = password;
             // testing if the user has been found
-            if(response.status == 'success') {
+            if(find_response.status == 'success') {
                 // testing if the hash using the password corresponds to the one in the database
-                if(response.hash == hash(response)) {
+                if(find_response.hash == hash(find_response)) {
+                    // creating a session array to be posted to user_session.php
+                    var session = {
+                        username: find_response.username,
+                        part1: sha3_256(find_response.username + find_response.password),
+                        part2: sha3_256(find_response.time + salt + find_response.password)
+                    }
+                    // post request to the specified file with the session object
+                    $.post('../php_helper/user_session.php', session, function(session_response) {
+                        console.log(session_response);
+                        if(session_response.status == 'success') {
+                            console.log('session created');
+                        } else {
+                            console.log(session_response.status);
+                        }
+                    }, 'json');
                     message('signed in!');
                 } else {
                     message('username/email and password do not match');
                 }
             } else {
-                message(response.status);
+                message(find_response.status);
             }
         }, 'json');
     });
@@ -141,13 +166,13 @@ $(function() {
         delete info.checkpassword;
 
         // sending a post request to the specified file with the info object
-        $.post('../phpSQL/register.php', info, function(response) {
+        $.post('../php_helper/create_user.php', info, function(create_response) {
             // testing if the user has been successfully added
-            if(response.status == 'success') {
+            if(create_response.status == 'success') {
                 changeForm();
                 message('account created!');
             } else {
-                message(response.status);
+                message(create_response.status);
             }
         }, 'json');
     });
