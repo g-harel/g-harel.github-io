@@ -19,7 +19,6 @@
             }
             document.write('</table>');
         }
-
     }, 'json');
 </script>
 
