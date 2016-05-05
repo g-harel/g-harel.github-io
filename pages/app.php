@@ -7,7 +7,7 @@
         type: 1
     };
 
-    $.post('../php_helper/find_events.php', info, function(events_response) {
+    $.post('../php_helper/find.php', info, function(events_response) {
         if(events_response.status == 'success') {
             document.write('<table>');
             console.log(events_response);

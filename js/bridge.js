@@ -1,6 +1,3 @@
-// salt added to the passwords
-var pepper = '691f17c48fc12fc506188f063a5849562a6804c4af868aad72205bf54341fc67';
-
 // three regex objects for username, password and email
 var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g;
 var emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g;
@@ -21,25 +18,6 @@ function changeForm() {
 // clears all the forms
 function clearForm() {
     $('input').not('.button').val('');
-}
-
-// hashes the contents of the object being passed to it
-function hash(user) {
-    part1 = mix(user.username, user.password);
-    part2 = mix(user.time + pepper, user.password);
-    return mix(part1, part2);
-}
-
-// hashes the contents of part1 and part 2 together
-function mix(part1, part2) {
-    // hashing the sum of part1 and 2
-    var hash = sha3_256(part1 + part2);
-    // hasing the hash itself and salt 10000 times
-    var rehash = 10000;
-    while(rehash--) {
-        hash = sha3_256(hash + pepper + rehash);
-    }
-    return hash;
 }
 
 // on document ready function for button listeners
@@ -78,41 +56,14 @@ $(function() {
             return;
         }
 
-        // store the password client side and delete it in the object being sent
-        var password = info.password;
-        delete info.password;
-
         // sending a post request to the specified file with the info object
-        $.post('../php_helper/find_user.php', info, function(find_response) {
-            // adding back the password to the received JSON object
-            find_response.password = password;
-            // testing if the user has been found
-            if(find_response.status == 'success') {
-                // testing if the hash using the password corresponds to the one in the database
-                if(find_response.hash == hash(find_response)) {
-                    // creating a session array to be posted to user_session.php
-                    var session = {
-                        username: find_response.username,
-                        part1: mix(find_response.username, find_response.password),
-                        part2: mix(find_response.time + pepper, find_response.password)
-                    }
-                    // post request to the specified file with the session object
-                    $.post('../php_helper/user_session.php', session, function(session_response) {
-                        console.log(session_response);
-                        if(session_response.status == 'success') {
-                            console.log('session created');
-                        } else {
-                            console.log(session_response.status);
-                        }
-                    }, 'json');
-                    message('signed in!');
-                } else {
-                    message('username/email and password do not match');
-                }
+        $.post('../php_helper/login.php', info, function(login_response) {
+            if(login_response == 'success') {
+                message('signed in!');
             } else {
-                message(find_response.status);
+                message(login_response);
             }
-        }, 'json');
+        }, 'text');
     });
 
     // click listener for the finish button
@@ -122,8 +73,8 @@ $(function() {
 
         // storing the values of the fields
         var info = {
-            username: $(this).siblings('#ruser').val().trim(),
-            email: $(this).siblings('#remail').val().trim(),
+	          username: $(this).siblings('#ruser').val().trim(),
+	          email: $(this).siblings('#remail').val().trim(),
             password: $(this).siblings('#rpassword').val().trim(),
             checkpassword: $(this).siblings('#rrpassword').val().trim()
         };
@@ -151,31 +102,24 @@ $(function() {
             message('wrong password format');
             return;
         }
+
         // checking that the passwords match
         if(info.password != info.checkpassword) {
             message('passwords do not match');
             return;
         }
-
-        // creating a pseudorandom integer to salt the hash
-        info.time = (new Date()).getMilliseconds();
-
-        // hashing the info object
-        info.hash = hash(info);
-
-        // removing the password information before sending a request to the server
-        delete info.password;
+				// removing the password check variable
         delete info.checkpassword;
 
         // sending a post request to the specified file with the info object
-        $.post('../php_helper/create_user.php', info, function(create_response) {
+        $.post('../php_helper/register.php', info, function(register_response) {
             // testing if the user has been successfully added
-            if(create_response.status == 'success') {
+            if(register_response == 'success') {
                 changeForm();
                 message('account created!');
             } else {
-                message(create_response.status);
+                message(register_response);
             }
-        }, 'json');
+        }, 'text');
     });
 });
