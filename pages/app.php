@@ -6,6 +6,7 @@
         part2: 1,
         type: 1
     };
+
     $.post('../php_helper/find_events.php', info, function(events_response) {
         if(events_response.status == 'success') {
             document.write('<table>');
