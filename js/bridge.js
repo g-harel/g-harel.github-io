@@ -1,5 +1,5 @@
 // salt added to the passwords
-var salt = '691f17c48fc12fc506188f063a5849562a6804c4af868aad72205bf54341fc67';
+var pepper = '691f17c48fc12fc506188f063a5849562a6804c4af868aad72205bf54341fc67';
 
 // three regex objects for username, password and email
 var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g;
@@ -14,7 +14,7 @@ function message(message) {
 
 // changes the form being shown and clears the values from both
 function changeForm() {
-    $('.form').toggle(0);
+    $('.form').toggle();
     clearForm();
 }
 
@@ -24,19 +24,20 @@ function clearForm() {
 }
 
 // hashes the contents of the object being passed to it
-function hash(user, part1, part2) {
-    // 10000x[[username + password] + [time + salt + password]] where the hash of x is shown as [x]
-    // if part1 and 2 are defined, then this part is skipped
-    if((!part1 || !part2) && user) {
-        part1 = sha3_256(user.username + user.password);
-        part2 = sha3_256(user.time + salt + user.password);
-    }
+function hash(user) {
+    part1 = mix(user.username, user.password);
+    part2 = mix(user.time + pepper, user.password);
+    return mix(part1, part2);
+}
+
+// hashes the contents of part1 and part 2 together
+function mix(part1, part2) {
     // hashing the sum of part1 and 2
     var hash = sha3_256(part1 + part2);
     // hasing the hash itself and salt 10000 times
     var rehash = 10000;
     while(rehash--) {
-        hash = sha3_256(hash + salt + rehash);
+        hash = sha3_256(hash + pepper + rehash);
     }
     return hash;
 }
@@ -44,8 +45,9 @@ function hash(user, part1, part2) {
 // on document ready function for button listeners
 $(function() {
 
-    // toggle which form is shown with the .utility buttons
+    // click listener for the utility buttons
     $('.utility').on('click', function() {
+        // toggle which form is shown
         changeForm();
     });
 
@@ -91,8 +93,8 @@ $(function() {
                     // creating a session array to be posted to user_session.php
                     var session = {
                         username: find_response.username,
-                        part1: sha3_256(find_response.username + find_response.password),
-                        part2: sha3_256(find_response.time + salt + find_response.password)
+                        part1: mix(find_response.username, find_response.password),
+                        part2: mix(find_response.time + pepper, find_response.password)
                     }
                     // post request to the specified file with the session object
                     $.post('../php_helper/user_session.php', session, function(session_response) {

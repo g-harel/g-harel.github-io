@@ -10,16 +10,11 @@
                         var username = '$_SESSION[username]';
                         var part1 = '$_SESSION[part1]';
                         var part2 = '$_SESSION[part2]';
-                        console.log(username + part1 + part2);
+                        console.log('session variables : ' + username + ' ' + part1 + ' ' + part2);
+                        // redirect to other page
                     </script>"
                 );
-            } else {
-                echo (
-                    "<script>
-                        console.log('session not set');
-                    </script>"
-                );
-            }
+            } else {echo ("<script> console.log('session not set'); </script>");}
         ?>
         <title>Agenda</title>
         <link rel='icon' href='../res/favicon.ico'>
