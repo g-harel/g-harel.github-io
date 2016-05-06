@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 //connecting to the database and picking the table to read from
 require_once('connect.php');
 mysqli_select_db($conn, 'agenda_users');
@@ -29,6 +31,10 @@ if(empty($response)) {
     if(empty($array)) {
         $response = 'username/email not found';
     } else if(password_verify($_POST['password'], $array['hash'])) {
+		if(isset($_SESSION['username']) || isset($_SESSION['hash'])) {
+			session_destroy();
+			session_start();
+		}
 		// sets the session variables if the user entered the right credentials
 		$_SESSION['username'] = $array['username'];
 		$_SESSION['password'] = $_POST['password'];
