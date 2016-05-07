@@ -15,6 +15,11 @@
     color: #222222;
 }
 
+table, td {
+	border: 1px solid black;
+	height: 30px;
+}
+
 html, body {
     /* make height be full page */
     height: 100%;
@@ -22,7 +27,6 @@ html, body {
 
 body {
     background-color: white;
-    overflow: hidden;
 }
 
 #footer {

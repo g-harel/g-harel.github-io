@@ -1,10 +1,14 @@
+
+<div id='contentofpage'></div>
 <script>
-    table({
+    if(table({
 		type: 1,
 		columns: ['data3', 'data2', 'data1'],
 		target: '#contentofpage',
 		append: true,
-		sort: 'id DESC'
-	});
+		sort: 'id DESC',
+		minimum_lines: 5
+	})) {
+		console.log('fail');
+	}
 </script>
-<div id='contentofpage'></div>

@@ -6,16 +6,15 @@ session_start();
 require_once('connect.php');
 mysqli_select_db($conn, 'agenda_users');
 
-// array with the names of the required fields in the post array
+// checking that all the required fields are defined
 $required_fields = array('identifier', 'password');
-
-// going through the required fields to check that they exist in the post array
 foreach($required_fields as $field) {
     if(empty($_POST[$field])) {
         $response = 'missing information';
     }
 }
 
+// if all required fields are defined
 if(empty($response)) {
     // preparing the sql statement
     $stmt = mysqli_prepare($conn, 'SELECT * FROM agenda_users.users WHERE username=? OR email =? LIMIT 1;');
@@ -27,11 +26,12 @@ if(empty($response)) {
     $result = mysqli_stmt_get_result($stmt);
     // creating an array from the result
     $array = mysqli_fetch_array($result);
-    // checking that a result was found with the query or that the hash matches the password and setting the appropriate $response
+    // verifying the result and setting the appropriate response
     if(empty($array)) {
         $response = 'username/email not found';
     } else if(password_verify($_POST['password'], $array['hash'])) {
-		if(isset($_SESSION['username']) || isset($_SESSION['hash'])) {
+		// destroying the current session if it is already being used
+		if(isset($_SESSION['username']) || isset($_SESSION['password'])) {
 			session_destroy();
 			session_start();
 		}
