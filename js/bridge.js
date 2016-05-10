@@ -30,41 +30,58 @@ function clearForm() {
 //		minimum_lines: minimum number of rows (extra will be blank)
 // }
 function table(settings) {
-	// do nothing if the target object is not specified or does not exist
-	if ( settings.target && $(settings.target).length ) {
-		$.post('../php_helper/find.php', settings, function(response) {
-			console.log(response);
-			// if the query is successful, build the table
-	        if (response.status == 'success') {
-				// finding the number of rows to be drawn
-				var rows = Math.max(response.length || 0, settings.minimum_lines || 0);
-		        var table = '<table>';
-				// nested loop adding the rows and the data
-				for (var i = 0; i < rows; i++) {
-	                table += '<tr>'
-	                for (var j = 0; j < settings.columns.length; j++) {
-						// deciding what the contents of the cells will be
-						var contents = '';
-						if(response[i]) {
-							contents = response[i][settings.columns[j]]
-						}
-	                    table += '<td>' + contents + '</td>';
-	                };
-	            }
-		        table += '</table>';
-				// either append or override the given target
-	            if (settings.append) {
-	                $(settings.target).append(table);
-	            } else {
-	                $(settings.target).html(table);
-	            }
-	        } else {
-	            console.log(response.status);
-	        }
-	    }, 'json');
-	} else {
-		console.log('invalid target');
-	}
+    // do nothing if the target object is not specified or does not exist
+    if (settings.target && $(settings.target).length) {
+        $.post('../php_helper/find_event.php', settings, function(response) {
+            console.log(response);
+            // if the query is successful, build the table
+            if (response.status == 'success') {
+                // finding the number of rows to be drawn
+                var rows = Math.max(response.length || 0, settings.minimum_lines || 0);
+                var table = '<table cellspacing="0">';
+                // nested loop adding the rows and the data
+                for (var i = 0; i < rows; i++) {
+                    table += '<tr data-eventid="' + (response[i] && response[i].id) + '">';
+                    for (var j = 0; j < settings.columns.length; j++) {
+                        // deciding what the contents of the cells will be
+                        var contents = '';
+                        if (response[i]) {
+                            contents = response[i][settings.columns[j]];
+                        }
+                        table += '<td>' + contents + '</td>';
+                    }
+                    table += '<td><input value="X" type="button" class="remove button"></td>';
+                    table += '</tr>';
+                }
+                table += '</table>';
+                // either append or override the given target
+                if (settings.append) {
+                    $(settings.target).append(table);
+                } else {
+                    $(settings.target).html(table);
+                }
+                rem_listener();
+            } else {
+                console.log(response.status);
+            }
+        }, 'json');
+    } else {
+        console.log('invalid target');
+    }
+}
+
+function rem_listener() {
+    $('.remove').on('click', function() {
+        var info = {
+            eventid: $(this).closest('tr').attr('data-eventid')
+        };
+        console.log(info);
+        return;
+        // TODO
+        $.post('../php_helper/remove.php', info, function(response) {
+
+        }, 'text');
+    });
 }
 
 // on document ready function for button listeners
@@ -86,7 +103,7 @@ $(function() {
         // check that the fields are filled
         for (var key in info) {
             if (info.hasOwnProperty(key)) {
-                if (info[key] == '') {
+                if (info[key] === '') {
                     message('please fill in all the fields');
                     return;
                 }
@@ -109,8 +126,8 @@ $(function() {
         }, 'text');
     });
 
-    // click listener for the finish button
-    $('#finish').on('click', function() {
+    // click listener for the register button
+    $('#register').on('click', function() {
         // storing the values of the fields
         var info = {
             username: $(this).siblings('#user').val().trim(),

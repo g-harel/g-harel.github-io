@@ -15,9 +15,14 @@
     color: #222222;
 }
 
-table, td {
-	border: 1px solid black;
+td {;
 	height: 30px;
+	border-collapse: collapse;
+	padding: 2px;
+}
+
+tr:nth-child(even) {
+	background-color: rgba(34,34,34,0.2);
 }
 
 html, body {

@@ -15,7 +15,7 @@ if(isset($_SESSION['username']) && isset($_SESSION['password'])) {
 
 	// sets which columns are going to be read
 	if(isset($_POST['columns'])) {
-		$columns = '';
+		$columns = 'id, ';
 		foreach($_POST['columns'] as $column) {
 			$columns .= $column.', ';
 		}

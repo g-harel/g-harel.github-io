@@ -2,10 +2,6 @@
 
 session_start();
 
-//connecting to the database and picking the table to read from
-require_once('connect.php');
-mysqli_select_db($conn, 'agenda_users');
-
 // checking that all the required fields are defined
 $required_fields = array('identifier', 'password');
 foreach($required_fields as $field) {
@@ -16,6 +12,9 @@ foreach($required_fields as $field) {
 
 // if all required fields are defined
 if(empty($response)) {
+	//connecting to the database and picking the table to read from
+	require_once('connect.php');
+	mysqli_select_db($conn, 'agenda_users');
     // preparing the sql statement
     $stmt = mysqli_prepare($conn, 'SELECT * FROM agenda_users.users WHERE username=? OR email =? LIMIT 1;');
     // binding the values in the statement to the post values
@@ -42,12 +41,11 @@ if(empty($response)) {
     } else {
 		$response = 'username/email and password do not match';
 	}
+	// closing the statement and the connection
+	mysqli_stmt_close($stmt);
+	mysqli_close($conn);
+	// replying the status of the request
+	echo $response;
 }
-
-// closing the statement and the connection
-mysqli_stmt_close($stmt);
-mysqli_close($conn);
-// replying the status of the request
-echo $response;
 
 ?>

@@ -1,9 +1,5 @@
 <?php
 
-// connecting to the database and picking the table to read from
-require_once('connect.php');
-mysqli_select_db($conn, 'agenda_users');
-
 // checking that all the required fields are defined
 $required_fields = array('username', 'email', 'password');
 foreach($required_fields as $field) {
@@ -14,6 +10,9 @@ foreach($required_fields as $field) {
 
 // if all required fields are defined
 if(empty($response)) {
+	// connecting to the database and picking the table to read from
+	require_once('connect.php');
+	mysqli_select_db($conn, 'agenda_users');
 	//creating a hash for the password
 	$hash = password_hash($_POST['password'], PASSWORD_BCRYPT);
     // preparing the mysql statement
@@ -28,12 +27,11 @@ if(empty($response)) {
     } else {
         $response = 'username/email already in use';
     }
+	// closing the statement and the connection
+	mysqli_stmt_close($stmt);
+	mysqli_close($conn);
+	// sending back a JSON encoded string
+	echo $response;
 }
-
-// closing the statement and the connection
-mysqli_stmt_close($stmt);
-mysqli_close($conn);
-// sending back a JSON encoded string
-echo $response;
 
 ?>
