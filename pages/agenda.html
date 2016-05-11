@@ -1,9 +1,12 @@
 
 <div id='contentofpage'></div>
 <script>
+	$.post('../php_helper/add_event.php', {type:1, data1:'d1', data2:'d2', data3:'d3'}, function(response) {
+		console.log(response);
+	});
     if(table({
 		type: 1,
-		columns: ['data3', 'data2', 'data1'],
+		columns: ['data1', 'data2', 'data3'],
 		target: '#contentofpage',
 		append: true,
 		sort: 'id DESC',
@@ -11,7 +14,4 @@
 	})) {
 		console.log('fail');
 	}
-	$.post('../php_helper/add_event.php', {type:1, data1:'d1', data2:'d2'}, function(response) {
-		console.log(response);
-	});
 </script>

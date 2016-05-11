@@ -32,26 +32,26 @@ function clearForm() {
 function table(settings) {
     // do nothing if the target object is not specified or does not exist
     if (settings.target && $(settings.target).length) {
-        $.post('../php_helper/find_event.php', settings, function(response) {
-            console.log(response);
+        $.post('../php_helper/find_event.php', settings, function(find_response) {
+            console.log(find_response);
             // if the query is successful, build the table
-            if (response.status == 'success') {
+            if (find_response.status == 'success') {
                 // finding the number of rows to be drawn
-                var rows = Math.max(response.length || 0, settings.minimum_lines || 0);
+                var rows = Math.max(find_response.length || 0, settings.minimum_lines || 0);
                 var table = '<table cellspacing="0">';
                 // nested loop adding the rows and the data
                 for (var i = 0; i < rows; i++) {
-                    table += '<tr data-eventid="' + (response[i] && response[i].id) + '">';
+                    table += '<tr data-eventid="' + (find_response[i] && find_response[i].id) + '">';
                     for (var j = 0; j < settings.columns.length; j++) {
                         // deciding what the contents of the cells will be
-                        var contents = '';
-                        if (response[i]) {
-                            contents = response[i][settings.columns[j]];
-                        }
+						var contents = find_response[i] && find_response[i][settings.columns[j]] || '';
                         table += '<td>' + contents + '</td>';
                     }
-                    table += '<td><input value="X" type="button" class="remove button"></td>';
-                    table += '</tr>';
+					table += '<td>';
+                    if(find_response[i]) {
+						table += '<input value="X" type="button" class="remove button">';
+					}
+					table += '</td></tr>';
                 }
                 table += '</table>';
                 // either append or override the given target
@@ -60,9 +60,10 @@ function table(settings) {
                 } else {
                     $(settings.target).html(table);
                 }
+				// adding the listeners to the buttons in the table
                 rem_listener();
             } else {
-                console.log(response.status);
+                console.log(find_response.status);
             }
         }, 'json');
     } else {
@@ -72,15 +73,21 @@ function table(settings) {
 
 function rem_listener() {
     $('.remove').on('click', function() {
+		var $row = $(this).closest('tr');
         var info = {
-            eventid: $(this).closest('tr').attr('data-eventid')
+            id: $row.attr('data-eventid') || ''
         };
         console.log(info);
-        return;
-        // TODO
-        $.post('../php_helper/remove.php', info, function(response) {
-
-        }, 'text');
+		if(info.id) {
+			$.post('../php_helper/remove_event.php', info, function(remove_response) {
+				if(remove_response == 'success') {
+					$row.children().html('');
+					$row.appendTo($row.parent());
+				} else {
+					console.log(remove_response);
+				}
+	        }, 'text');
+		}
     });
 }
 

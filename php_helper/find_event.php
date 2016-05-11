@@ -32,7 +32,6 @@ if(isset($_SESSION['username']) && isset($_SESSION['password'])) {
 
     // preparing the sql statement
     $stmt = mysqli_prepare($conn, "SELECT $columns FROM agenda_users.events WHERE hash=? AND type=? $sort;");
-	error_log("SELECT $columns FROM agenda_users.events WHERE hash=$hash AND type=$_POST[type] ;");
     // binding the values in the statement to the post values
     mysqli_stmt_bind_param($stmt, 'si', $hash, $_POST['type']);
     // executing the statement
