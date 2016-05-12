@@ -7,12 +7,11 @@ if(!(isset($_SESSION['username']) && isset($_SESSION['password']) && isset($_POS
 	echo json_encode(array('status'=>'user not logged in or query missing information'));
 	exit();
 }
-
 //connecting to the database and picking the table to read from
 require_once('connect.php');
 mysqli_select_db($conn, 'events');
-// $hash = crypt($_SESSION['username'], '$1$username$');
-$hash = 'test';
+// weak hash of the username so that it isnt in plaintext in the database
+$hash = crypt($_SESSION['username'], '$1$username$');
 // preparing the mysql statement
 $stmt = mysqli_prepare($conn, 'INSERT INTO agenda_users.events (hash, type, data1, data2, data3) VALUES (?,?,?,?,?);');
 // binding the values in the statement
@@ -25,7 +24,6 @@ if($result) {
 } else {
     $response = 'username/email already in use';
 }
-
 // closing the statement and the connection
 mysqli_stmt_close($stmt);
 mysqli_close($conn);

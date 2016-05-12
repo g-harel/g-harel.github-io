@@ -108,7 +108,7 @@ table td + td, table th + th{
 	border-left: 1px solid rgba(34,34,34,0.2);
 }
 
-td {
+td, th {
 	height: 30px;
 	padding: 2px;
 	text-align: center;

@@ -7,13 +7,11 @@ if(!(isset($_SESSION['username']) && isset($_SESSION['password']) && isset($_POS
 	echo json_encode(array('status'=>'user not logged in or query missing information'));
 	exit();
 }
-
 //connecting to the database and picking the table to read from
 require_once('connect.php');
 mysqli_select_db($conn, 'events');
-// $hash = crypt($_SESSION['username'], '$1$username$');
-$hash = 'test';
-error_log("DELETE FROM agenda_users.events WHERE id=$_POST[id] AND hash=$hash;");
+// weak hash of the username to remove events of the current user
+$hash = crypt($_SESSION['username'], '$1$username$');
 // preparing the mysql statement
 $stmt = mysqli_prepare($conn, 'DELETE FROM agenda_users.events WHERE id=? AND hash=?;');
 // binding the values in the statement
@@ -26,7 +24,6 @@ if($result) {
 } else {
 	$response = 'delete operation failed'.$_SESSION['username'].$_SESSION['password'].$_POST['id'];
 }
-
 // closing the statement and the connection
 mysqli_stmt_close($stmt);
 mysqli_close($conn);
