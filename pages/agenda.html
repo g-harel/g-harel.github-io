@@ -1,17 +1,24 @@
 
-<div id='contentofpage'></div>
+<div id='table'></div>
 <script>
-	$.post('../php_helper/add_event.php', {type:1, data1:'d1', data2:'d2', data3:'d3'}, function(response) {
-		//console.log(response);
-	});
-    if(create_table({
-		type: 1,
-		columns: ['data1', 'data3'],
-		target: '#contentofpage',
-		sort: 'id DESC',
+	$.post('../php_helper/retreive.php', {}, function(response) {
+		console.log(response);
+		$('#table').html(table({
+			minimum_lines: 20,
+			caption: 'caption',
+			titles: ['id', 't1', 't2', 't3'],
+			data: response,
+			ids: [1,2,3,4,5],
+			removable: true
+		}));
+		rem_listener();
+	}, 'JSON');
+	document.write(table({
 		minimum_lines: 20,
-		caption: 'CAPTION'
-	})) {
-		console.log('fail');
-	}
+		caption: 'caption',
+		titles: ['t1', 't2'],
+		data: [['1', '2'],['3', '4']],
+		ids: [1,2,3,4,5],
+		removable: true
+	}));
 </script>
