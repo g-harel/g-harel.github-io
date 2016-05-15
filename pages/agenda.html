@@ -1,7 +1,11 @@
-
 <div id='table'></div>
 <script>
+	// $.post('../php_helper/add.php', {description: 'testdesc', priority: 1}, function(response) {
+	// 	console.log(response);
+	// });
 	$.post('../php_helper/retreive.php', {}, function(response) {
+		console.log(response);
+		response = response.tasks;
 		console.log(response);
 		$('#table').html(table({
 			minimum_lines: 20,
@@ -13,12 +17,4 @@
 		}));
 		rem_listener();
 	}, 'JSON');
-	document.write(table({
-		minimum_lines: 20,
-		caption: 'caption',
-		titles: ['t1', 't2'],
-		data: [['1', '2'],['3', '4']],
-		ids: [1,2,3,4,5],
-		removable: true
-	}));
 </script>

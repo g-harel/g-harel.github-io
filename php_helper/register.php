@@ -11,11 +11,10 @@ foreach($required_fields as $field) {
 
 // connecting to the database and picking the table to read from
 require_once('connect.php');
-mysqli_select_db($conn, 'agenda_users');
 //creating a hash for the password
 $hash = password_hash($_POST['password'], PASSWORD_BCRYPT);
 // preparing the mysql statement
-$stmt = mysqli_prepare($conn, 'INSERT INTO agenda_users.users (username, email, hash) VALUES (?,?,?);');
+$stmt = mysqli_prepare($conn, 'INSERT INTO agenda.users (username, email, hash) VALUES (?,?,?);');
 // binding the values in the statement
 mysqli_stmt_bind_param($stmt, 'sss', $_POST['username'], $_POST['email'], $hash);
 // executing the statement and storing the result

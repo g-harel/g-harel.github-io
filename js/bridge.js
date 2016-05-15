@@ -3,6 +3,8 @@ var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g;
 var emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g;
 var passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g;
 
+draw();
+
 // function to show messages to the user
 function message(message) {
     $('#message').stop().html(message).slideToggle(20).delay(2000).slideToggle(20);
@@ -18,6 +20,15 @@ function changeForm() {
 // clears all the forms
 function clearForm() {
     $('input').not('.button').val('');
+}
+
+function draw() {
+	$.post('../php_helper/retreive.php', {}, function(response) {
+		if (response.status) {
+			return;
+		}
+		//
+	}, 'JSON');
 }
 
 // creates html table
@@ -50,9 +61,9 @@ function table(settings) {
 	var data_rows = settings.data.length || 0;
 	var columns = settings.data[0].length;
 	for (var i = 0; i < data_rows; i++) {
-		// adding an eventid and a remove button if removable
+		// adding an taskid and a remove button if removable
 		if (settings.removable && settings.ids[i]) {
-			var head = '<tr data-eventid="' + settings.ids[i] + '">';
+			var head = '<tr data-taskid="' + settings.ids[i] + '">';
 			var tail = '<td><input value="X" type="button" class="remove button"></td></tr>';
 		} else {
 			var head = '<tr>';
@@ -84,21 +95,21 @@ function rem_listener() {
     $('.remove').on('click', function() {
 		// storing the parent row and its id for future use
 		var $row = $(this).closest('tr');
-        var id = $row.attr('data-eventid') || '';
-        console.log('removing event #' + id);
-		// server request to remove the event with the specific id
-		// $.post('../php_helper/remove_event.php', {id: id}, function(remove_response) {
-		// 	if(remove_response == 'success') {
-		// 		// send the row to the bottom of the table
-		// 		$row.appendTo($row.parent());
-		// 		// empty the row's content
-		// 		$row.children().html('');
-		// 		// set the eventid to 0
-		// 		$row.attr('data-eventid', 0);
-		// 	} else {
-		// 		console.log(remove_response);
-		// 	}
-        // }, 'text');
+        var id = $row.attr('data-taskid') || '';
+        console.log('removing task #' + id);
+		// server request to remove the task with the specific id
+		$.post('../php_helper/remove.php', {id: id, table: 'tasks'}, function(remove_response) {
+			if(remove_response == 'success') {
+				// send the row to the bottom of the table
+				$row.appendTo($row.parent());
+				// empty the row's content
+				$row.children().html('');
+				// set the taskid to 0
+				$row.attr('data-taskid', 0);
+			} else {
+				console.log(remove_response);
+			}
+        }, 'text');
     });
 }
 

@@ -2,20 +2,14 @@
 
 session_start();
 
-// checking that all the required fields are defined
-$required_fields = array('identifier', 'password');
-foreach($required_fields as $field) {
-    if(empty($_POST[$field])) {
-        $response = 'missing information';
-		exit();
-    }
+if(!(isset($_POST['identifier']) && isset($_POST['password']))) {
+	echo 'too little information to log in';
+	exit();
 }
-
 //connecting to the database and picking the table to read from
 require_once('connect.php');
-mysqli_select_db($conn, 'agenda_users');
 // preparing the sql statement
-$stmt = mysqli_prepare($conn, 'SELECT * FROM agenda_users.users WHERE username=? OR email =? LIMIT 1;');
+$stmt = mysqli_prepare($conn, 'SELECT * FROM agenda.users WHERE username=? OR email =? LIMIT 1;');
 // binding the values in the statement to the post values
 mysqli_stmt_bind_param($stmt, 'ss', $_POST['identifier'], $_POST['identifier']);
 // executing the statement
