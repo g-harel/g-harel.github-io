@@ -1,20 +1,30 @@
-<div id='table'></div>
+<div id='header'>&nbsp</div>
+<div id='main' class='main_nav'>&nbsp</div>
+<div id='timeline' class='main_nav'>&nbsp</div>
+<div id='meetings' class='main_nav'>&nbsp</div>
+<div id='timers' class='main_nav'>&nbsp</div>
+
+
+
+
+
+
 <script>
 	// $.post('../php_helper/add.php', {description: 'testdesc', priority: 1}, function(response) {
 	// 	console.log(response);
 	// });
-	$.post('../php_helper/retreive.php', {}, function(response) {
-		console.log(response);
-		response = response.tasks;
-		console.log(response);
-		$('#table').html(table({
-			minimum_lines: 20,
-			caption: 'caption',
-			titles: ['id', 't1', 't2', 't3'],
-			data: response,
-			ids: [1,2,3,4,5],
-			removable: true
-		}));
-		rem_listener();
-	}, 'JSON');
+	// $.post('../php_helper/retreive.php', {}, function(response) {
+	// 	console.log(response);
+	// 	response = response.tasks;
+	// 	console.log(response);
+	// 	$('#table').html(table({
+	// 		minimum_lines: 20,
+	// 		caption: 'caption',
+	// 		titles: ['id', 't1', 't2', 't3'],
+	// 		data: response,
+	// 		ids: [1,2,3,4,5],
+	// 		removable: true
+	// 	}));
+	// 	rem_listener();
+	// }, 'JSON');
 </script>
