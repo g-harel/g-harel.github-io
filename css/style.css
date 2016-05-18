@@ -105,14 +105,21 @@ hr {
     margin-bottom: 10px;
 }
 
-table td + td, table th + th{
+table td + td {
 	border-left: 1px solid rgba(34,34,34,0.2);
 }
 
 td, th {
-	height: 30px;
+	height: 22px;
 	padding: 2px;
 	text-align: center;
+}
+
+th {
+	text-transform: uppercase;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	background-color: #white;
 }
 
 tr:nth-child(even) {
@@ -120,38 +127,76 @@ tr:nth-child(even) {
 }
 
 table {
-	width: 80%;
-	border: 2px solid black;
+	width: 100%;
+	background-color: white;
 }
 
-input.remove {
-	padding: 4px;
+.dropshadow {
+	box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
 }
 
-.main_nav {
-
+.content {
+	height: calc(100% - 36px);
+	display: none;
+	background-color: white;
+	width: 100%;
+	overflow-y: scroll;
 }
 
 #header {
-	width: 100%;
+	width: calc(100% - 10px);
 	height: 3%;
-	background-color: grey;
+	min-height: 25px;
+	background-color: #00E26B;
+	padding-left: 10px;
+	margin-bottom: 10px;
+}
+
+#header img {
+	bottom: -16%;
 }
 
 #main {
 	width: calc(70% - 20px);
-	height: calc(67% - 20px);
+	height: calc(67% - 30px);
 	float: left;
 	left: 10px;
-	background-color: black;
+	background-color: white;
+}
+
+ul {
+	text-transform: uppercase;
+}
+
+.tab {
+	color: #00E26B;
+	border-top-left-radius: 1px;
+	border-top-right-radius: 1px;
+	text-align: center;
+	cursor: pointer;
+	background-color: white;
+	display: inline-block;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	width: 25%;
+}
+
+#tab_slider {
+	height: 2px;
+	width: 25%;
+	background-color: #00E26B;
+}
+
+.content.current {
+	display: inline-block;
 }
 
 #timeline {
 	width: calc(30% - 10px);
-	height: calc(97% - 10px);
+	height: calc(97% - 20px);
 	float: right;
 	right: 10px;
-	background-color: black;
+	background-color: white;
 }
 
 #meetings {
@@ -160,13 +205,20 @@ input.remove {
 	float: left;
 	left: 10px;
 	top: 10px;
-	background-color: black;
+	background-color: white;
 }
 
 #timers {
 	width: calc(35% - 15px);
 	height: 30%;
 	margin-left: calc(35% + 5px);
-	top: calc(67% - 10px);
-	background-color: black;
+	top: calc(67% - 20px);
+	background-color: white;
+}
+
+.subcontent {
+	background-color: white;
+	width: 50%;
+	height: 100%;
+	display: inline-block;
 }

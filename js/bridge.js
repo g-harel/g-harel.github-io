@@ -35,7 +35,6 @@ function draw() {
 /*
 settings = {
 	minimum_lines: #
-	caption: ''
 	titles: []
 	data: [][]
 	ids : []
@@ -44,8 +43,6 @@ settings = {
 */
 function table(settings) {
 	var table = '<table cellspacing="0">';
-	// caption
-	table += (settings.caption && ('<caption>' + settings.caption + '</caption>')) || '';
 	// headers
 	if (settings.titles) {
 		table += '<tr>';
@@ -128,7 +125,6 @@ $(function() {
             identifier: $(this).siblings('#identifier').val().trim(),
             password: $(this).siblings('#password').val().trim()
         };
-
         // check that the fields are filled
         for (var key in info) {
             if (info.hasOwnProperty(key)) {
@@ -138,13 +134,11 @@ $(function() {
                 }
             }
         }
-
         // check that the format of the identifier fields matches either the username or remail one
         if (!info.identifier.match(emailRegEx) && !info.identifier.match(usernameRegEx)) {
             message('invalid username/email');
             return;
         }
-
         // sending a post request to the specified file with the info object
         $.post('../php_helper/login.php', info, function(login_response) {
             if (login_response == 'success') {
@@ -164,7 +158,6 @@ $(function() {
             password: $(this).siblings('#password').val().trim(),
             checkpassword: $(this).siblings('#password2').val().trim()
         };
-
         //checking that all fields are filled
         for (var key in info) {
             if (info.hasOwnProperty(key)) {
@@ -174,7 +167,6 @@ $(function() {
                 }
             }
         }
-
         // checking that each of the field inputs are in the correct format
         if (!info.username.match(usernameRegEx)) {
             message('wrong username format');
@@ -188,7 +180,6 @@ $(function() {
             message('wrong password format');
             return;
         }
-
         // checking that the passwords match
         if (info.password != info.checkpassword) {
             message('passwords do not match');
@@ -196,7 +187,6 @@ $(function() {
         }
         // removing the password check variable
         delete info.checkpassword;
-
         // sending a post request to the specified file with the info object
         $.post('../php_helper/register.php', info, function(register_response) {
             // testing if the user has been successfully added
@@ -208,4 +198,22 @@ $(function() {
             }
         }, 'text');
     });
+
+	// click listener for the tab buttons
+	$('.tab').on('click', function() {
+		// changing the class of the buttons
+		var $tab = $(this);
+		$tab.siblings().removeClass('current');
+		$tab.addClass('current');
+		// changing the class of the content divs
+		var $content = $tab.parent().siblings();
+		$content.removeClass('current');
+		$content.filter('#' + $tab.attr('data-content')).addClass('current');
+		// moving the tab slider
+		var position = $tab.attr('data-content').slice(-1);
+		console.log(position);
+		$tab.parent().siblings('#tab_slider').animate({
+			left: (position*25) + '%'
+		}, 175);
+	});
 });
