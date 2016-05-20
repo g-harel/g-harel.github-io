@@ -5,6 +5,7 @@
     <head>
         <title>Agenda</title>
         <link rel='icon' href='../res/favicon.ico'>
+		<link href='https://fonts.googleapis.com/css?family=Roboto:700,500,400' rel='stylesheet' type='text/css'>
         <link href='https://fonts.googleapis.com/css?family=Open+Sans:800,700,600' rel='stylesheet' type='text/css'>
         <script src='../js/jquery-2.2.3.js'></script>
         <script src='../js/bridge.js'></script>

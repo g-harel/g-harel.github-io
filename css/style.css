@@ -9,24 +9,18 @@
     border-width: 0px;
     position: relative;
     outline: none;
-    font-family: 'Open Sans';
+    font-family: 'Roboto';
     font-size: 16px;
-    font-weight: 600;
+    font-weight: 400;
     color: #222222;
 }
 
 html, body {
-    /* make height be full page */
     height: 100%;
 }
 
 body {
     background-color: white;
-	/*overflow: hidden;*/
-}
-
-#footer {
-    bottom: 0px;
 }
 
 #message {
@@ -38,9 +32,13 @@ body {
     text-align: center;
     display: none;
     text-transform: uppercase;
-    font-weight: 700;
+    font-weight: 500;
     background-color: #222222;
     color: white;
+}
+
+#register_form {
+    display: none;
 }
 
 .form {
@@ -54,13 +52,8 @@ body {
     top: 20%;
 }
 
-#register_form {
-    display: none;
-}
-
 label {
     font-size: 25px;
-    font-weight: 600;
 }
 
 input.login {
@@ -68,7 +61,6 @@ input.login {
     margin-top: 10px;
     height: 35px;
     width: 430px;
-    font-weight: 600;
     border-radius: 1px;
     /*background-color: #05bd61;*/
     background-color: rgba(34,34,34,0.2);
@@ -99,6 +91,8 @@ input.login {
     opacity: 0.9;
 }
 
+/* main interface starting here */
+
 hr {
     border-top: 1px solid rgba(34, 34, 34, 0.2);
     margin-top: 20px;
@@ -110,6 +104,8 @@ table td + td {
 }
 
 td, th {
+	overflow: hidden;
+	text-overflow: ellipsis;
 	height: 22px;
 	padding: 2px;
 	text-align: center;
@@ -120,6 +116,7 @@ th {
 	padding-top: 4px;
 	padding-bottom: 4px;
 	background-color: #white;
+	font-weight: 500;
 }
 
 tr:nth-child(even) {
@@ -129,6 +126,8 @@ tr:nth-child(even) {
 table {
 	width: 100%;
 	background-color: white;
+	white-space: nowrap;
+	table-layout: fixed;
 }
 
 .dropshadow {
@@ -140,7 +139,25 @@ table {
 	display: none;
 	background-color: white;
 	width: 100%;
-	overflow-y: scroll;
+	/*overflow-y: scroll;*/
+}
+
+#darken {
+	display: none;
+	position: fixed;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0,0,0,0.7);
+	z-index: 3;
+}
+
+.infobox {
+	top: 20%;
+	width: 40%;
+	height: 40%;
+	margin-left: auto;
+	margin-right: auto;
+	background-color: green;
 }
 
 #header {
@@ -158,6 +175,7 @@ table {
 
 #main {
 	width: calc(70% - 20px);
+	max-width: calc(70% - 20px);
 	height: calc(67% - 30px);
 	float: left;
 	left: 10px;
@@ -166,6 +184,15 @@ table {
 
 ul {
 	text-transform: uppercase;
+}
+
+#add_icon {
+	position: fixed;
+	display: inline;
+	top: calc(67% - 44px);
+	left: calc(70% - 78px);
+	z-index: 2;
+	cursor: pointer;
 }
 
 .tab {
@@ -179,6 +206,7 @@ ul {
 	padding-top: 6px;
 	padding-bottom: 6px;
 	width: 25%;
+	font-weight: 500;
 }
 
 #tab_slider {
@@ -189,6 +217,11 @@ ul {
 
 .content.current {
 	display: inline-block;
+}
+
+.edit {
+	cursor: pointer;
+	color: #00E26B;
 }
 
 #timeline {
@@ -220,5 +253,10 @@ ul {
 	background-color: white;
 	width: 50%;
 	height: 100%;
+	overflow-y: scroll;
 	display: inline-block;
+}
+
+#tasks1 {
+	overflow-y: scroll;
 }

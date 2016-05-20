@@ -30,6 +30,7 @@ for ($i = 0; $i < 3; $i++) {
 		array_push($response[$tables[$i]], $row);
 	}
 }
+$response['status'] = 'success';
 
 // closing the statement and the connection
 mysqli_stmt_close($stmt);

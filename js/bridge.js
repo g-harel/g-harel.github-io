@@ -3,8 +3,6 @@ var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g;
 var emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g;
 var passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g;
 
-draw();
-
 // function to show messages to the user
 function message(message) {
     $('#message').stop().html(message).slideToggle(20).delay(2000).slideToggle(20);
@@ -22,13 +20,48 @@ function clearForm() {
     $('input').not('.button').val('');
 }
 
-function draw() {
-	$.post('../php_helper/retreive.php', {}, function(response) {
-		if (response.status) {
-			return;
-		}
-		//
-	}, 'JSON');
+function draw(response) {
+	$('#tasks').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'description', 'objective', 'project'],
+		data: response.tasks,
+		cols: [3,2,4,5],
+		col_width: ['75px', '36%', '32%', '32%', '45px'],
+		button: '<span class="edit button">edit</span>'
+	}));
+	$('#objectives').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'objectives'],
+		data: response.objectives,
+		cols: [3,2],
+		col_width: ['75px', '100%', '45px'],
+		button: '<span class="edit button">edit</span>'
+	}));
+	$('#projects').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'projects'],
+		data: response.projects,
+		cols: [3,2],
+		col_width: ['75px', '100%', '45px'],
+		button: '<span class="edit button">edit</span>'
+	}));
+	$('#week_tasks_table').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'tasks'],
+		data: response.tasks,
+		cols: [3,2],
+		col_width: ['75px', '100%', '45px'],
+		button: '<span class="edit button">>>></span>'
+	}));
+	$('#day_tasks_table').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'tasks'],
+		data: response.tasks,
+		cols: [3,2],
+		col_width: ['75px', '100%', '45px'],
+		button: '<span class="edit button">>>></span>'
+	}));
+	rem_listener();
 }
 
 // creates html table
@@ -37,48 +70,39 @@ settings = {
 	minimum_lines: #
 	titles: []
 	data: [][]
-	ids : []
-	removable: ?
+	cols: []
+	col_width: []
+	button: ""
 }
 */
 function table(settings) {
 	var table = '<table cellspacing="0">';
+	// column widths
+	for (var i = 0; i < (settings.col_width && settings.col_width.length); i++) {
+		table += '<col width=' + settings.col_width[i] + '/>';
+	}
 	// headers
 	if (settings.titles) {
 		table += '<tr>';
 		for (var i = 0; i < settings.titles.length; i++) {
 			table += '<th>' + settings.titles[i] + '</th>';
 		}
-		if (settings.removable) {
-			table += '<th></th>';
-		}
-		table += '</tr>';
+		table += '<th></th></tr>';
 	}
 	// rows with data
 	var data_rows = settings.data.length || 0;
-	var columns = settings.data[0].length;
+	var columns = settings.cols.length || 0;
 	for (var i = 0; i < data_rows; i++) {
-		// adding an taskid and a remove button if removable
-		if (settings.removable && settings.ids[i]) {
-			var head = '<tr data-taskid="' + settings.ids[i] + '">';
-			var tail = '<td><input value="X" type="button" class="remove button"></td></tr>';
-		} else {
-			var head = '<tr>';
-			var tail = '</tr>';
-		}
-		table += head;
+		table += '<tr data-taskid="' + settings.data[i][0] + '">';
 		for (var j = 0; j < columns; j++) {
-			table += '<td>' + settings.data[i][j] + '</td>';
+			table += '<td>' + settings.data[i][settings.cols[j]] + '</td>';
 		}
-		table += tail;
+		table += '<td>' + settings.button + '</td></tr>';
 	}
 	// empty rows
-	var empty_rows = settings.minimum_lines - data_rows;
-	if (settings.removable) {
-		columns++;
-	}
+	var empty_rows = settings.minimum_lines - data_rows + 3;
 	var row = '';
-	for (var j = 0; j < columns; j++) {
+	for (var j = 0; j <= columns; j++) {
 		row += '<td></td>';
 	}
 	for (var i = 0; i < empty_rows; i++) {
@@ -112,6 +136,15 @@ function rem_listener() {
 
 // on document ready function for button listeners
 $(function() {
+	// fills the divs on the page
+	$.post('../php_helper/retreive.php', {}, function(response) {
+		console.log(response);
+		if (response.status) {
+			draw(response);
+		} else {
+			message(response.status);
+		}
+	}, 'JSON');
     // click listener for the utility buttons
     $('.utility').on('click', function() {
         // toggle which form is shown
@@ -210,8 +243,7 @@ $(function() {
 		$content.removeClass('current');
 		$content.filter('#' + $tab.attr('data-content')).addClass('current');
 		// moving the tab slider
-		var position = $tab.attr('data-content').slice(-1);
-		console.log(position);
+		var position = $tab.attr('data-contentid');
 		$tab.parent().siblings('#tab_slider').animate({
 			left: (position*25) + '%'
 		}, 175);
