@@ -73,6 +73,10 @@ input.login {
     color: white;
 }
 
+.button {
+	cursor: pointer;
+}
+
 .login.button {
     padding-left: 0px;
     margin-left: 0px;
@@ -186,13 +190,25 @@ ul {
 	text-transform: uppercase;
 }
 
-#add_icon {
+.add {
 	position: fixed;
 	display: inline;
+	z-index: 2;
+}
+
+#add_task_icon {
 	top: calc(67% - 44px);
 	left: calc(70% - 78px);
-	z-index: 2;
-	cursor: pointer;
+}
+
+#add_objective_icon {
+	top: calc(67% - 44px);
+	left: calc(35% - 68px);
+}
+
+#add_project_icon {
+	top: calc(67% - 44px);
+	left: calc(70% - 78px);
 }
 
 .tab {
@@ -220,7 +236,6 @@ ul {
 }
 
 .edit {
-	cursor: pointer;
 	color: #00E26B;
 }
 
@@ -257,6 +272,6 @@ ul {
 	display: inline-block;
 }
 
-#tasks1 {
+#tasks {
 	overflow-y: scroll;
 }

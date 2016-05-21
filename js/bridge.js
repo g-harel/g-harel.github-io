@@ -53,13 +53,29 @@ function draw(response) {
 		col_width: ['75px', '100%', '45px'],
 		button: '<span class="edit button">>>></span>'
 	}));
+	$('#week_tasks').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'tasks'],
+		data: response.tasks,
+		cols: [6,2],
+		col_width: ['75px', '100%', '45px'],
+		button: '<span class="edit button">edit</span>'
+	}));
 	$('#day_tasks_table').append(table({
 		minimum_lines: 18,
 		titles: ['priority', 'tasks'],
 		data: response.tasks,
-		cols: [3,2],
+		cols: [6,2],
 		col_width: ['75px', '100%', '45px'],
 		button: '<span class="edit button">>>></span>'
+	}));
+	$('#day_tasks').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'tasks'],
+		data: response.tasks,
+		cols: [7,2],
+		col_width: ['75px', '100%', '45px'],
+		button: '<span class="edit button">edit</span>'
 	}));
 	rem_listener();
 }
@@ -136,7 +152,7 @@ function rem_listener() {
 
 // on document ready function for button listeners
 $(function() {
-	// fills the divs on the page
+	// requests all the information for the user
 	$.post('../php_helper/retreive.php', {}, function(response) {
 		console.log(response);
 		if (response.status) {
@@ -145,6 +161,7 @@ $(function() {
 			message(response.status);
 		}
 	}, 'JSON');
+
     // click listener for the utility buttons
     $('.utility').on('click', function() {
         // toggle which form is shown
