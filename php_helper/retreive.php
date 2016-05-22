@@ -14,7 +14,7 @@ $response = array();
 $tables = array('objectives', 'projects', 'tasks');
 for ($i = 0; $i < 3; $i++) {
 	// preparing the sql statement
-	$stmt = mysqli_prepare($conn, "SELECT * FROM agenda.$tables[$i] WHERE username=?;");
+	$stmt = mysqli_prepare($conn, "SELECT * FROM agenda.$tables[$i] WHERE username=? ORDER BY priority ASC;");
 	// binding the values in the statement to the post values
 	mysqli_stmt_bind_param($stmt, 's', $_SESSION['username']);
 	// executing the statement

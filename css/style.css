@@ -239,6 +239,10 @@ ul {
 	color: #00E26B;
 }
 
+.move {
+
+}
+
 #timeline {
 	width: calc(30% - 10px);
 	height: calc(97% - 20px);

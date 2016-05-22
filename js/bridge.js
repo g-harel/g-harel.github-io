@@ -21,14 +21,10 @@ function clearForm() {
 }
 
 function draw(response) {
-	$('#tasks').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'description', 'objective', 'project'],
-		data: response.tasks,
-		cols: [3,2,4,5],
-		col_width: ['75px', '36%', '32%', '32%', '45px'],
-		button: '<span class="edit button">edit</span>'
-	}));
+
+	var tasks_week = sort_by_priority(response.tasks, 6);
+	var tasks_day = sort_by_priority(response.tasks, 7);
+
 	$('#objectives').append(table({
 		minimum_lines: 18,
 		titles: ['priority', 'objectives'],
@@ -45,18 +41,26 @@ function draw(response) {
 		col_width: ['75px', '100%', '45px'],
 		button: '<span class="edit button">edit</span>'
 	}));
+	$('#tasks').append(table({
+		minimum_lines: 18,
+		titles: ['priority', 'description', 'objective', 'project'],
+		data: response.tasks,
+		cols: [3,2,4,5],
+		col_width: ['75px', '36%', '32%', '32%', '45px'],
+		button: '<span class="edit button">edit</span>'
+	}));
 	$('#week_tasks_table').append(table({
 		minimum_lines: 18,
 		titles: ['priority', 'tasks'],
 		data: response.tasks,
 		cols: [3,2],
 		col_width: ['75px', '100%', '45px'],
-		button: '<span class="edit button">>>></span>'
+		button: '<span class="move button">>>></span>'
 	}));
 	$('#week_tasks').append(table({
 		minimum_lines: 18,
 		titles: ['priority', 'tasks'],
-		data: response.tasks,
+		data: tasks_week,
 		cols: [6,2],
 		col_width: ['75px', '100%', '45px'],
 		button: '<span class="edit button">edit</span>'
@@ -64,33 +68,31 @@ function draw(response) {
 	$('#day_tasks_table').append(table({
 		minimum_lines: 18,
 		titles: ['priority', 'tasks'],
-		data: response.tasks,
+		data: tasks_week,
 		cols: [6,2],
 		col_width: ['75px', '100%', '45px'],
-		button: '<span class="edit button">>>></span>'
+		button: '<span class="move button">>>></span>'
 	}));
 	$('#day_tasks').append(table({
 		minimum_lines: 18,
 		titles: ['priority', 'tasks'],
-		data: response.tasks,
+		data: tasks_day,
 		cols: [7,2],
 		col_width: ['75px', '100%', '45px'],
 		button: '<span class="edit button">edit</span>'
 	}));
-	rem_listener();
+	listeners();
 }
 
-// creates html table
-/*
-settings = {
-	minimum_lines: #
-	titles: []
-	data: [][]
-	cols: []
-	col_width: []
-	button: ""
-}
-*/
+/* creates html table
+	settings = {
+		minimum_lines: #
+		titles: []
+		data: [][]
+		cols: []
+		col_width: []
+		button: ""
+	}*/
 function table(settings) {
 	var table = '<table cellspacing="0">';
 	// column widths
@@ -109,7 +111,7 @@ function table(settings) {
 	var data_rows = settings.data.length || 0;
 	var columns = settings.cols.length || 0;
 	for (var i = 0; i < data_rows; i++) {
-		table += '<tr data-taskid="' + settings.data[i][0] + '">';
+		table += '<tr data-taskid="' + i + '">';
 		for (var j = 0; j < columns; j++) {
 			table += '<td>' + settings.data[i][settings.cols[j]] + '</td>';
 		}
@@ -128,29 +130,68 @@ function table(settings) {
 	return table;
 }
 
-function rem_listener() {
-    $('.remove').on('click', function() {
-		// storing the parent row and its id for future use
-		var $row = $(this).closest('tr');
-        var id = $row.attr('data-taskid') || '';
-        console.log('removing task #' + id);
-		// server request to remove the task with the specific id
-		$.post('../php_helper/remove.php', {id: id, table: 'tasks'}, function(remove_response) {
-			if(remove_response == 'success') {
-				// send the row to the bottom of the table
-				$row.appendTo($row.parent());
-				// empty the row's content
-				$row.children().html('');
-				// set the taskid to 0
-				$row.attr('data-taskid', 0);
-			} else {
-				console.log(remove_response);
-			}
-        }, 'text');
-    });
+function sort_by_priority(source_array, index) {
+	// initializing some variables at the start rather than in the loop
+	var week_temp_tasks = {};
+	var current_priority = 0;
+	var highest_priority = 0;
+	// loop through all items and store them in an array at the index of their priority within an object
+	for (var i = 0; i < source_array.length; i++) {
+		current_priority = source_array[i][index]
+		// not adding to the array if the index is null
+		if (!current_priority) {
+			continue;
+		}
+		// changing the highest priority if the current one is a bigger number
+		highest_priority = Math.max(highest_priority, current_priority);
+		// pushing to the array at the index if it exists, or creating and array if it doesn't
+		if (week_temp_tasks[current_priority]) {
+			week_temp_tasks[current_priority].push(source_array[i]);
+		} else {
+			week_temp_tasks[current_priority] = [source_array[i]];
+		}
+	}
+	// concatenating all the arrays into one
+	var sorted_array = [];
+	for (var i = 0; i <= highest_priority; i++) {
+		if (week_temp_tasks[i]) {
+			sorted_array = sorted_array.concat(week_temp_tasks[i]);
+		}
+	}
+	return sorted_array;
 }
 
-// on document ready function for button listeners
+// adds a listener for all the buttons that are addded after the page loads
+function listeners() {
+	// listener for the remove buttons
+    // $('.remove').on('click', function() {
+	// 	// storing the parent row and its id for future use
+	// 	var $row = $(this).closest('tr');
+    //     var id = $row.attr('data-taskid') || '';
+    //     console.log('removing task #' + id);
+	// 	// server request to remove the task with the specific id
+	// 	$.post('../php_helper/remove.php', {id: id, table: 'tasks'}, function(remove_response) {
+	// 		if(remove_response == 'success') {
+	// 			// send the row to the bottom of the table
+	// 			$row.appendTo($row.parent());
+	// 			// empty the row's content
+	// 			$row.children().html('');
+	// 			// set the taskid to 0
+	// 			$row.attr('data-taskid', 0);
+	// 		} else {
+	// 			console.log(remove_response);
+	// 		}
+    //     }, 'text');
+    // });
+
+	// listener for the move buttons
+	$('.move').on('click', function() {
+		$row = $(this).closest('tr');
+
+
+	});
+}
+
 $(function() {
 	// requests all the information for the user
 	$.post('../php_helper/retreive.php', {}, function(response) {
