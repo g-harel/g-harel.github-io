@@ -1,6 +1,8 @@
 <div id='darken'>
-	<div class='infobox'>
-		&nbsp
+	<div class='editbox'>
+		<div id='priority'>
+			<input type='number' min='1' />
+		</div>
 	</div>
 </div>
 <div id='header'>
@@ -17,16 +19,17 @@
 	<div id='objproj' class='content current'>
 		<img id='add_objective_icon' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
 		<img id='add_project_icon' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
-		<div id='objectives' class='subcontent'></div><div id='projects' class='subcontent'></div>
+		<div id='objectives' class='subcontent' data-source='objectives'></div><div id='projects' class='subcontent' data-source='projects'></div>
 	</div>
 	<div id='tasks' class='content'>
 		<img id='add_task_icon' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
+		<div id='all_tasks' data-source='tasks'></div>
 	</div>
 	<div id='week' class='content'>
-		<div id='week_tasks_table' class='subcontent'></div><div id='week_tasks' class='subcontent'></div>
+		<div id='week_tasks_table' class='subcontent' data-source='tasks'></div><div id='week_tasks' class='subcontent' data-source='tasks'></div>
 	</div>
 	<div id='day' class='content'>
-		<div id='day_tasks_table' class='subcontent'></div><div id='day_tasks' class='subcontent'></div>
+		<div id='day_tasks_table' class='subcontent' data-source='tasks'></div><div id='day_tasks' class='subcontent' data-source='tasks'></div>
 	</div>
 </div>
 <div id='timeline' class='main_nav dropshadow'>&nbsp</div>

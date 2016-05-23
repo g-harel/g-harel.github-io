@@ -22,76 +22,179 @@ function clearForm() {
 
 function draw(response) {
 
-	var tasks_week = sort_by_priority(response.tasks, 6);
-	var tasks_day = sort_by_priority(response.tasks, 7);
+	// adding the index of the "source" array to each element in it so that the right one can be modified
+	// even after the array gets sorted and the contents are moved around
+	for (var i = 0; i < response.objectives.length; i++) {
+		response.objectives[i].push(i);
+	}
+	for (var i = 0; i < response.projects.length; i++) {
+		response.projects[i].push(i);
+	}
+	for (var i = 0; i < response.tasks.length; i++) {
+		response.tasks[i].push(i);
+	}
 
-	$('#objectives').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'objectives'],
-		data: response.objectives,
-		cols: [3,2],
-		col_width: ['75px', '100%', '45px'],
-		button: '<span class="edit button">edit</span>'
-	}));
-	$('#projects').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'projects'],
-		data: response.projects,
-		cols: [3,2],
-		col_width: ['75px', '100%', '45px'],
-		button: '<span class="edit button">edit</span>'
-	}));
-	$('#tasks').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'description', 'objective', 'project'],
-		data: response.tasks,
-		cols: [3,2,4,5],
-		col_width: ['75px', '36%', '32%', '32%', '45px'],
-		button: '<span class="edit button">edit</span>'
-	}));
-	$('#week_tasks_table').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'tasks'],
-		data: response.tasks,
-		cols: [3,2],
-		col_width: ['75px', '100%', '45px'],
-		button: '<span class="move button">>>></span>'
-	}));
-	$('#week_tasks').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'tasks'],
-		data: tasks_week,
-		cols: [6,2],
-		col_width: ['75px', '100%', '45px'],
-		button: '<span class="edit button">edit</span>'
-	}));
-	$('#day_tasks_table').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'tasks'],
-		data: tasks_week,
-		cols: [6,2],
-		col_width: ['75px', '100%', '45px'],
-		button: '<span class="move button">>>></span>'
-	}));
-	$('#day_tasks').append(table({
-		minimum_lines: 18,
-		titles: ['priority', 'tasks'],
-		data: tasks_day,
-		cols: [7,2],
-		col_width: ['75px', '100%', '45px'],
-		button: '<span class="edit button">edit</span>'
-	}));
-	listeners();
+	var drawme = {
+		objectives: draw_objectives,
+		projects: draw_projects,
+		tasks: draw_tasks
+	}
+
+	drawme['objectives']();
+	drawme['projects']();
+	drawme['tasks']();
+	bind_listeners();
+
+	function draw_objectives() {
+		var objectives = sort_by_priority(response.objectives, 3);
+		$('#objectives').html(table({
+			minimum_lines: 18,
+			titles: ['priority', 'objectives'],
+			data: objectives,
+			responseid: 4,
+			cols: [3,2],
+			col_width: ['75px', '100%'],
+			edit_cols: [true, true],
+			button: ''
+		}));
+	}
+
+	function draw_projects() {
+		var projects = sort_by_priority(response.projects, 3);
+		$('#projects').html(table({
+			minimum_lines: 18,
+			titles: ['priority', 'projects'],
+			data: projects,
+			responseid: 4,
+			cols: [3,2],
+			col_width: ['75px', '100%'],
+			edit_cols: [true, true],
+			button: ''
+		}));
+	}
+
+	function draw_tasks() {
+		var tasks_all = sort_by_priority(response.tasks, 3);
+		var tasks_week = sort_by_priority(response.tasks, 6);
+		var tasks_day = sort_by_priority(response.tasks, 7);
+		$('#all_tasks').html(table({
+			minimum_lines: 18,
+			titles: ['priority', 'description', 'objective', 'project'],
+			data: tasks_all,
+			responseid: 8,
+			cols: [3,2,4,5],
+			col_width: ['75px', '36%', '32%', '32%'],
+			edit_cols: [true, true, true, true],
+			button: ''
+		}));
+		$('#week_tasks_table').html(table({
+			minimum_lines: 18,
+			titles: ['priority', 'tasks'],
+			data: tasks_all,
+			responseid: 8,
+			cols: [3,2],
+			col_width: ['75px', '100%', '45px'],
+			edit_cols: [false, false],
+			button: '<td><span class="move button" data-target="week">>>></span></td>'
+		}));
+		$('#week_tasks').html(table({
+			minimum_lines: 18,
+			titles: ['priority', 'tasks'],
+			data: tasks_week,
+			responseid: 8,
+			cols: [6,2],
+			col_width: ['75px', '100%'],
+			edit_cols: [true, false],
+			button: ''
+		}));
+		$('#day_tasks_table').html(table({
+			minimum_lines: 18,
+			titles: ['priority', 'tasks'],
+			data: tasks_week,
+			responseid: 8,
+			cols: [6,2],
+			col_width: ['75px', '100%', '45px'],
+			edit_cols: [false, false],
+			button: '<td><span class="move button" data-target="day">>>></span></td>'
+		}));
+		$('#day_tasks').html(table({
+			minimum_lines: 18,
+			titles: ['priority', 'tasks'],
+			data: tasks_day,
+			responseid: 8,
+			cols: [7,2],
+			col_width: ['75px', '100%', '45px'],
+			edit_cols: [true, false],
+			button: '<td><span class="move button" data-target="timeline">>>></span></td>'
+		}));
+	}
+
+	function bind_listeners() {
+		// moves the task to week or day (by giving it a week/day priority)
+		$('.move').on('click', function() {
+			var $row = $(this).closest('tr');
+			var id = $row.attr('data-responseid');
+			var target = $(this).attr('data-target');
+			if (target == 'week') {
+				response.tasks[id][6] = response.tasks[id][3];
+			} else if (target == 'day') {
+				response.tasks[id][7] = response.tasks[id][6] || null;
+			}
+			drawme['tasks']();
+			bind_listeners();
+		});
+
+		// allows the user to live edit the contents of the tables when the cells are doubleclicked
+		$('.editable').on('dblclick', function() {
+			// storing some values
+			var element = $(this);
+			var oldvalue = element.html();
+			var type = element.parent().closest('div').attr('data-source');
+			var index = element.closest('tr').attr('data-responseid');
+			var position = element.closest('td').attr('data-datapos');
+			// replacing the text inside the clicked div with a text input element
+			element.closest('td').html('<input type="text" id="live_edit"></input>');
+			// setting focus to the new input and adding a blur listener to store the value
+			var live_edit = $('#live_edit');
+			live_edit.focus();
+			live_edit.val(oldvalue); // setting after to have cursor at the end
+			live_edit.on('blur', function() {
+				var newvalue = live_edit.val();
+				// redraws if the new value is not empty and has been changed
+				if (newvalue && newvalue != oldvalue) {
+					response[type][index][position] = newvalue;
+					drawme[type]();
+					bind_listeners();
+				} else {
+					live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+					bind_listeners();
+				}
+			});
+		});
+
+		$('.editidxx').on('click', function() {
+			var $row = $(this).closest('tr');
+			var id = $row.attr('data-responseid');
+			edit_window = $('#darken');
+			edit_window.toggle();
+			edit_window.first().children().show();
+			edit_window.first().achildren().not('#priority').hide();
+			draw_tasks();
+			bind_listeners();
+		});
+	}
 }
 
 /* creates html table
 	settings = {
-		minimum_lines: #
-		titles: []
-		data: [][]
-		cols: []
-		col_width: []
-		button: ""
+		minimum_lines: #	> minimum number of lines to show (for formatting)
+		titles: []			> the header names
+		data: [][]			> the data to be formatted
+		responseid: #		> the index of the id
+		cols: []			> columns to be displayed
+		col_width: []		> the width of each column being created
+		edit_cols: []		> whether or not the column is editable
+		button: ""			> additional html code appended to the end of each row
 	}*/
 function table(settings) {
 	var table = '<table cellspacing="0">';
@@ -111,16 +214,17 @@ function table(settings) {
 	var data_rows = settings.data.length || 0;
 	var columns = settings.cols.length || 0;
 	for (var i = 0; i < data_rows; i++) {
-		table += '<tr data-taskid="' + i + '">';
+		table += '<tr data-responseid="' + settings.data[i][settings.responseid] + '">';
 		for (var j = 0; j < columns; j++) {
-			table += '<td>' + settings.data[i][settings.cols[j]] + '</td>';
+			table += '<td data-datapos="' + settings.cols[j] + '"><div ' + (settings.edit_cols[j] && 'class="editable"' || '') + '>' + settings.data[i][settings.cols[j]] + '</div></td>';
 		}
-		table += '<td>' + settings.button + '</td></tr>';
+		table += settings.button + '</tr>';
 	}
 	// empty rows
 	var empty_rows = settings.minimum_lines - data_rows + 3;
 	var row = '';
-	for (var j = 0; j <= columns; j++) {
+	columns = Math.max(columns, settings.titles.length, settings.cols.length, settings.col_width.length);
+	for (var j = 0; j < columns; j++) {
 		row += '<td></td>';
 	}
 	for (var i = 0; i < empty_rows; i++) {
@@ -130,6 +234,9 @@ function table(settings) {
 	return table;
 }
 
+// sorts the source array according to the value of each element at the index
+// this function might seem unnecessarily complicated, but since it is being called so many times,
+// I wanted to avoid using nested loops to keep it quick on large arrays
 function sort_by_priority(source_array, index) {
 	// initializing some variables at the start rather than in the loop
 	var week_temp_tasks = {};
@@ -138,13 +245,13 @@ function sort_by_priority(source_array, index) {
 	// loop through all items and store them in an array at the index of their priority within an object
 	for (var i = 0; i < source_array.length; i++) {
 		current_priority = source_array[i][index]
-		// not adding to the array if the index is null
+		// not adding to the object if the index is null
 		if (!current_priority) {
 			continue;
 		}
 		// changing the highest priority if the current one is a bigger number
 		highest_priority = Math.max(highest_priority, current_priority);
-		// pushing to the array at the index if it exists, or creating and array if it doesn't
+		// pushing to the object at the index if it exists, or creating and array if it doesn't
 		if (week_temp_tasks[current_priority]) {
 			week_temp_tasks[current_priority].push(source_array[i]);
 		} else {
@@ -154,42 +261,12 @@ function sort_by_priority(source_array, index) {
 	// concatenating all the arrays into one
 	var sorted_array = [];
 	for (var i = 0; i <= highest_priority; i++) {
+		// check if there is a value at the index
 		if (week_temp_tasks[i]) {
 			sorted_array = sorted_array.concat(week_temp_tasks[i]);
 		}
 	}
 	return sorted_array;
-}
-
-// adds a listener for all the buttons that are addded after the page loads
-function listeners() {
-	// listener for the remove buttons
-    // $('.remove').on('click', function() {
-	// 	// storing the parent row and its id for future use
-	// 	var $row = $(this).closest('tr');
-    //     var id = $row.attr('data-taskid') || '';
-    //     console.log('removing task #' + id);
-	// 	// server request to remove the task with the specific id
-	// 	$.post('../php_helper/remove.php', {id: id, table: 'tasks'}, function(remove_response) {
-	// 		if(remove_response == 'success') {
-	// 			// send the row to the bottom of the table
-	// 			$row.appendTo($row.parent());
-	// 			// empty the row's content
-	// 			$row.children().html('');
-	// 			// set the taskid to 0
-	// 			$row.attr('data-taskid', 0);
-	// 		} else {
-	// 			console.log(remove_response);
-	// 		}
-    //     }, 'text');
-    // });
-
-	// listener for the move buttons
-	$('.move').on('click', function() {
-		$row = $(this).closest('tr');
-
-
-	});
 }
 
 $(function() {
