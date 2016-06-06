@@ -1,9 +1,7 @@
 <div id='darken'>
-	<div class='editbox'>
-		<div id='priority'>
-			<input type='number' min='1' />
-		</div>
-	</div>
+	<div id='#add_objectives' class='add_dialog invisible'>objectives</div>
+	<div id='#add_projects' class='add_dialog invisible'>projects</div>
+	<div id='#add_tasks' class='add_dialog invisible'>tasks</div>
 </div>
 <div id='header'>
 	<img src="../res/icon_white_small.png" height="65%" width="auto" class='button'>
@@ -17,12 +15,12 @@
 	</ul>
 	<div id='tab_slider'></div>
 	<div id='objproj' class='content current'>
-		<img id='add_objective_icon' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
-		<img id='add_project_icon' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
+		<img id='add_objective_icon' data-source='objectives' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
+		<img id='add_project_icon' data-source='projects' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
 		<div id='objectives' class='subcontent' data-source='objectives'></div><div id='projects' class='subcontent' data-source='projects'></div>
 	</div>
 	<div id='tasks' class='content'>
-		<img id='add_task_icon' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
+		<img id='add_task_icon' data-source='tasks' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
 		<div id='all_tasks' data-source='tasks'></div>
 	</div>
 	<div id='week' class='content'>

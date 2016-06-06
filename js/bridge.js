@@ -2,6 +2,7 @@
 var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g;
 var emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g;
 var passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g;
+var drawme = {};
 
 // function to show messages to the user
 function message(message) {
@@ -34,7 +35,7 @@ function draw(response) {
 		response.tasks[i].push(i);
 	}
 
-	var drawme = {
+	drawme = {
 		objectives: draw_objectives,
 		projects: draw_projects,
 		tasks: draw_tasks
@@ -43,7 +44,6 @@ function draw(response) {
 	drawme['objectives']();
 	drawme['projects']();
 	drawme['tasks']();
-	bind_listeners();
 
 	function draw_objectives() {
 		var objectives = sort_by_priority(response.objectives, 3);
@@ -54,9 +54,9 @@ function draw(response) {
 			responseid: 4,
 			cols: [3,2],
 			col_width: ['75px', '100%'],
-			edit_cols: [true, true],
-			button: ''
+			edit_cols: [true, true]
 		}));
+		bind_listeners();
 	}
 
 	function draw_projects() {
@@ -68,9 +68,9 @@ function draw(response) {
 			responseid: 4,
 			cols: [3,2],
 			col_width: ['75px', '100%'],
-			edit_cols: [true, true],
-			button: ''
+			edit_cols: [true, true]
 		}));
+		bind_listeners();
 	}
 
 	function draw_tasks() {
@@ -84,8 +84,7 @@ function draw(response) {
 			responseid: 8,
 			cols: [3,2,4,5],
 			col_width: ['75px', '36%', '32%', '32%'],
-			edit_cols: [true, true, true, true],
-			button: ''
+			edit_cols: [true, true, true, true]
 		}));
 		$('#week_tasks_table').html(table({
 			minimum_lines: 18,
@@ -104,8 +103,7 @@ function draw(response) {
 			responseid: 8,
 			cols: [6,2],
 			col_width: ['75px', '100%'],
-			edit_cols: [true, false],
-			button: ''
+			edit_cols: [true, false]
 		}));
 		$('#day_tasks_table').html(table({
 			minimum_lines: 18,
@@ -127,11 +125,12 @@ function draw(response) {
 			edit_cols: [true, false],
 			button: '<td><span class="move button" data-target="timeline">>>></span></td>'
 		}));
+		bind_listeners();
 	}
 
 	function bind_listeners() {
 		// moves the task to week or day (by giving it a week/day priority)
-		$('.move').on('click', function() {
+		$('.move').off().on('click', function() {
 			var $row = $(this).closest('tr');
 			var id = $row.attr('data-responseid');
 			var target = $(this).attr('data-target');
@@ -141,11 +140,10 @@ function draw(response) {
 				response.tasks[id][7] = response.tasks[id][6] || null;
 			}
 			drawme['tasks']();
-			bind_listeners();
 		});
 
 		// allows the user to live edit the contents of the tables when the cells are doubleclicked
-		$('.editable').on('dblclick', function() {
+		$('.editable').off().on('dblclick', function() {
 			// storing some values
 			var element = $(this);
 			var oldvalue = element.html();
@@ -164,23 +162,11 @@ function draw(response) {
 				if (newvalue && newvalue != oldvalue) {
 					response[type][index][position] = newvalue;
 					drawme[type]();
-					bind_listeners();
 				} else {
 					live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
 					bind_listeners();
 				}
 			});
-		});
-
-		$('.editidxx').on('click', function() {
-			var $row = $(this).closest('tr');
-			var id = $row.attr('data-responseid');
-			edit_window = $('#darken');
-			edit_window.toggle();
-			edit_window.first().children().show();
-			edit_window.first().achildren().not('#priority').hide();
-			draw_tasks();
-			bind_listeners();
 		});
 	}
 }
@@ -218,7 +204,7 @@ function table(settings) {
 		for (var j = 0; j < columns; j++) {
 			table += '<td data-datapos="' + settings.cols[j] + '"><div ' + (settings.edit_cols[j] && 'class="editable"' || '') + '>' + settings.data[i][settings.cols[j]] + '</div></td>';
 		}
-		table += settings.button + '</tr>';
+		table += (settings.button || '') + '</tr>';
 	}
 	// empty rows
 	var empty_rows = settings.minimum_lines - data_rows + 3;
@@ -382,5 +368,17 @@ $(function() {
 		$tab.parent().siblings('#tab_slider').animate({
 			left: (position*25) + '%'
 		}, 175);
+	});
+
+	$('.add, #darken').on('click', function() {
+		var type = $(this).attr('data-source');
+		console.log(type);
+		add_window = $('#darken');
+		add_window.toggle();
+		//add_window.children('#add_objectives').toggle();
+		add_window.children().filter('#add_' + type).addClass('this');
+		// add_window.first().children('#add_' + type).show();
+		// add_window.first().children().not('#add_' + type).hide();
+		// drawme[type]();
 	});
 });
