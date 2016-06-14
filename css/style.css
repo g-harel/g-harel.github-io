@@ -58,6 +58,7 @@ input.login {
     height: 35px;
     width: 430px;
     border-radius: 1px;
+    /*background-color: #05bd61;*/
     background-color: rgba(34,34,34,0.2);
     color: #222222;
 }
@@ -81,11 +82,6 @@ input.login {
     color: white;
 }
 
-/* clicked buttons */
-.button:active {
-    top: 2px;
-}
-
 .button:hover {
     opacity: 0.9;
 }
@@ -105,16 +101,16 @@ table td + td {
 td, th {
 	overflow: hidden;
 	text-overflow: ellipsis;
-	height: 22px;
+	height: 19px;
 	padding: 2px;
 	text-align: center;
 }
 
 th {
 	text-transform: uppercase;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	background-color: #white;
+	padding-top: 2px;
+	padding-bottom: 2px;
+	background-color: white;
 	font-weight: 500;
 }
 
@@ -151,12 +147,14 @@ table {
 }
 
 .add_dialog {
+	position: fixed;
+	display: none;
 	top: 20%;
-	width: 20%;
-	margin-left: auto;
-	margin-right: auto;
-	float: left;
-	color: red;
+	left: 32%;
+	width: 36%;
+	min-height: 30%;
+	z-index: 4;
+	background-color: white;
 }
 
 #header {
@@ -196,14 +194,26 @@ ul {
 	left: calc(70% - 78px);
 }
 
+#add_task_icon:active {
+	top: calc(67% - 42px);
+}
+
 #add_objective_icon {
 	top: calc(67% - 44px);
 	left: calc(35% - 68px);
 }
 
+#add_objective_icon:active {
+	top: calc(67% - 42px);
+}
+
 #add_project_icon {
 	top: calc(67% - 44px);
 	left: calc(70% - 78px);
+}
+
+#add_project_icon:active {
+	top: calc(67% - 42px);
 }
 
 .tab {
@@ -226,16 +236,17 @@ ul {
 	background-color: #00E26B;
 }
 
+.content, .subcontent {
+	background-image: repeating-linear-gradient(180deg, transparent, transparent 23px, rgba(241,241,241,1) 23px, rgba(241,241,241,1) 46px);
+	background-position: bottom center;
+}
+
 .content.current {
 	display: inline-block;
 }
 
 .edit {
 	color: #00E26B;
-}
-
-.move {
-
 }
 
 .editable {
@@ -286,8 +297,4 @@ ul {
 
 #tasks {
 	overflow-y: scroll;
-}
-
-.invisible {
-	display: none;
 }

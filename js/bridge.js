@@ -48,7 +48,6 @@ function draw(response) {
 	function draw_objectives() {
 		var objectives = sort_by_priority(response.objectives, 3);
 		$('#objectives').html(table({
-			minimum_lines: 18,
 			titles: ['priority', 'objectives'],
 			data: objectives,
 			responseid: 4,
@@ -62,7 +61,6 @@ function draw(response) {
 	function draw_projects() {
 		var projects = sort_by_priority(response.projects, 3);
 		$('#projects').html(table({
-			minimum_lines: 18,
 			titles: ['priority', 'projects'],
 			data: projects,
 			responseid: 4,
@@ -78,7 +76,6 @@ function draw(response) {
 		var tasks_week = sort_by_priority(response.tasks, 6);
 		var tasks_day = sort_by_priority(response.tasks, 7);
 		$('#all_tasks').html(table({
-			minimum_lines: 18,
 			titles: ['priority', 'description', 'objective', 'project'],
 			data: tasks_all,
 			responseid: 8,
@@ -87,7 +84,6 @@ function draw(response) {
 			edit_cols: [true, true, true, true]
 		}));
 		$('#week_tasks_table').html(table({
-			minimum_lines: 18,
 			titles: ['priority', 'tasks'],
 			data: tasks_all,
 			responseid: 8,
@@ -97,7 +93,6 @@ function draw(response) {
 			button: '<td><span class="move button" data-target="week">>>></span></td>'
 		}));
 		$('#week_tasks').html(table({
-			minimum_lines: 18,
 			titles: ['priority', 'tasks'],
 			data: tasks_week,
 			responseid: 8,
@@ -106,7 +101,6 @@ function draw(response) {
 			edit_cols: [true, false]
 		}));
 		$('#day_tasks_table').html(table({
-			minimum_lines: 18,
 			titles: ['priority', 'tasks'],
 			data: tasks_week,
 			responseid: 8,
@@ -116,7 +110,6 @@ function draw(response) {
 			button: '<td><span class="move button" data-target="day">>>></span></td>'
 		}));
 		$('#day_tasks').html(table({
-			minimum_lines: 18,
 			titles: ['priority', 'tasks'],
 			data: tasks_day,
 			responseid: 8,
@@ -173,7 +166,6 @@ function draw(response) {
 
 /* creates html table
 	settings = {
-		minimum_lines: #	> minimum number of lines to show (for formatting)
 		titles: []			> the header names
 		data: [][]			> the data to be formatted
 		responseid: #		> the index of the id
@@ -205,16 +197,6 @@ function table(settings) {
 			table += '<td data-datapos="' + settings.cols[j] + '"><div ' + (settings.edit_cols[j] && 'class="editable"' || '') + '>' + settings.data[i][settings.cols[j]] + '</div></td>';
 		}
 		table += (settings.button || '') + '</tr>';
-	}
-	// empty rows
-	var empty_rows = settings.minimum_lines - data_rows + 3;
-	var row = '';
-	columns = Math.max(columns, settings.titles.length, settings.cols.length, settings.col_width.length);
-	for (var j = 0; j < columns; j++) {
-		row += '<td></td>';
-	}
-	for (var i = 0; i < empty_rows; i++) {
-		table += '<tr>' + row + '</tr>';
 	}
 	table += '</table>';
 	return table;
@@ -370,15 +352,12 @@ $(function() {
 		}, 175);
 	});
 
+	// click listener for add buttons
 	$('.add, #darken').on('click', function() {
 		var type = $(this).attr('data-source');
 		console.log(type);
-		add_window = $('#darken');
-		add_window.toggle();
-		//add_window.children('#add_objectives').toggle();
-		add_window.children().filter('#add_' + type).addClass('this');
-		// add_window.first().children('#add_' + type).show();
-		// add_window.first().children().not('#add_' + type).hide();
-		// drawme[type]();
+		$('#darken').toggle();
+		$('.add_dialog').hide();
+		$('#add_' + type).show();
 	});
 });
