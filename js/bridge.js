@@ -3,6 +3,14 @@ var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g;
 var emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g;
 var passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g;
 var drawme = {};
+var getId = {};
+
+// creating an object that will allow to get the column name with the id and table
+var table_fields = {
+	objectives: ['id', 'username', 'description', 'priority'],
+	projects: ['id', 'username', 'description', 'priority'],
+	tasks: ['id', 'username', 'description', 'priority', 'objective', 'project', 'week_priority', 'day_priority']
+};
 
 // function to show messages to the user
 function message(message) {
@@ -119,6 +127,10 @@ function draw(response) {
 			button: '<td><span class="move button" data-target="timeline">>>></span></td>'
 		}));
 		bind_listeners();
+
+		getId = function(type, responseid) {
+			return response[type][responseid][0];
+		}
 	}
 
 	function bind_listeners() {
@@ -153,8 +165,24 @@ function draw(response) {
 				var newvalue = live_edit.val();
 				// redraws if the new value is not empty and has been changed
 				if (newvalue && newvalue != oldvalue) {
-					response[type][index][position] = newvalue;
-					drawme[type]();
+					// creating in the object to be passed to edit.php
+					var data = {
+						type: type,
+						field: table_fields[type][position],
+						id: getId(type, index),
+						value: newvalue
+					};
+					$.post('../php_helper/edit.php', data, function(edit_response) {
+						console.log(edit_response);
+						if (edit_response == 'success') {
+							response[type][index][position] = newvalue;
+							drawme[type]();
+						} else {
+							message(edit_response);
+							live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+							bind_listeners();
+						}
+					}, 'text');
 				} else {
 					live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
 					bind_listeners();
