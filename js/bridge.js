@@ -6,7 +6,8 @@ var drawme = {};
 var getId = {};
 
 // creating an object that will allow to get the column name with the id and table
-var table_fields = {
+var db_struct = {
+	tables: ['objectives', 'projects', 'tasks'],
 	objectives: ['id', 'username', 'description', 'priority'],
 	projects: ['id', 'username', 'description', 'priority'],
 	tasks: ['id', 'username', 'description', 'priority', 'objective', 'project', 'week_priority', 'day_priority']
@@ -31,27 +32,20 @@ function clearForm() {
 
 function draw(response) {
 
-	// adding the index of the "source" array to each element in it so that the right one can be modified
-	// even after the array gets sorted and the contents are moved around
-	for (var i = 0; i < response.objectives.length; i++) {
-		response.objectives[i].push(i);
-	}
-	for (var i = 0; i < response.projects.length; i++) {
-		response.projects[i].push(i);
-	}
-	for (var i = 0; i < response.tasks.length; i++) {
-		response.tasks[i].push(i);
-	}
-
 	drawme = {
 		objectives: draw_objectives,
 		projects: draw_projects,
 		tasks: draw_tasks
 	}
 
-	drawme['objectives']();
-	drawme['projects']();
-	drawme['tasks']();
+	// adding an index to each element to reference it in the response object and creating the table for that datatype
+	for (var i = 0; i < db_struct.tables.length; i++) {
+		var current_table = db_struct.tables[i];
+		for (var j = 0; j < response[current_table].length; j++) {
+			response[current_table][j].push(j);
+		}
+		drawme[current_table]();
+	}
 
 	function draw_objectives() {
 		var objectives = sort_by_priority(response.objectives, 3);
@@ -127,10 +121,6 @@ function draw(response) {
 			button: '<td><span class="move button" data-target="timeline">>>></span></td>'
 		}));
 		bind_listeners();
-
-		getId = function(type, responseid) {
-			return response[type][responseid][0];
-		}
 	}
 
 	function bind_listeners() {
@@ -168,8 +158,8 @@ function draw(response) {
 					// creating in the object to be passed to edit.php
 					var data = {
 						type: type,
-						field: table_fields[type][position],
-						id: getId(type, index),
+						field: db_struct[type][position],
+						id: response[type][index][0],
 						value: newvalue
 					};
 					$.post('../php_helper/edit.php', data, function(edit_response) {
