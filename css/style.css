@@ -9,6 +9,8 @@
     font-size: 16px;
     font-weight: 400;
     color: #222222;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 html, body {
@@ -100,7 +102,6 @@ table td + td {
 
 td, th {
 	overflow: hidden;
-	text-overflow: ellipsis;
 	height: 19px;
 	padding: 2px;
 	text-align: center;
@@ -110,17 +111,11 @@ th {
 	text-transform: uppercase;
 	padding-top: 2px;
 	padding-bottom: 2px;
-	background-color: white;
 	font-weight: 500;
-}
-
-tr:nth-child(even) {
-	background-color: rgba(241,241,241,1);
 }
 
 table {
 	width: 100%;
-	background-color: white;
 	white-space: nowrap;
 	table-layout: fixed;
 }
@@ -189,22 +184,9 @@ ul {
 	z-index: 2;
 }
 
-#add_task_icon {
-	top: calc(67% - 44px);
-	left: calc(70% - 78px);
-}
-
-#add_task_icon:active {
-	top: calc(67% - 42px);
-}
-
 #add_objective_icon {
 	top: calc(67% - 44px);
 	left: calc(35% - 68px);
-}
-
-#add_objective_icon:active {
-	top: calc(67% - 42px);
 }
 
 #add_project_icon {
@@ -212,14 +194,17 @@ ul {
 	left: calc(70% - 78px);
 }
 
-#add_project_icon:active {
+#add_task_icon {
+	top: calc(67% - 44px);
+	left: calc(70% - 78px);
+}
+
+#add_objective_icon:active, #add_project_icon:active, #add_task_icon:active {
 	top: calc(67% - 42px);
 }
 
 .tab {
 	color: #00E26B;
-	border-top-left-radius: 1px;
-	border-top-right-radius: 1px;
 	text-align: center;
 	cursor: pointer;
 	background-color: white;
@@ -237,8 +222,7 @@ ul {
 }
 
 .content, .subcontent {
-	background-image: repeating-linear-gradient(180deg, transparent, transparent 23px, rgba(241,241,241,1) 23px, rgba(241,241,241,1) 46px);
-	background-position: bottom center;
+	background-image: repeating-linear-gradient(180deg, transparent, transparent 23px,#f1f1f1 23px, #f1f1f1 46px);
 }
 
 .content.current {

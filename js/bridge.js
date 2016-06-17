@@ -130,8 +130,10 @@ function draw(response) {
 			var id = $row.attr('data-responseid');
 			var target = $(this).attr('data-target');
 			if (target == 'week') {
+				// TODO set the priority in db
 				response.tasks[id][6] = response.tasks[id][3];
 			} else if (target == 'day') {
+				// TODO set the priority in db
 				response.tasks[id][7] = response.tasks[id][6] || null;
 			}
 			drawme['tasks']();
