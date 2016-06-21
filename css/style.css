@@ -75,6 +75,14 @@ input.login {
 	cursor: pointer;
 }
 
+.button:hover {
+    opacity: 0.9;
+}
+
+.button:active {
+	top: 3px;
+}
+
 .login.button {
     padding-left: 0px;
     margin-left: 0px;
@@ -82,10 +90,6 @@ input.login {
     background-color: #222222;
     width: 438px;
     color: white;
-}
-
-.button:hover {
-    opacity: 0.9;
 }
 
 /* main interface starting here */
@@ -229,13 +233,13 @@ ul {
 	display: inline-block;
 }
 
-.edit {
-	color: #00E26B;
-}
-
 .editable {
 	cursor: cell;
 	width: 100%;
+}
+
+.remove {
+	color: #00E26B;
 }
 
 #live_edit {

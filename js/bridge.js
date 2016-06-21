@@ -54,8 +54,9 @@ function draw(response) {
 			data: objectives,
 			responseid: 4,
 			cols: [3,2],
-			col_width: ['75px', '100%'],
-			edit_cols: [true, true]
+			col_width: ['75px', '100%', '30px'],
+			edit_cols: [true, true],
+			button: '<td><span class="remove button">X</span></td>'
 		}));
 		bind_listeners();
 	}
@@ -67,8 +68,9 @@ function draw(response) {
 			data: projects,
 			responseid: 4,
 			cols: [3,2],
-			col_width: ['75px', '100%'],
-			edit_cols: [true, true]
+			col_width: ['75px', '100%', '30px'],
+			edit_cols: [true, true],
+			button: '<td><span class="remove button">X</span></td>'
 		}));
 		bind_listeners();
 	}
@@ -82,8 +84,9 @@ function draw(response) {
 			data: tasks_all,
 			responseid: 8,
 			cols: [3,2,4,5],
-			col_width: ['75px', '36%', '32%', '32%'],
-			edit_cols: [true, true, true, true]
+			col_width: ['75px', '36%', '32%', '32%', '30px'],
+			edit_cols: [true, true, true, true],
+			button: '<td><span class="remove button">X</span></td>'
 		}));
 		$('#week_tasks_table').html(table({
 			titles: ['priority', 'tasks'],
@@ -99,8 +102,9 @@ function draw(response) {
 			data: tasks_week,
 			responseid: 8,
 			cols: [6,2],
-			col_width: ['75px', '100%'],
-			edit_cols: [true, false]
+			col_width: ['75px', '100%', '30px'],
+			edit_cols: [true, false],
+			button: '<td><span class="remove button">X</span></td>'
 		}));
 		$('#day_tasks_table').html(table({
 			titles: ['priority', 'tasks'],
@@ -116,9 +120,9 @@ function draw(response) {
 			data: tasks_day,
 			responseid: 8,
 			cols: [7,2],
-			col_width: ['75px', '100%', '45px'],
+			col_width: ['75px', '100%', '30px', '45px'],
 			edit_cols: [true, false],
-			button: '<td><span class="move button" data-target="timeline">>>></span></td>'
+			button: '<td><span class="remove button">X</span></td><td><span class="move button" data-target="timeline">>>></span></td>'
 		}));
 		bind_listeners();
 	}
@@ -157,7 +161,7 @@ function draw(response) {
 				var newvalue = live_edit.val();
 				// redraws if the new value is not empty and has been changed
 				if (newvalue && newvalue != oldvalue) {
-					// creating in the object to be passed to edit.php
+					// creating in the object to be passed to backend
 					var data = {
 						type: type,
 						field: db_struct[type][position],
@@ -180,6 +184,27 @@ function draw(response) {
 					bind_listeners();
 				}
 			});
+		});
+
+		$('.remove').off().on('click', function() {
+			// storing some values
+			var element = $(this);
+			var type = element.parent().closest('div').attr('data-source');
+			var index = element.closest('tr').attr('data-responseid');
+			// creating in the object to be passed to backend
+			var data = {
+				type: type,
+				id: response[type][index][0],
+			};
+			console.log(data);
+			$.post('../php_helper/remove.php', data, function(remove_response) {
+				console.log(remove_response);
+				if (remove_response == 'success') {
+					element.closest('tr').remove();
+				} else {
+					message(remove_response);
+				}
+			}, 'text');
 		});
 	}
 }

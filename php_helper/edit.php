@@ -9,17 +9,15 @@ isset($_POST['type']) &&
 isset($_POST['field']) &&
 isset($_POST['id']) &&
 isset($_POST['value']) &&
-preg_match('/'.$_POST['type'].'/', 'objectivesprojectstasks') &&
-preg_match('/'.$_POST['field'].'/', 'descriptionpriorityobjectiveprojectweek_priorityday_priority'))) {
+preg_match('/'.$_POST['type'].'/', 'objectives projects tasks') &&
+preg_match('/'.$_POST['field'].'/', 'description priority objective project week_priority day_priority'))) {
 	echo 'user not logged in or query missing information';
 	exit();
 }
-//connecting to the database and picking the table to read from
+//connecting to the database and picking the type to read from
 require_once('connect.php');
 // preparing the mysql statement
-$query = 'UPDATE agenda.'.$_POST['type'].' SET '.$_POST['field'].'=? WHERE username=? AND id=?;';
-error_log($query.' '.$_POST['value'].' '.$_SESSION['username'].' '.$_POST['id']);
-$stmt = mysqli_prepare($conn, $query);
+$stmt = mysqli_prepare($conn, "UPDATE agenda.$_POST[type] SET $_POST[field]=? WHERE username=? AND id=?;");
 // binding the values in the statement
 mysqli_stmt_bind_param($stmt, 'ssi', $_POST['value'], $_SESSION['username'], $_POST['id']);
 // executing the statement and storing the result

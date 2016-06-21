@@ -3,14 +3,18 @@
 session_start();
 
 // checking that the necessary values are set
-if(!(isset($_SESSION['username']) && isset($_SESSION['password']) && isset($_POST['id']) && isset($_POST['table']))) {
-	echo json_encode(array('status'=>'user not logged in or query missing information'));
+if(!(isset($_SESSION['username']) &&
+isset($_SESSION['password']) &&
+isset($_POST['id']) &&
+isset($_POST['type']) &&
+preg_match('/'.$_POST['type'].'/', 'objectives projects tasks'))) {
+	echo 'user not logged in or query missing information';
 	exit();
 }
-//connecting to the database and picking the table to read from
+//connecting to the database and picking the type to read from
 require_once('connect.php');
 // preparing the mysql statement
-$stmt = mysqli_prepare($conn, "DELETE FROM agenda.$_POST[table] WHERE id=? AND username=?;");
+$stmt = mysqli_prepare($conn, "DELETE FROM agenda.$_POST[type] WHERE id=? AND username=?;");
 // binding the values in the statement
 mysqli_stmt_bind_param($stmt, 'is', $_POST['id'], $_SESSION['username']);
 // executing the statement and storing the result
