@@ -14,8 +14,13 @@ preg_match('/'.$_POST['field'].'/', 'description priority objective project week
 	echo 'user not logged in or query missing information';
 	exit();
 }
+// checking if the value is intended to be null
+if ($_POST['value'] == 'NULL') {
+	$_POST['value'] = NULL;
+}
 //connecting to the database and picking the type to read from
 require_once('connect.php');
+error_log("UPDATE agenda.$_POST[type] SET $_POST[field]=$_POST[value] WHERE username=? AND id=?;");
 // preparing the mysql statement
 $stmt = mysqli_prepare($conn, "UPDATE agenda.$_POST[type] SET $_POST[field]=? WHERE username=? AND id=?;");
 // binding the values in the statement

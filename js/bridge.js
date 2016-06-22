@@ -49,9 +49,9 @@ function draw(response) {
 			data: objectives,
 			responseid: 4,
 			cols: [3,2],
-			col_width: ['75px', '100%', '30px'],
+			col_width: ['75px', '100%', '70px'],
 			edit_cols: [true, true],
-			button: '<td><span class="remove button">X</span></td>'
+			button: '<td><span class="remove button">remove</span></td>'
 		}));
 		bind_listeners();
 	}
@@ -63,9 +63,9 @@ function draw(response) {
 			data: projects,
 			responseid: 4,
 			cols: [3,2],
-			col_width: ['75px', '100%', '30px'],
+			col_width: ['75px', '100%', '70px'],
 			edit_cols: [true, true],
-			button: '<td><span class="remove button">X</span></td>'
+			button: '<td><span class="remove button">remove</span></td>'
 		}));
 		bind_listeners();
 	}
@@ -79,9 +79,9 @@ function draw(response) {
 			data: tasks_all,
 			responseid: 8,
 			cols: [3,2,4,5],
-			col_width: ['75px', '36%', '32%', '32%', '30px'],
+			col_width: ['75px', '36%', '32%', '32%', '70px'],
 			edit_cols: [true, true, true, true],
-			button: '<td><span class="remove button">X</span></td>'
+			button: '<td><span class="remove button">remove</span></td>'
 		}));
 		$('#tasks_week_source').html(table({
 			titles: ['priority', 'tasks'],
@@ -97,9 +97,9 @@ function draw(response) {
 			data: tasks_week,
 			responseid: 8,
 			cols: [6,2],
-			col_width: ['75px', '100%', '30px'],
+			col_width: ['75px', '100%', '70px'],
 			edit_cols: [true, false],
-			button: '<td><span class="remove button">X</span></td>'
+			button: '<td><span class="remove_shallow button" data-source="week_priority">remove</span></td>'
 		}));
 		$('#tasks_day_source').html(table({
 			titles: ['priority', 'tasks'],
@@ -115,9 +115,9 @@ function draw(response) {
 			data: tasks_day,
 			responseid: 8,
 			cols: [7,2],
-			col_width: ['75px', '100%', '30px', '45px'],
+			col_width: ['75px', '100%', '70px', '45px'],
 			edit_cols: [true, false],
-			button: '<td><span class="remove button">X</span></td><td><span class="move button" data-target="timeline">>>></span></td>'
+			button: '<td><span class="remove_shallow button" data-source="day_priority">remove</span></td><td><span class="move button" data-target="timeline">>>></span></td>'
 		}));
 		bind_listeners();
 	}
@@ -134,6 +134,11 @@ function draw(response) {
 			} else if (target == 'day') {
 				var source_index = 6,
 					target_index = 7;
+			}
+			// execution stops if the tasks has already been moved
+			if (response.tasks[index][target_index]) {
+				message('task has already been moved');
+				return;
 			}
 			// creating in the object to be passed to backend
 			var data = {
@@ -154,7 +159,6 @@ function draw(response) {
 
 		// allows the user to live edit the contents of the tables when the cells are doubleclicked
 		$('.editable').off().on('dblclick', function() {
-			// storing some values
 			var element = $(this),
 				oldvalue = element.html(),
 				type = element.parent().closest('div').attr('data-source'),
@@ -168,38 +172,36 @@ function draw(response) {
 			live_edit.val(oldvalue); // setting after to have cursor at the end
 			live_edit.on('blur', function() {
 				var newvalue = live_edit.val();
-				// redraws if the new value is not empty and has been changed
-				if (newvalue && newvalue != oldvalue) {
-					// creating in the object to be passed to backend
-					var data = {
-						type: type,
-						field: db_struct[type][position],
-						id: response[type][index][0],
-						value: newvalue
-					};
-					$.post('../php_helper/edit.php', data, function(edit_response) {
-						if (edit_response == 'success') {
-							response[type][index][position] = newvalue;
-							drawme[type]();
-						} else {
-							message(edit_response);
-							live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
-							bind_listeners();
-						}
-					}, 'text');
-				} else {
+				// resets if the new value is empty or has not been changed
+				if (!newvalue || newvalue == oldvalue) {
 					live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
 					bind_listeners();
+					return;
 				}
+				// creating in the object to be passed to backend
+				var data = {
+					type: type,
+					field: db_struct[type][position],
+					id: response[type][index][0],
+					value: newvalue
+				};
+				$.post('../php_helper/edit.php', data, function(edit_response) {
+					if (edit_response == 'success') {
+						response[type][index][position] = newvalue;
+						drawme[type]();
+					} else {
+						message(edit_response);
+						live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+						bind_listeners();
+					}
+				}, 'text');
 			});
 		});
 
 		$('.remove').off().on('click', function() {
-			// storing some values
 			var element = $(this),
 				type = element.parent().closest('div').attr('data-source'),
 				index = element.closest('tr').attr('data-responseid');
-			// TODO differenciate between primary and secondary
 			// creating in the object to be passed to backend
 			var data = {
 				type: type,
@@ -210,6 +212,32 @@ function draw(response) {
 					element.closest('tr').remove();
 				} else {
 					message(remove_response);
+				}
+			}, 'text');
+		});
+
+		$('.remove_shallow').off().on('click', function() {
+			var $row = $(this).closest('tr'),
+				index = $row.attr('data-responseid'),
+				type = $(this).attr('data-source');
+			// execution stops if the task is also in the day table
+			if (type == 'week_priority' && response.tasks[index][7]) {
+				message('task is being used in day, cannot be removed from week')
+				return;
+			}
+			// creating in the object to be passed to backend
+			var data = {
+				type: 'tasks',
+				field: type,
+				id: response['tasks'][index][0],
+				value: 'NULL'
+			};
+			$.post('../php_helper/edit.php', data, function(edit_response) {
+				if (edit_response == 'success') {
+					response.tasks[index][((type == 'week_priority')?6:7)] = undefined;
+					drawme['tasks']();
+				} else {
+					message(edit_response);
 				}
 			}, 'text');
 		});
