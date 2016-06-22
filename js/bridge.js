@@ -1,9 +1,9 @@
 // three regex objects for username, password and email
-var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g;
-var emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g;
-var passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g;
-var drawme = {};
-var getId = {};
+var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g,
+	emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g,
+	passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g,
+	drawme = {},
+	getId = {};
 
 // creating an object that will allow to get the column name with the id and table
 var db_struct = {
@@ -22,11 +22,6 @@ function message(message) {
 // changes the form being shown and clears the values from both
 function changeForm() {
     $('.form').toggle();
-    clearForm();
-}
-
-// clears all the forms
-function clearForm() {
     $('input').not('.button').val('');
 }
 
@@ -76,10 +71,10 @@ function draw(response) {
 	}
 
 	function draw_tasks() {
-		var tasks_all = sort_by_priority(response.tasks, 3);
-		var tasks_week = sort_by_priority(response.tasks, 6);
-		var tasks_day = sort_by_priority(response.tasks, 7);
-		$('#all_tasks').html(table({
+		var tasks_all = sort_by_priority(response.tasks, 3),
+			tasks_week = sort_by_priority(response.tasks, 6),
+			tasks_day = sort_by_priority(response.tasks, 7);
+		$('#tasks_main').html(table({
 			titles: ['priority', 'description', 'objective', 'project'],
 			data: tasks_all,
 			responseid: 8,
@@ -88,7 +83,7 @@ function draw(response) {
 			edit_cols: [true, true, true, true],
 			button: '<td><span class="remove button">X</span></td>'
 		}));
-		$('#week_tasks_table').html(table({
+		$('#tasks_week_source').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_all,
 			responseid: 8,
@@ -97,7 +92,7 @@ function draw(response) {
 			edit_cols: [false, false],
 			button: '<td><span class="move button" data-target="week">>>></span></td>'
 		}));
-		$('#week_tasks').html(table({
+		$('#tasks_week').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_week,
 			responseid: 8,
@@ -106,7 +101,7 @@ function draw(response) {
 			edit_cols: [true, false],
 			button: '<td><span class="remove button">X</span></td>'
 		}));
-		$('#day_tasks_table').html(table({
+		$('#tasks_day_source').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_week,
 			responseid: 8,
@@ -115,7 +110,7 @@ function draw(response) {
 			edit_cols: [false, false],
 			button: '<td><span class="move button" data-target="day">>>></span></td>'
 		}));
-		$('#day_tasks').html(table({
+		$('#tasks_day').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_day,
 			responseid: 8,
@@ -130,27 +125,41 @@ function draw(response) {
 	function bind_listeners() {
 		// moves the task to week or day (by giving it a week/day priority)
 		$('.move').off().on('click', function() {
-			var $row = $(this).closest('tr');
-			var id = $row.attr('data-responseid');
-			var target = $(this).attr('data-target');
+			var $row = $(this).closest('tr'),
+				index = $row.attr('data-responseid'),
+				target = $(this).attr('data-target');
 			if (target == 'week') {
-				// TODO set the priority in db
-				response.tasks[id][6] = response.tasks[id][3];
+				var source_index = 3,
+					target_index = 6;
 			} else if (target == 'day') {
-				// TODO set the priority in db
-				response.tasks[id][7] = response.tasks[id][6] || null;
+				var source_index = 6,
+					target_index = 7;
 			}
-			drawme['tasks']();
+			// creating in the object to be passed to backend
+			var data = {
+				type: 'tasks',
+				field: db_struct['tasks'][target_index],
+				id: response['tasks'][index][0],
+				value: response.tasks[index][source_index]
+			};
+			$.post('../php_helper/edit.php', data, function(edit_response) {
+				if (edit_response == 'success') {
+					response.tasks[index][target_index] = data.value;
+					drawme['tasks']();
+				} else {
+					message(edit_response);
+				}
+			}, 'text');
 		});
 
 		// allows the user to live edit the contents of the tables when the cells are doubleclicked
 		$('.editable').off().on('dblclick', function() {
 			// storing some values
-			var element = $(this);
-			var oldvalue = element.html();
-			var type = element.parent().closest('div').attr('data-source');
-			var index = element.closest('tr').attr('data-responseid');
-			var position = element.closest('td').attr('data-datapos');
+			var element = $(this),
+				oldvalue = element.html(),
+				type = element.parent().closest('div').attr('data-source'),
+				index = element.closest('tr').attr('data-responseid'),
+				position = element.closest('td').attr('data-datapos');
 			// replacing the text inside the clicked div with a text input element
 			element.closest('td').html('<input type="text" id="live_edit"></input>');
 			// setting focus to the new input and adding a blur listener to store the value
@@ -169,7 +178,6 @@ function draw(response) {
 						value: newvalue
 					};
 					$.post('../php_helper/edit.php', data, function(edit_response) {
-						console.log(edit_response);
 						if (edit_response == 'success') {
 							response[type][index][position] = newvalue;
 							drawme[type]();
@@ -188,17 +196,16 @@ function draw(response) {
 
 		$('.remove').off().on('click', function() {
 			// storing some values
-			var element = $(this);
-			var type = element.parent().closest('div').attr('data-source');
-			var index = element.closest('tr').attr('data-responseid');
+			var element = $(this),
+				type = element.parent().closest('div').attr('data-source'),
+				index = element.closest('tr').attr('data-responseid');
+			// TODO differenciate between primary and secondary
 			// creating in the object to be passed to backend
 			var data = {
 				type: type,
 				id: response[type][index][0],
 			};
-			console.log(data);
 			$.post('../php_helper/remove.php', data, function(remove_response) {
-				console.log(remove_response);
 				if (remove_response == 'success') {
 					element.closest('tr').remove();
 				} else {
@@ -234,8 +241,8 @@ function table(settings) {
 		table += '<th></th></tr>';
 	}
 	// rows with data
-	var data_rows = settings.data.length || 0;
-	var columns = settings.cols.length || 0;
+	var data_rows = settings.data.length || 0,
+		columns = settings.cols.length || 0;
 	for (var i = 0; i < data_rows; i++) {
 		table += '<tr data-responseid="' + settings.data[i][settings.responseid] + '">';
 		for (var j = 0; j < columns; j++) {
@@ -252,9 +259,9 @@ function table(settings) {
 // I wanted to avoid using nested loops to keep it quick on large arrays
 function sort_by_priority(source_array, index) {
 	// initializing some variables at the start rather than in the loop
-	var week_temp_tasks = {};
-	var current_priority = 0;
-	var highest_priority = 0;
+	var week_temp_tasks = {},
+		current_priority = 0,
+		highest_priority = 0;
 	// loop through all items and store them in an array at the index of their priority within an object
 	for (var i = 0; i < source_array.length; i++) {
 		current_priority = source_array[i][index]
