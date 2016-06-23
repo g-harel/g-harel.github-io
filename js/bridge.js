@@ -3,7 +3,7 @@ var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g,
 	emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g,
 	passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g,
 	drawme = {},
-	getId = {};
+	user = {};
 
 // creating an object that will allow to get the column name with the id and table
 var db_struct = {
@@ -26,7 +26,6 @@ function changeForm() {
 }
 
 function draw(response) {
-
 	drawme = {
 		objectives: draw_objectives,
 		projects: draw_projects,
@@ -49,11 +48,16 @@ function draw(response) {
 			data: objectives,
 			responseid: 4,
 			cols: [3,2],
-			col_width: ['75px', '100%', '70px'],
+			col_width: ['75px', '100%', '30px'],
 			edit_cols: [true, true],
-			button: '<td><span class="remove button">remove</span></td>'
+			button: '<td><span class="remove button">❌</span></td>'
 		}));
 		bind_listeners();
+		var dropdown = '<option disabled selected> -- select an objective -- </option>';
+		for (var i = 0; i < response.objectives.length; i++) {
+			dropdown += '<option>' + response.objectives[i][2] + '</option>';
+		}
+		$('#dropdown_objectives').html(dropdown);
 	}
 
 	function draw_projects() {
@@ -63,11 +67,16 @@ function draw(response) {
 			data: projects,
 			responseid: 4,
 			cols: [3,2],
-			col_width: ['75px', '100%', '70px'],
+			col_width: ['75px', '100%', '30px'],
 			edit_cols: [true, true],
-			button: '<td><span class="remove button">remove</span></td>'
+			button: '<td><span class="remove button">❌</span></td>'
 		}));
 		bind_listeners();
+		var dropdown = '<option disabled selected> -- select a project -- </option>';
+		for (var i = 0; i < response.projects.length; i++) {
+			dropdown += '<option>' + response.projects[i][2] + '</option>';
+		}
+		$('#dropdown_projects').html(dropdown);
 	}
 
 	function draw_tasks() {
@@ -79,45 +88,45 @@ function draw(response) {
 			data: tasks_all,
 			responseid: 8,
 			cols: [3,2,4,5],
-			col_width: ['75px', '36%', '32%', '32%', '70px'],
+			col_width: ['75px', '36%', '32%', '32%', '30px'],
 			edit_cols: [true, true, true, true],
-			button: '<td><span class="remove button">remove</span></td>'
+			button: '<td><span class="remove button">❌</span></td>'
 		}));
 		$('#tasks_week_source').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_all,
 			responseid: 8,
 			cols: [3,2],
-			col_width: ['75px', '100%', '45px'],
+			col_width: ['75px', '100%', '29px'],
 			edit_cols: [false, false],
-			button: '<td><span class="move button" data-target="week">>>></span></td>'
+			button: '<td><span class="move button" data-target="week">➤</span></td>'
 		}));
 		$('#tasks_week').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_week,
 			responseid: 8,
 			cols: [6,2],
-			col_width: ['75px', '100%', '70px'],
+			col_width: ['75px', '100%', '30px'],
 			edit_cols: [true, false],
-			button: '<td><span class="remove_shallow button" data-source="week_priority">remove</span></td>'
+			button: '<td><span class="remove_shallow button" data-source="week_priority">❌</span></td>'
 		}));
 		$('#tasks_day_source').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_week,
 			responseid: 8,
 			cols: [6,2],
-			col_width: ['75px', '100%', '45px'],
+			col_width: ['75px', '100%', '29px'],
 			edit_cols: [false, false],
-			button: '<td><span class="move button" data-target="day">>>></span></td>'
+			button: '<td><span class="move button" data-target="day">➤</span></td>'
 		}));
 		$('#tasks_day').html(table({
 			titles: ['priority', 'tasks'],
 			data: tasks_day,
 			responseid: 8,
 			cols: [7,2],
-			col_width: ['75px', '100%', '70px', '45px'],
+			col_width: ['75px', '100%', '30px', '29px'],
 			edit_cols: [true, false],
-			button: '<td><span class="remove_shallow button" data-source="day_priority">remove</span></td><td><span class="move button" data-target="timeline">>>></span></td>'
+			button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move button" data-target="timeline">➤</span></td>'
 		}));
 		bind_listeners();
 	}
@@ -198,6 +207,7 @@ function draw(response) {
 			});
 		});
 
+		// removes data from the database
 		$('.remove').off().on('click', function() {
 			var element = $(this),
 				type = element.parent().closest('div').attr('data-source'),
@@ -216,6 +226,7 @@ function draw(response) {
 			}, 'text');
 		});
 
+		// removes the priority for the week/day, this will prevent it from being displayed
 		$('.remove_shallow').off().on('click', function() {
 			var $row = $(this).closest('tr'),
 				index = $row.attr('data-responseid'),
@@ -433,9 +444,8 @@ $(function() {
 	});
 
 	// click listener for add buttons
-	$('.add, #darken').on('click', function() {
+	$('.add, #cancel').on('click', function() {
 		var type = $(this).attr('data-source');
-		console.log(type);
 		$('#darken').toggle();
 		$('.add_dialog').hide();
 		$('#add_' + type).show();

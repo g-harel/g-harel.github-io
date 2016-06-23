@@ -60,7 +60,6 @@ input.login {
     height: 35px;
     width: 430px;
     border-radius: 1px;
-    /*background-color: #05bd61;*/
     background-color: rgba(34,34,34,0.2);
     color: #222222;
 }
@@ -146,14 +145,33 @@ table {
 }
 
 .add_dialog {
+	text-align: center;
 	position: fixed;
 	display: none;
-	top: 20%;
+	top: 25%;
 	left: 32%;
-	width: 36%;
-	min-height: 30%;
+	width: 454px;
+	padding-bottom: 10px;
 	z-index: 4;
 	background-color: white;
+}
+
+.new_label {
+	top: 4px;
+}
+
+.add_dialog select {
+	padding: 4px;
+    padding-left: 8px;
+    margin-top: 10px;
+	height: 35px;
+    width: 438px;
+    border-radius: 1px;
+    background-color: rgba(34,34,34,0.2);
+}
+
+.add_dialog select:disabled {
+	color: rgba(255,255,255,0.6);
 }
 
 #header {
@@ -213,8 +231,7 @@ ul {
 	cursor: pointer;
 	background-color: white;
 	display: inline-block;
-	padding-top: 6px;
-	padding-bottom: 6px;
+	padding-top: 3px;
 	width: 25%;
 	font-weight: 500;
 }
@@ -238,8 +255,9 @@ ul {
 	width: 100%;
 }
 
-.remove, .remove_shallow {
+.remove, .remove_shallow, .move {
 	color: #00E26B;
+	font-size: 14px;
 }
 
 #live_edit {
