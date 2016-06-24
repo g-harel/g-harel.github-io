@@ -1,20 +1,24 @@
 
 <div id='darken'>
-	<div id='add_objectives' class='add_dialog'>
-		<label class='new_label'>CREATE NEW OBJECTIVE</label>
-		<input type='text' placeholder='description' class='login'/>
-		<input type='number' placeholder='priority' class='login'/>
-		<input type='button' value='ADD' class='button login'/><hr/>
-		<input type='button' value='CANCEL' id='cancel' class='button login'/>
+	<div id='add_objectives' class='add_dialog dropshadow'>
+		<form id='add_objective_form'>
+			<label class='new_label'>CREATE NEW OBJECTIVE</label>
+			<input type='text' placeholder='description' class='login'id='objective_description'/>
+			<input type='number' placeholder='priority' min='1' class='login' id='objective_priority'/>
+			<input type='submit' value='ADD' class='button login'/><hr/>
+			<input type='button' value='CANCEL' id='cancel' class='button login'/>
+		</form>
 	</div>
-	<div id='add_projects' class='add_dialog'>
-		<label class='new_label'>CREATE NEW PROJECT</label>
-		<input type='text' placeholder='description' class='login'/>
-		<input type='number' placeholder='priority' class='login'/>
-		<input type='button' value='ADD' class='button login'/><hr/>
-		<input type='button' value='CANCEL' id='cancel' class='button login'/>
+	<div id='add_projects' class='add_dialog dropshadow'>
+		<form id='add_project_form'>
+			<label class='new_label'>CREATE NEW PROJECT</label>
+			<input type='text' placeholder='description' class='login' id='project_description'/>
+			<input type='number' placeholder='priority' min='1' class='login' id='project_priority'/>
+			<input type='submit' value='ADD' class='button login'/><hr/>
+			<input type='button' value='CANCEL' id='cancel' class='button login'/>
+		</form>
 	</div>
-	<div id='add_tasks' class='add_dialog'>
+	<div id='add_tasks' class='add_dialog dropshadow'>
 		<label class='new_label'>CREATE NEW TASK</label>
 		<input type='text' placeholder='description' class='login'/>
 		<input type='number' placeholder='priority' class='login'/>

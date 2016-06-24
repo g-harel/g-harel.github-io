@@ -2,7 +2,11 @@
 var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g,
 	emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g,
 	passwordRegEx = /^[a-zA-Z0-9!@#$%^&*()]{8,20}$/g,
-	drawme = {},
+	drawme = {
+		objectives: draw_objectives,
+		projects: draw_projects,
+		tasks: draw_tasks
+	},
 	user = {};
 
 // creating an object that will allow to get the column name with the id and table
@@ -25,234 +29,224 @@ function changeForm() {
     $('input').not('.button').val('');
 }
 
-function draw(response) {
-	drawme = {
-		objectives: draw_objectives,
-		projects: draw_projects,
-		tasks: draw_tasks
-	}
-
-	// adding an index to each element to reference it in the response object and creating the table for that datatype
-	for (var i = 0; i < db_struct.tables.length; i++) {
-		var current_table = db_struct.tables[i];
-		for (var j = 0; j < response[current_table].length; j++) {
-			response[current_table][j].push(j);
+function draw_objectives() {
+	var objectives = sort_by_priority(user.objectives, 3);
+	$('#objectives').html(table({
+		titles: ['priority', 'objectives'],
+		data: objectives,
+		responseid: 4,
+		cols: [3,2],
+		col_width: ['75px', '100%', '30px'],
+		edit_cols: [true, true],
+		button: '<td><span class="remove button">❌</span></td>'
+	}));
+	bind_active();
+	var dropdown = '<option disabled selected> -- select an objective -- </option>';
+	for (var i = 0; i < user.objectives.length; i++) {
+		if (!user.objectives[i]) {
+			continue;
 		}
-		drawme[current_table]();
+		dropdown += '<option>' + user.objectives[i][2] + '</option>';
 	}
+	$('#dropdown_objectives').html(dropdown);
+}
 
-	function draw_objectives() {
-		var objectives = sort_by_priority(response.objectives, 3);
-		$('#objectives').html(table({
-			titles: ['priority', 'objectives'],
-			data: objectives,
-			responseid: 4,
-			cols: [3,2],
-			col_width: ['75px', '100%', '30px'],
-			edit_cols: [true, true],
-			button: '<td><span class="remove button">❌</span></td>'
-		}));
-		bind_listeners();
-		var dropdown = '<option disabled selected> -- select an objective -- </option>';
-		for (var i = 0; i < response.objectives.length; i++) {
-			dropdown += '<option>' + response.objectives[i][2] + '</option>';
+function draw_projects() {
+	var projects = sort_by_priority(user.projects, 3);
+	$('#projects').html(table({
+		titles: ['priority', 'projects'],
+		data: projects,
+		responseid: 4,
+		cols: [3,2],
+		col_width: ['75px', '100%', '30px'],
+		edit_cols: [true, true],
+		button: '<td><span class="remove button">❌</span></td>'
+	}));
+	bind_active();
+	var dropdown = '<option disabled selected> -- select a project -- </option>';
+	for (var i = 0; i < user.projects.length; i++) {
+		if (!user.projects[i]) {
+			continue;
 		}
-		$('#dropdown_objectives').html(dropdown);
+		dropdown += '<option>' + user.projects[i][2] + '</option>';
 	}
+	$('#dropdown_projects').html(dropdown);
+}
 
-	function draw_projects() {
-		var projects = sort_by_priority(response.projects, 3);
-		$('#projects').html(table({
-			titles: ['priority', 'projects'],
-			data: projects,
-			responseid: 4,
-			cols: [3,2],
-			col_width: ['75px', '100%', '30px'],
-			edit_cols: [true, true],
-			button: '<td><span class="remove button">❌</span></td>'
-		}));
-		bind_listeners();
-		var dropdown = '<option disabled selected> -- select a project -- </option>';
-		for (var i = 0; i < response.projects.length; i++) {
-			dropdown += '<option>' + response.projects[i][2] + '</option>';
+function draw_tasks() {
+	var tasks_all = sort_by_priority(user.tasks, 3),
+		tasks_week = sort_by_priority(user.tasks, 6),
+		tasks_day = sort_by_priority(user.tasks, 7);
+	$('#tasks_main').html(table({
+		titles: ['priority', 'description', 'objective', 'project'],
+		data: tasks_all,
+		responseid: 8,
+		cols: [3,2,4,5],
+		col_width: ['75px', '36%', '32%', '32%', '30px'],
+		edit_cols: [true, true, true, true],
+		button: '<td><span class="remove button">❌</span></td>'
+	}));
+	$('#tasks_week_source').html(table({
+		titles: ['priority', 'tasks'],
+		data: tasks_all,
+		responseid: 8,
+		cols: [3,2],
+		col_width: ['75px', '100%', '29px'],
+		edit_cols: [false, false],
+		button: '<td><span class="move button" data-target="week">➤</span></td>'
+	}));
+	$('#tasks_week').html(table({
+		titles: ['priority', 'tasks'],
+		data: tasks_week,
+		responseid: 8,
+		cols: [6,2],
+		col_width: ['75px', '100%', '30px'],
+		edit_cols: [true, false],
+		button: '<td><span class="remove_shallow button" data-source="week_priority">❌</span></td>'
+	}));
+	$('#tasks_day_source').html(table({
+		titles: ['priority', 'tasks'],
+		data: tasks_week,
+		responseid: 8,
+		cols: [6,2],
+		col_width: ['75px', '100%', '29px'],
+		edit_cols: [false, false],
+		button: '<td><span class="move button" data-target="day">➤</span></td>'
+	}));
+	$('#tasks_day').html(table({
+		titles: ['priority', 'tasks'],
+		data: tasks_day,
+		responseid: 8,
+		cols: [7,2],
+		col_width: ['75px', '100%', '30px', '29px'],
+		edit_cols: [true, false],
+		button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move button" data-target="timeline">➤</span></td>'
+	}));
+	bind_active();
+}
+
+function bind_active() {
+	// moves the task to week or day (by giving it a week/day priority)
+	$('.move').off().on('click', function() {
+		var $row = $(this).closest('tr'),
+			index = $row.attr('data-responseid'),
+			target = $(this).attr('data-target');
+		if (target == 'week') {
+			var source_index = 3,
+				target_index = 6;
+		} else if (target == 'day') {
+			var source_index = 6,
+				target_index = 7;
 		}
-		$('#dropdown_projects').html(dropdown);
-	}
-
-	function draw_tasks() {
-		var tasks_all = sort_by_priority(response.tasks, 3),
-			tasks_week = sort_by_priority(response.tasks, 6),
-			tasks_day = sort_by_priority(response.tasks, 7);
-		$('#tasks_main').html(table({
-			titles: ['priority', 'description', 'objective', 'project'],
-			data: tasks_all,
-			responseid: 8,
-			cols: [3,2,4,5],
-			col_width: ['75px', '36%', '32%', '32%', '30px'],
-			edit_cols: [true, true, true, true],
-			button: '<td><span class="remove button">❌</span></td>'
-		}));
-		$('#tasks_week_source').html(table({
-			titles: ['priority', 'tasks'],
-			data: tasks_all,
-			responseid: 8,
-			cols: [3,2],
-			col_width: ['75px', '100%', '29px'],
-			edit_cols: [false, false],
-			button: '<td><span class="move button" data-target="week">➤</span></td>'
-		}));
-		$('#tasks_week').html(table({
-			titles: ['priority', 'tasks'],
-			data: tasks_week,
-			responseid: 8,
-			cols: [6,2],
-			col_width: ['75px', '100%', '30px'],
-			edit_cols: [true, false],
-			button: '<td><span class="remove_shallow button" data-source="week_priority">❌</span></td>'
-		}));
-		$('#tasks_day_source').html(table({
-			titles: ['priority', 'tasks'],
-			data: tasks_week,
-			responseid: 8,
-			cols: [6,2],
-			col_width: ['75px', '100%', '29px'],
-			edit_cols: [false, false],
-			button: '<td><span class="move button" data-target="day">➤</span></td>'
-		}));
-		$('#tasks_day').html(table({
-			titles: ['priority', 'tasks'],
-			data: tasks_day,
-			responseid: 8,
-			cols: [7,2],
-			col_width: ['75px', '100%', '30px', '29px'],
-			edit_cols: [true, false],
-			button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move button" data-target="timeline">➤</span></td>'
-		}));
-		bind_listeners();
-	}
-
-	function bind_listeners() {
-		// moves the task to week or day (by giving it a week/day priority)
-		$('.move').off().on('click', function() {
-			var $row = $(this).closest('tr'),
-				index = $row.attr('data-responseid'),
-				target = $(this).attr('data-target');
-			if (target == 'week') {
-				var source_index = 3,
-					target_index = 6;
-			} else if (target == 'day') {
-				var source_index = 6,
-					target_index = 7;
+		// execution stops if the tasks has already been moved
+		if (user.tasks[index][target_index]) {
+			message('task has already been moved');
+			return;
+		}
+		// creating in the object to be passed to backend
+		var data = {
+			type: 'tasks',
+			field: db_struct['tasks'][target_index],
+			id: user['tasks'][index][0],
+			value: user.tasks[index][source_index]
+		};
+		$.post('../php_helper/edit.php', data, function(edit_response) {
+			if (edit_response == 'success') {
+				user.tasks[index][target_index] = data.value;
+				drawme['tasks']();
+			} else {
+				message(edit_response);
 			}
-			// execution stops if the tasks has already been moved
-			if (response.tasks[index][target_index]) {
-				message('task has already been moved');
+		}, 'text');
+	});
+
+	// allows the user to live edit the contents of the tables when the cells are doubleclicked
+	$('.editable').off().on('dblclick', function() {
+		var element = $(this),
+			oldvalue = element.html(),
+			type = element.parent().closest('div').attr('data-source'),
+			index = element.closest('tr').attr('data-responseid'),
+			position = element.closest('td').attr('data-datapos');
+		// replacing the text inside the clicked div with a text input element
+		element.closest('td').html('<input type="text" id="live_edit"></input>');
+		// setting focus to the new input and adding a blur listener to store the value
+		var live_edit = $('#live_edit');
+		live_edit.focus();
+		live_edit.val(oldvalue); // setting after to have cursor at the end
+		live_edit.on('blur', function() {
+			var newvalue = live_edit.val();
+			// resets if the new value is empty or has not been changed
+			if (!newvalue || newvalue == oldvalue) {
+				live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+				bind_active();
 				return;
 			}
-			// creating in the object to be passed to backend
-			var data = {
-				type: 'tasks',
-				field: db_struct['tasks'][target_index],
-				id: response['tasks'][index][0],
-				value: response.tasks[index][source_index]
-			};
-			$.post('../php_helper/edit.php', data, function(edit_response) {
-				if (edit_response == 'success') {
-					response.tasks[index][target_index] = data.value;
-					drawme['tasks']();
-				} else {
-					message(edit_response);
-				}
-			}, 'text');
-		});
-
-		// allows the user to live edit the contents of the tables when the cells are doubleclicked
-		$('.editable').off().on('dblclick', function() {
-			var element = $(this),
-				oldvalue = element.html(),
-				type = element.parent().closest('div').attr('data-source'),
-				index = element.closest('tr').attr('data-responseid'),
-				position = element.closest('td').attr('data-datapos');
-			// replacing the text inside the clicked div with a text input element
-			element.closest('td').html('<input type="text" id="live_edit"></input>');
-			// setting focus to the new input and adding a blur listener to store the value
-			var live_edit = $('#live_edit');
-			live_edit.focus();
-			live_edit.val(oldvalue); // setting after to have cursor at the end
-			live_edit.on('blur', function() {
-				var newvalue = live_edit.val();
-				// resets if the new value is empty or has not been changed
-				if (!newvalue || newvalue == oldvalue) {
-					live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
-					bind_listeners();
-					return;
-				}
-				// creating in the object to be passed to backend
-				var data = {
-					type: type,
-					field: db_struct[type][position],
-					id: response[type][index][0],
-					value: newvalue
-				};
-				$.post('../php_helper/edit.php', data, function(edit_response) {
-					if (edit_response == 'success') {
-						response[type][index][position] = newvalue;
-						drawme[type]();
-					} else {
-						message(edit_response);
-						live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
-						bind_listeners();
-					}
-				}, 'text');
-			});
-		});
-
-		// removes data from the database
-		$('.remove').off().on('click', function() {
-			var element = $(this),
-				type = element.parent().closest('div').attr('data-source'),
-				index = element.closest('tr').attr('data-responseid');
 			// creating in the object to be passed to backend
 			var data = {
 				type: type,
-				id: response[type][index][0],
-			};
-			$.post('../php_helper/remove.php', data, function(remove_response) {
-				if (remove_response == 'success') {
-					element.closest('tr').remove();
-				} else {
-					message(remove_response);
-				}
-			}, 'text');
-		});
-
-		// removes the priority for the week/day, this will prevent it from being displayed
-		$('.remove_shallow').off().on('click', function() {
-			var $row = $(this).closest('tr'),
-				index = $row.attr('data-responseid'),
-				type = $(this).attr('data-source');
-			// execution stops if the task is also in the day table
-			if (type == 'week_priority' && response.tasks[index][7]) {
-				message('task is being used in day, cannot be removed from week')
-				return;
-			}
-			// creating in the object to be passed to backend
-			var data = {
-				type: 'tasks',
-				field: type,
-				id: response['tasks'][index][0],
-				value: 'NULL'
+				field: db_struct[type][position],
+				id: user[type][index][0],
+				value: newvalue
 			};
 			$.post('../php_helper/edit.php', data, function(edit_response) {
 				if (edit_response == 'success') {
-					response.tasks[index][((type == 'week_priority')?6:7)] = undefined;
-					drawme['tasks']();
+					user[type][index][position] = newvalue;
+					drawme[type]();
 				} else {
 					message(edit_response);
+					live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+					bind_active();
 				}
 			}, 'text');
 		});
-	}
+	});
+
+	// removes data from the database
+	$('.remove').off().on('click', function() {
+		var element = $(this),
+			type = element.parent().closest('div').attr('data-source'),
+			index = element.closest('tr').attr('data-responseid');
+		// creating in the object to be passed to backend
+		var data = {
+			type: type,
+			id: user[type][index][0],
+		};
+		$.post('../php_helper/remove.php', data, function(remove_response) {
+			if (remove_response == 'success') {
+				element.closest('tr').remove();
+				user[type][index] = undefined;
+			} else {
+				message(remove_response);
+			}
+		}, 'text');
+	});
+
+	// removes the priority for the week/day, this will prevent it from being displayed
+	$('.remove_shallow').off().on('click', function() {
+		var $row = $(this).closest('tr'),
+			index = $row.attr('data-responseid'),
+			type = $(this).attr('data-source');
+		// execution stops if the task is also in the day table
+		if (type == 'week_priority' && user.tasks[index][7]) {
+			message('task is being used in day, cannot be removed from week')
+			return;
+		}
+		// creating in the object to be passed to backend
+		var data = {
+			type: 'tasks',
+			field: type,
+			id: user['tasks'][index][0],
+			value: 'NULL'
+		};
+		$.post('../php_helper/edit.php', data, function(edit_response) {
+			if (edit_response == 'success') {
+				user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
+				drawme['tasks']();
+			} else {
+				message(edit_response);
+			}
+		}, 'text');
+	});
 }
 
 /* creates html table
@@ -303,7 +297,10 @@ function sort_by_priority(source_array, index) {
 		highest_priority = 0;
 	// loop through all items and store them in an array at the index of their priority within an object
 	for (var i = 0; i < source_array.length; i++) {
-		current_priority = source_array[i][index]
+		if (!source_array[i]) {
+			continue;
+		}
+		current_priority = source_array[i][index];
 		// not adding to the object if the index is null
 		if (!current_priority) {
 			continue;
@@ -329,16 +326,6 @@ function sort_by_priority(source_array, index) {
 }
 
 $(function() {
-	// requests all the information for the user
-	$.post('../php_helper/retreive.php', {}, function(response) {
-		console.log(response);
-		if (response.status) {
-			draw(response);
-		} else {
-			message(response.status);
-		}
-	}, 'JSON');
-
     // click listener for the utility buttons
     $('.utility').on('click', function() {
         // toggle which form is shown
@@ -346,11 +333,12 @@ $(function() {
     });
 
     // click listener for the signin button
-    $('#signin').on('click', function() {
+    $('#login_form').on('submit', function(e) {
+		e.preventDefault();
         // storing the values of the fields
         var info = {
-            identifier: $(this).siblings('#identifier').val().trim(),
-            password: $(this).siblings('#password').val().trim()
+            identifier: $('#login_identifier').val().trim(),
+            password: $('#login_password').val().trim()
         };
         // check that the fields are filled
         for (var key in info) {
@@ -377,13 +365,14 @@ $(function() {
     });
 
     // click listener for the register button
-    $('#register').on('click', function() {
+    $('#register_form').on('submit', function(e) {
+		e.preventDefault();
         // storing the values of the fields
         var info = {
-            username: $(this).siblings('#user').val().trim(),
-            email: $(this).siblings('#email').val().trim(),
-            password: $(this).siblings('#password').val().trim(),
-            checkpassword: $(this).siblings('#password2').val().trim()
+            username: $('#register_user').val().trim(),
+            email: $('#register_email').val().trim(),
+            password: $('#register_password').val().trim(),
+            checkpassword: $('#register_checkpassword').val().trim()
         };
         //checking that all fields are filled
         for (var key in info) {
@@ -426,6 +415,24 @@ $(function() {
         }, 'text');
     });
 
+	// requests all the information for the user
+	$.post('../php_helper/retreive.php', {}, function(response) {
+		console.log(response);
+		if (response.status == 'success') {
+			user = response;
+			// adding an index to each element to reference it in the response object and creating the table for that datatype
+			for (var i = 0; i < db_struct.tables.length; i++) {
+				var current_table = db_struct.tables[i];
+				for (var j = 0; j < user[current_table].length; j++) {
+					user[current_table][j].push(j);
+				}
+				drawme[current_table]();
+			}
+		} else {
+			message(response.status);
+		}
+	}, 'JSON');
+
 	// click listener for the tab buttons
 	$('.tab').on('click', function() {
 		// changing the class of the buttons
@@ -449,5 +456,66 @@ $(function() {
 		$('#darken').toggle();
 		$('.add_dialog').hide();
 		$('#add_' + type).show();
+	});
+
+	$('#add_objective_form').on('submit', function(e) {
+		e.preventDefault();
+		var info = {
+			type: 'objectives',
+			description: $('#objective_description').val().trim(),
+			priority: $('#objective_priority').val().trim(),
+		};
+		//checking that all fields are filled
+		for (var key in info) {
+			if (info.hasOwnProperty(key)) {
+				if (info[key] === '') {
+					message('please fill in all the fields');
+					return;
+				}
+			}
+		}
+		info.objective = '';
+		info.project = '';
+		$.post('../php_helper/add.php', info, function(add_response) {
+			console.log(add_response);
+			if (add_response.status == 'success') {
+				$('#darken').toggle();
+				$('#add_objective_form').children('input').not('.button').val('');
+				user.objectives.push([add_response.id,'',info.description,info.priority,user.objectives.length]);
+				drawme['objectives']();
+			} else {
+				message(add_response.status);
+			}
+		}, 'JSON');
+	});
+
+	$('#add_project_form').on('submit', function(e) {
+		e.preventDefault();
+		var info = {
+			type: 'projects',
+			description: $('#project_description').val().trim(),
+			priority: $('#project_priority').val().trim(),
+		};
+		//checking that all fields are filled
+		for (var key in info) {
+			if (info.hasOwnProperty(key)) {
+				if (info[key] === '') {
+					message('please fill in all the fields');
+					return;
+				}
+			}
+		}
+		info.objective = '';
+		info.project = '';
+		$.post('../php_helper/add.php', info, function(add_response) {
+			if (add_response.status == 'success') {
+				$('#darken').toggle();
+				$('#add_project_form').children('input').not('.button').val('');
+				user.projects.push([add_response.id,'',info.description,info.priority,user.projects.length]);
+				drawme['projects']();
+			} else {
+				message(add_response.status);
+			}
+		}, 'JSON');
 	});
 });
