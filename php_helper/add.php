@@ -17,7 +17,7 @@ preg_match('/'.$_POST['type'].'/', 'objectives projects tasks'))) {
 //connecting to the database and picking the table to read from
 require_once('connect.php');
 // preparing the mysql statement
-if ($_POST['type'] != 'task') {
+if ($_POST['type'] != 'tasks') {
 	$stmt = mysqli_prepare($conn, "INSERT INTO agenda.$_POST[type] (username, description, priority) VALUES (?,?,?);");
 	// binding the values in the statement
 	mysqli_stmt_bind_param($stmt, 'ssi', $_SESSION['username'], $_POST['description'], $_POST['priority']);

@@ -1,9 +1,8 @@
-
 <div id='darken'>
 	<div id='add_objectives' class='add_dialog dropshadow'>
 		<form id='add_objective_form'>
 			<label class='new_label'>CREATE NEW OBJECTIVE</label>
-			<input type='text' placeholder='description' class='login'id='objective_description'/>
+			<input type='text' placeholder='description' autocomplete='off' class='login'id='objective_description'/>
 			<input type='number' placeholder='priority' min='1' class='login' id='objective_priority'/>
 			<input type='submit' value='ADD' class='button login'/><hr/>
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
@@ -12,20 +11,22 @@
 	<div id='add_projects' class='add_dialog dropshadow'>
 		<form id='add_project_form'>
 			<label class='new_label'>CREATE NEW PROJECT</label>
-			<input type='text' placeholder='description' class='login' id='project_description'/>
+			<input type='text' placeholder='description' autocomplete='off' class='login' id='project_description'/>
 			<input type='number' placeholder='priority' min='1' class='login' id='project_priority'/>
 			<input type='submit' value='ADD' class='button login'/><hr/>
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
 		</form>
 	</div>
 	<div id='add_tasks' class='add_dialog dropshadow'>
-		<label class='new_label'>CREATE NEW TASK</label>
-		<input type='text' placeholder='description' class='login'/>
-		<input type='number' placeholder='priority' class='login'/>
-		<select id='dropdown_objectives'></select>
-		<select id='dropdown_projects'></select>
-		<input type='button' value='ADD' class='button login'/><hr/>
-		<input type='button' value='CANCEL' id='cancel' class='button login'/>
+		<form id='add_task_form'>
+			<label class='new_label'>CREATE NEW TASK</label>
+			<input type='text' placeholder='description' autocomplete='off' id='task_description' class='login'/>
+			<input type='number' placeholder='priority' min='1' id='task_priority' class='login'/>
+			<select id='dropdown_objectives'></select>
+			<select id='dropdown_projects'></select>
+			<input type='submit' value='ADD' class='button login'/><hr/>
+			<input type='button' value='CANCEL' id='cancel' class='button login'/>
+		</form>
 	</div>
 </div>
 <div id='header'>
@@ -55,6 +56,6 @@
 		<div id='tasks_day_source' class='subcontent' data-source='tasks'></div><div id='tasks_day' class='subcontent' data-source='tasks'></div>
 	</div>
 </div>
-<div id='timeline' class='main_nav dropshadow'>&nbsp</div>
-<div id='meetings' class='main_nav dropshadow'>&nbsp</div>
-<div id='timers' class='main_nav dropshadow'>&nbsp</div>
+<div id='timeline' class='main_nav dropshadow'>&nbsp;</div>
+<div id='meetings' class='main_nav dropshadow'>&nbsp;</div>
+<div id='timers' class='main_nav dropshadow'>&nbsp;</div>

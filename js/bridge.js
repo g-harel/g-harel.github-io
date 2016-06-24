@@ -46,7 +46,7 @@ function draw_objectives() {
 		if (!user.objectives[i]) {
 			continue;
 		}
-		dropdown += '<option>' + user.objectives[i][2] + '</option>';
+		dropdown += '<option value="' + user.objectives[i][2] + '">' + user.objectives[i][2] + '</option>';
 	}
 	$('#dropdown_objectives').html(dropdown);
 }
@@ -68,7 +68,7 @@ function draw_projects() {
 		if (!user.projects[i]) {
 			continue;
 		}
-		dropdown += '<option>' + user.projects[i][2] + '</option>';
+		dropdown += '<option value="' + user.projects[i][2] + '">' + user.projects[i][2] + '</option>';
 	}
 	$('#dropdown_projects').html(dropdown);
 }
@@ -120,7 +120,7 @@ function draw_tasks() {
 		cols: [7,2],
 		col_width: ['75px', '100%', '30px', '29px'],
 		edit_cols: [true, false],
-		button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move button" data-target="timeline">➤</span></td>'
+		button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move2 button" data-target="timeline">➤</span></td>'
 	}));
 	bind_active();
 }
@@ -206,6 +206,11 @@ function bind_active() {
 		var element = $(this),
 			type = element.parent().closest('div').attr('data-source'),
 			index = element.closest('tr').attr('data-responseid');
+		// execution stops if the task is used in week table
+		if (element.parent().closest('div').attr('id') == 'tasks_main' && user.tasks[index][6]) {
+			message('task is being used in week, cannot be removed')
+			return;
+		}
 		// creating in the object to be passed to backend
 		var data = {
 			type: type,
@@ -215,6 +220,7 @@ function bind_active() {
 			if (remove_response == 'success') {
 				element.closest('tr').remove();
 				user[type][index] = undefined;
+				drawme['tasks']();
 			} else {
 				message(remove_response);
 			}
@@ -261,7 +267,7 @@ function bind_active() {
 	}*/
 function table(settings) {
 	var table = '<table cellspacing="0">';
-	// column widths
+	// custom column widths
 	for (var i = 0; i < (settings.col_width && settings.col_width.length); i++) {
 		table += '<col width=' + settings.col_width[i] + '/>';
 	}
@@ -323,6 +329,53 @@ function sort_by_priority(source_array, index) {
 		}
 	}
 	return sorted_array;
+}
+
+// function used to add objectives, projects and tasks (in from listeners bellow)
+function add_obj_proj(type) {
+	var info = {
+		type: type + 's',
+		description: $('#' + type + '_description').val().trim(),
+		priority: $('#' + type + '_priority').val().trim(),
+	};
+	for (var key in info) {
+		if (info.hasOwnProperty(key)) {
+			if (info[key] === '') {
+				message('please fill in all the fields');
+				return;
+			}
+		}
+	}
+	if (type == 'task') {
+		info.objective = $('#dropdown_objectives').val();
+		info.project = $('#dropdown_projects').val();
+		if (!info.objective || ! info.project) {
+			message('please select a project/objective');
+			return;
+		}
+	} else {
+		info.objective = '';
+		info.project = '';
+	}
+	$.post('../php_helper/add.php', info, function(add_response) {
+		if (add_response.status == 'success') {
+			var target = user[type + 's'],
+				length = target.length;
+			$('#darken').toggle();
+			$('#add_' + type + '_form').children('input').not('.button').val('');
+			target.push([add_response.id, '', info.description, info.priority]);
+			if (type == 'task') {
+				target[length].push(info.objective);
+				target[length].push(info.project);
+				target[length].push(null);
+				target[length].push(null);
+			}
+			target[length].push(length)
+			drawme[type + 's']();
+		} else {
+			message(add_response.status);
+		}
+	}, 'JSON');
 }
 
 $(function() {
@@ -458,64 +511,21 @@ $(function() {
 		$('#add_' + type).show();
 	});
 
+	// submit listener for the form that adds a new objective
 	$('#add_objective_form').on('submit', function(e) {
 		e.preventDefault();
-		var info = {
-			type: 'objectives',
-			description: $('#objective_description').val().trim(),
-			priority: $('#objective_priority').val().trim(),
-		};
-		//checking that all fields are filled
-		for (var key in info) {
-			if (info.hasOwnProperty(key)) {
-				if (info[key] === '') {
-					message('please fill in all the fields');
-					return;
-				}
-			}
-		}
-		info.objective = '';
-		info.project = '';
-		$.post('../php_helper/add.php', info, function(add_response) {
-			console.log(add_response);
-			if (add_response.status == 'success') {
-				$('#darken').toggle();
-				$('#add_objective_form').children('input').not('.button').val('');
-				user.objectives.push([add_response.id,'',info.description,info.priority,user.objectives.length]);
-				drawme['objectives']();
-			} else {
-				message(add_response.status);
-			}
-		}, 'JSON');
+		add_obj_proj('objective');
 	});
 
+	// submit listener for the form that adds a new objective
 	$('#add_project_form').on('submit', function(e) {
 		e.preventDefault();
-		var info = {
-			type: 'projects',
-			description: $('#project_description').val().trim(),
-			priority: $('#project_priority').val().trim(),
-		};
-		//checking that all fields are filled
-		for (var key in info) {
-			if (info.hasOwnProperty(key)) {
-				if (info[key] === '') {
-					message('please fill in all the fields');
-					return;
-				}
-			}
-		}
-		info.objective = '';
-		info.project = '';
-		$.post('../php_helper/add.php', info, function(add_response) {
-			if (add_response.status == 'success') {
-				$('#darken').toggle();
-				$('#add_project_form').children('input').not('.button').val('');
-				user.projects.push([add_response.id,'',info.description,info.priority,user.projects.length]);
-				drawme['projects']();
-			} else {
-				message(add_response.status);
-			}
-		}, 'JSON');
+		add_obj_proj('project');
+	});
+
+	// submit listener for the form that adds a new task
+	$('#add_task_form').on('submit', function(e) {
+		e.preventDefault();
+		add_obj_proj('task');
 	});
 });

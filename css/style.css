@@ -253,7 +253,7 @@ ul {
 	width: 100%;
 }
 
-.remove, .remove_shallow, .move {
+.remove, .remove_shallow, .move, .move2 {
 	color: #00E26B;
 	font-size: 14px;
 }
