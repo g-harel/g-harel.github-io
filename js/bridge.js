@@ -5,16 +5,18 @@ var usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g,
 	drawme = {
 		objectives: draw_objectives,
 		projects: draw_projects,
-		tasks: draw_tasks
+		tasks: draw_tasks,
+		meetings: draw_meetings
 	},
 	user = {};
 
 // creating an object that will allow to get the column name with the id and table
 var db_struct = {
-	tables: ['objectives', 'projects', 'tasks'],
+	tables: ['objectives', 'projects', 'tasks', 'meetings'],
 	objectives: ['id', 'username', 'description', 'priority'],
 	projects: ['id', 'username', 'description', 'priority'],
-	tasks: ['id', 'username', 'description', 'priority', 'objective', 'project', 'week_priority', 'day_priority']
+	tasks: ['id', 'username', 'description', 'priority', 'objective', 'project', 'week_priority', 'day_priority'],
+	meetings: ['id', 'username', 'description', 'objective', 'project', 'start', 'end']
 };
 
 // function to show messages to the user
@@ -121,6 +123,20 @@ function draw_tasks() {
 		col_width: ['75px', '100%', '30px', '29px'],
 		edit_cols: [true, false],
 		button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move2 button" data-target="timeline">➤</span></td>'
+	}));
+	bind_active();
+}
+
+function draw_meetings() {
+	var meetings = sort_by_priority(user.meetings, 0);
+	$('#meetings_table').html(table({
+		titles: ['description', 'objective', 'project', 'start', 'end'],
+		data: meetings,
+		responseid: 7,
+		cols: [2,3,4,5,6],
+		col_width: ['50%', '25%', '25%', '60px', '60px', '30px'],
+		edit_cols: [true, true, true, true, true],
+		button: '<td><span class="remove button">❌</span></td>'
 	}));
 	bind_active();
 }
@@ -266,6 +282,7 @@ function bind_active() {
 		button: ""			> additional html code appended to the end of each row
 	}*/
 function table(settings) {
+	console.log(settings.data);
 	var table = '<table cellspacing="0">';
 	// custom column widths
 	for (var i = 0; i < (settings.col_width && settings.col_width.length); i++) {

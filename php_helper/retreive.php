@@ -11,10 +11,10 @@ if(!(isset($_SESSION['username']) && isset($_SESSION['password']))) {
 require_once('connect.php');
 // creating an empty array that will be sent back as a response
 $response = array();
-$tables = array('objectives', 'projects', 'tasks');
-for ($i = 0; $i < 3; $i++) {
+$tables = array('objectives', 'projects', 'tasks', 'meetings');
+for ($i = 0; $i < 4; $i++) {
 	// preparing the sql statement
-	$stmt = mysqli_prepare($conn, "SELECT * FROM agenda.$tables[$i] WHERE username=? ORDER BY priority ASC;");
+	$stmt = mysqli_prepare($conn, "SELECT * FROM agenda.$tables[$i] WHERE username=?;");
 	// binding the values in the statement to the post values
 	mysqli_stmt_bind_param($stmt, 's', $_SESSION['username']);
 	// executing the statement

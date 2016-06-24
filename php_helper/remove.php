@@ -7,7 +7,7 @@ if(!(isset($_SESSION['username']) &&
 isset($_SESSION['password']) &&
 isset($_POST['id']) &&
 isset($_POST['type']) &&
-preg_match('/'.$_POST['type'].'/', 'objectives projects tasks'))) {
+preg_match('/'.$_POST['type'].'/', 'objectives projects tasks meetings'))) {
 	echo 'user not logged in or query missing information';
 	exit();
 }

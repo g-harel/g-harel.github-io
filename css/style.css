@@ -240,7 +240,7 @@ ul {
 	background-color: #00E26B;
 }
 
-.content, .subcontent {
+.content, .subcontent, #meetings_table {
 	background-image: repeating-linear-gradient(180deg, transparent, transparent 23px,#f1f1f1 23px, #f1f1f1 46px);
 }
 
@@ -275,7 +275,7 @@ ul {
 }
 
 #meetings {
-	width: calc(35% - 15px);
+	width: calc(70% - 20px);
 	height: 30%;
 	float: left;
 	left: 10px;
@@ -283,7 +283,26 @@ ul {
 	background-color: white;
 }
 
+#seperator {
+	height: 2px;
+	width: 100%;
+	background-color: #00E26B;
+}
+
+#meetings_title {
+	color: #00E26B;
+	padding-top: 3px;
+	width: 25%;
+	font-weight: 500;
+	height: 23px;
+}
+
+#meetings_table {
+	height: 100%;
+}
+
 #timers {
+	display: none;
 	float: left;
     width: calc(35% - 15px);
     height: 30%;

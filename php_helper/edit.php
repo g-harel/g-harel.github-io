@@ -9,8 +9,8 @@ isset($_POST['type']) &&
 isset($_POST['field']) &&
 isset($_POST['id']) &&
 isset($_POST['value']) &&
-preg_match('/'.$_POST['type'].'/', 'objectives projects tasks') &&
-preg_match('/'.$_POST['field'].'/', 'description priority objective project week_priority day_priority'))) {
+preg_match('/'.$_POST['type'].'/', 'objectives projects tasks meetings') &&
+preg_match('/'.$_POST['field'].'/', 'description priority objective project week_priority day_priority start end'))) {
 	echo 'user not logged in or query missing information';
 	exit();
 }
