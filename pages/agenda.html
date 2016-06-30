@@ -28,6 +28,15 @@
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
 		</form>
 	</div>
+	<div id='add_meetings' class='add_dialog dropshadow'>
+		<form id='add_meeting_form'>
+			<label class='new_label'>CREATE NEW MEETING</label>
+			<input type='text' placeholder='description' autocomplete='off' id='meeting_description' class='login'/>
+			<input type='number' placeholder='priority' min='1' id='meeting_priority' class='login'/>
+			<input type='submit' value='ADD' class='button login'/><hr/>
+			<input type='button' value='CANCEL' id='cancel' class='button login'/>
+		</form>
+	</div>
 </div>
 <div id='header'>
 	<img src="../res/icon_white_small.png" height="65%" width="auto" class='button'>
@@ -58,6 +67,7 @@
 </div>
 <div id='timeline' class='main_nav dropshadow'>&nbsp;</div>
 <div id='meetings' class='main_nav dropshadow'>
+	<img id='add_meeting_icon' data-source='meetings' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
 	<div id='meetings_title'>&nbsp;MEETINGS</div>
 	<div id='seperator'></div>
 	<div id='meetings_table' data-source='meetings'></div>

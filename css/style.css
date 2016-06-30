@@ -219,6 +219,15 @@ ul {
 	left: calc(70% - 78px);
 }
 
+#add_meeting_icon {
+	bottom: 20px;
+	left: calc(70% - 78px);
+}
+
+#add_meeting_icon2:active {
+	bottom: 18px;
+}
+
 #add_objective_icon:active, #add_project_icon:active, #add_task_icon:active {
 	top: calc(67% - 42px);
 }
@@ -299,6 +308,7 @@ ul {
 
 #meetings_table {
 	height: 100%;
+	overflow-y: scroll;
 }
 
 #timers {
