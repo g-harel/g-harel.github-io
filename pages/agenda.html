@@ -22,8 +22,8 @@
 			<label class='new_label'>CREATE NEW TASK</label>
 			<input type='text' placeholder='description' autocomplete='off' id='task_description' class='login'/>
 			<input type='number' placeholder='priority' min='1' id='task_priority' class='login'/>
-			<select id='dropdown_objectives'></select>
-			<select id='dropdown_projects'></select>
+			<select class='dropdown_objectives'></select>
+			<select class='dropdown_projects'></select>
 			<input type='submit' value='ADD' class='button login'/><hr/>
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
 		</form>
@@ -33,12 +33,14 @@
 			<label class='new_label'>CREATE NEW MEETING</label>
 			<input type='text' placeholder='description' autocomplete='off' id='meeting_description' class='login'/>
 			<input type='number' placeholder='priority' min='1' id='meeting_priority' class='login'/>
+			<select class='dropdown_objectives'></select>
+			<select class='dropdown_projects'></select>
 			<input type='submit' value='ADD' class='button login'/><hr/>
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
 		</form>
 	</div>
 </div>
-<div id='header'>
+<div id='header' class='dropshadow'>
 	<img src="../res/icon_white_small.png" height="65%" width="auto" class='button'>
 </div>
 <div id='main' class='main_nav dropshadow'>

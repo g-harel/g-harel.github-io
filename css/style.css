@@ -18,7 +18,7 @@ html, body {
 }
 
 body {
-    background-color: white;
+    background-color: #f1f1f1;
 }
 
 #message {
@@ -187,8 +187,7 @@ table {
 
 #main {
 	width: calc(70% - 20px);
-	max-width: calc(70% - 20px);
-	height: calc(67% - 30px);
+	height: calc(60% - 30px);
 	float: left;
 	left: 10px;
 	background-color: white;
@@ -205,18 +204,23 @@ ul {
 }
 
 #add_objective_icon {
-	top: calc(67% - 44px);
+	top: calc(60% - 44px);
 	left: calc(35% - 68px);
 }
 
 #add_project_icon {
-	top: calc(67% - 44px);
+	top: calc(60% - 44px);
 	left: calc(70% - 78px);
 }
 
 #add_task_icon {
-	top: calc(67% - 44px);
+	top: calc(60% - 44px);
 	left: calc(70% - 78px);
+}
+
+
+#add_objective_icon:active, #add_project_icon:active, #add_task_icon:active {
+	top: calc(60% - 42px);
 }
 
 #add_meeting_icon {
@@ -224,12 +228,9 @@ ul {
 	left: calc(70% - 78px);
 }
 
-#add_meeting_icon2:active {
+#add_meeting_icon:active {
 	bottom: 18px;
-}
-
-#add_objective_icon:active, #add_project_icon:active, #add_task_icon:active {
-	top: calc(67% - 42px);
+	top: calc(100% - 58px);
 }
 
 .tab {
@@ -277,7 +278,7 @@ ul {
 
 #timeline {
 	width: calc(30% - 10px);
-	height: calc(97% - 20px);
+	height: calc(100% - 50px);
 	float: right;
 	right: 10px;
 	background-color: white;
@@ -285,7 +286,7 @@ ul {
 
 #meetings {
 	width: calc(70% - 20px);
-	height: 30%;
+	height: calc(40% - 30px);
 	float: left;
 	left: 10px;
 	top: 10px;

@@ -50,7 +50,7 @@ function draw_objectives() {
 		}
 		dropdown += '<option value="' + user.objectives[i][2] + '">' + user.objectives[i][2] + '</option>';
 	}
-	$('#dropdown_objectives').html(dropdown);
+	$('.dropdown_objectives').html(dropdown);
 }
 
 function draw_projects() {
@@ -72,7 +72,7 @@ function draw_projects() {
 		}
 		dropdown += '<option value="' + user.projects[i][2] + '">' + user.projects[i][2] + '</option>';
 	}
-	$('#dropdown_projects').html(dropdown);
+	$('.dropdown_projects').html(dropdown);
 }
 
 function draw_tasks() {
@@ -130,11 +130,11 @@ function draw_tasks() {
 function draw_meetings() {
 	var meetings = sort_by_priority(user.meetings, 0);
 	$('#meetings_table').html(table({
-		titles: ['description', 'objective', 'project', 'start', 'end'],
+		titles: ['start', 'end', 'description', 'objective', 'project'],
 		data: meetings,
 		responseid: 7,
-		cols: [2,3,4,5,6],
-		col_width: ['50%', '25%', '25%', '60px', '60px', '30px'],
+		cols: [5,6,2,3,4],
+		col_width: ['60px', '60px', '50%', '25%', '25%', '30px'],
 		edit_cols: [true, true, true, true, true],
 		button: '<td><span class="remove button">❌</span></td>'
 	}));
@@ -282,7 +282,6 @@ function bind_active() {
 		button: ""			> additional html code appended to the end of each row
 	}*/
 function table(settings) {
-	console.log(settings.data);
 	var table = '<table cellspacing="0">';
 	// custom column widths
 	for (var i = 0; i < (settings.col_width && settings.col_width.length); i++) {
@@ -523,6 +522,7 @@ $(function() {
 	// click listener for add buttons
 	$('.add, #cancel').on('click', function() {
 		var type = $(this).attr('data-source');
+		console.log(type);
 		$('#darken').toggle();
 		$('.add_dialog').hide();
 		$('#add_' + type).show();
