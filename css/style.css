@@ -250,6 +250,15 @@ ul {
 	background-color: #00E26B;
 }
 
+#disable_day {
+	position: absolute;
+	background-color: rgba(255,255,255,0.7);
+	width: 25%;
+	height: 26px;
+	left: 75%;
+	z-index: 1;
+}
+
 .content, .subcontent, #meetings_table {
 	background-image: repeating-linear-gradient(180deg, transparent, transparent 23px,#f1f1f1 23px, #f1f1f1 46px);
 }

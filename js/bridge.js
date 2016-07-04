@@ -19,6 +19,159 @@ var db_struct = {
 	meetings: ['id', 'username', 'description', 'objective', 'project', 'start', 'end']
 };
 
+$(function() {
+    // click listener for the utility buttons
+    $('.utility').on('click', function() {
+        // toggle which form is shown
+        changeForm();
+    });
+
+    // click listener for the signin button
+    $('#login_form').on('submit', function(e) {
+		e.preventDefault();
+        // storing the values of the fields
+        var info = {
+            identifier: $('#login_identifier').val().trim(),
+            password: $('#login_password').val().trim()
+        };
+        // check that the fields are filled
+        for (var key in info) {
+            if (info.hasOwnProperty(key)) {
+                if (info[key] === '') {
+                    message('please fill in all the fields');
+                    return;
+                }
+            }
+        }
+        // check that the format of the identifier fields matches either the username or remail one
+        if (!info.identifier.match(emailRegEx) && !info.identifier.match(usernameRegEx)) {
+            message('invalid username/email');
+            return;
+        }
+        // sending a post request to the specified file with the info object
+        $.post('../php_helper/login.php', info, function(login_response) {
+            if (login_response == 'success') {
+                location.reload();
+            } else {
+                message(login_response);
+            }
+        }, 'text');
+    });
+
+    // click listener for the register button
+    $('#register_form').on('submit', function(e) {
+		e.preventDefault();
+        // storing the values of the fields
+        var info = {
+            username: $('#register_user').val().trim(),
+            email: $('#register_email').val().trim(),
+            password: $('#register_password').val().trim(),
+            checkpassword: $('#register_checkpassword').val().trim()
+        };
+        //checking that all fields are filled
+        for (var key in info) {
+            if (info.hasOwnProperty(key)) {
+                if (info[key] === '') {
+                    message('please fill in all the fields');
+                    return;
+                }
+            }
+        }
+        // checking that each of the field inputs are in the correct format
+        if (!info.username.match(usernameRegEx)) {
+            message('wrong username format');
+            return;
+        }
+        if (!info.email.match(emailRegEx)) {
+            message('wrong email format');
+            return;
+        }
+        if (!info.password.match(passwordRegEx)) {
+            message('wrong password format');
+            return;
+        }
+        // checking that the passwords match
+        if (info.password != info.checkpassword) {
+            message('passwords do not match');
+            return;
+        }
+        // removing the password check variable
+        delete info.checkpassword;
+        // sending a post request to the specified file with the info object
+        $.post('../php_helper/register.php', info, function(register_response) {
+            // testing if the user has been successfully added
+            if (register_response == 'success') {
+                changeForm();
+                message('account created!');
+            } else {
+                message(register_response);
+            }
+        }, 'text');
+    });
+
+	// requests all the information for the user
+	$.post('../php_helper/retreive.php', {}, function(response) {
+		console.log(response);
+		if (response.status == 'success') {
+			user = response;
+			// adding an index to each element to reference it in the response object and creating the table for that datatype
+			for (var i = 0; i < db_struct.tables.length; i++) {
+				var current_table = db_struct.tables[i];
+				for (var j = 0; j < user[current_table].length; j++) {
+					user[current_table][j].push(j);
+				}
+				drawme[current_table]();
+			}
+		} else {
+			message(response.status);
+		}
+	}, 'JSON');
+
+	// click listener for the tab buttons
+	$('.tab').on('click', function() {
+		// changing the class of the buttons
+		var $tab = $(this);
+		$tab.siblings().removeClass('current');
+		$tab.addClass('current');
+		// changing the class of the content divs
+		var $content = $tab.parent().siblings();
+		$content.removeClass('current');
+		$content.filter('#' + $tab.attr('data-content')).addClass('current');
+		// moving the tab slider
+		var position = $tab.attr('data-contentid');
+		$tab.parent().siblings('#tab_slider').animate({
+			left: (position*25) + '%'
+		}, 175);
+	});
+
+	// click listener for add buttons
+	$('.add, #cancel').on('click', function() {
+		var type = $(this).attr('data-source');
+		console.log(type);
+		$('#darken').toggle();
+		$('.add_dialog').hide();
+		$('#add_' + type).show();
+	});
+
+	// submit listener for the form that adds a new objective
+	$('#add_objective_form').on('submit', function(e) {
+		e.preventDefault();
+		add_obj_proj('objective');
+	});
+
+	// submit listener for the form that adds a new objective
+	$('#add_project_form').on('submit', function(e) {
+		e.preventDefault();
+		add_obj_proj('project');
+	});
+
+	// submit listener for the form that adds a new task
+	$('#add_task_form').on('submit', function(e) {
+		e.preventDefault();
+		add_obj_proj('task');
+	});
+});
+
 // function to show messages to the user
 function message(message) {
     $('#message').stop().html(message).slideToggle(20).delay(2000).slideToggle(20);
@@ -124,6 +277,11 @@ function draw_tasks() {
 		edit_cols: [true, false],
 		button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move2 button" data-target="timeline">➤</span></td>'
 	}));
+	if (tasks_week.length) {
+		$('#disable_day').hide();
+	} else {
+		$('#disable_day').show();
+	}
 	bind_active();
 }
 
@@ -393,156 +551,3 @@ function add_obj_proj(type) {
 		}
 	}, 'JSON');
 }
-
-$(function() {
-    // click listener for the utility buttons
-    $('.utility').on('click', function() {
-        // toggle which form is shown
-        changeForm();
-    });
-
-    // click listener for the signin button
-    $('#login_form').on('submit', function(e) {
-		e.preventDefault();
-        // storing the values of the fields
-        var info = {
-            identifier: $('#login_identifier').val().trim(),
-            password: $('#login_password').val().trim()
-        };
-        // check that the fields are filled
-        for (var key in info) {
-            if (info.hasOwnProperty(key)) {
-                if (info[key] === '') {
-                    message('please fill in all the fields');
-                    return;
-                }
-            }
-        }
-        // check that the format of the identifier fields matches either the username or remail one
-        if (!info.identifier.match(emailRegEx) && !info.identifier.match(usernameRegEx)) {
-            message('invalid username/email');
-            return;
-        }
-        // sending a post request to the specified file with the info object
-        $.post('../php_helper/login.php', info, function(login_response) {
-            if (login_response == 'success') {
-                location.reload();
-            } else {
-                message(login_response);
-            }
-        }, 'text');
-    });
-
-    // click listener for the register button
-    $('#register_form').on('submit', function(e) {
-		e.preventDefault();
-        // storing the values of the fields
-        var info = {
-            username: $('#register_user').val().trim(),
-            email: $('#register_email').val().trim(),
-            password: $('#register_password').val().trim(),
-            checkpassword: $('#register_checkpassword').val().trim()
-        };
-        //checking that all fields are filled
-        for (var key in info) {
-            if (info.hasOwnProperty(key)) {
-                if (info[key] === '') {
-                    message('please fill in all the fields');
-                    return;
-                }
-            }
-        }
-        // checking that each of the field inputs are in the correct format
-        if (!info.username.match(usernameRegEx)) {
-            message('wrong username format');
-            return;
-        }
-        if (!info.email.match(emailRegEx)) {
-            message('wrong email format');
-            return;
-        }
-        if (!info.password.match(passwordRegEx)) {
-            message('wrong password format');
-            return;
-        }
-        // checking that the passwords match
-        if (info.password != info.checkpassword) {
-            message('passwords do not match');
-            return;
-        }
-        // removing the password check variable
-        delete info.checkpassword;
-        // sending a post request to the specified file with the info object
-        $.post('../php_helper/register.php', info, function(register_response) {
-            // testing if the user has been successfully added
-            if (register_response == 'success') {
-                changeForm();
-                message('account created!');
-            } else {
-                message(register_response);
-            }
-        }, 'text');
-    });
-
-	// requests all the information for the user
-	$.post('../php_helper/retreive.php', {}, function(response) {
-		console.log(response);
-		if (response.status == 'success') {
-			user = response;
-			// adding an index to each element to reference it in the response object and creating the table for that datatype
-			for (var i = 0; i < db_struct.tables.length; i++) {
-				var current_table = db_struct.tables[i];
-				for (var j = 0; j < user[current_table].length; j++) {
-					user[current_table][j].push(j);
-				}
-				drawme[current_table]();
-			}
-		} else {
-			message(response.status);
-		}
-	}, 'JSON');
-
-	// click listener for the tab buttons
-	$('.tab').on('click', function() {
-		// changing the class of the buttons
-		var $tab = $(this);
-		$tab.siblings().removeClass('current');
-		$tab.addClass('current');
-		// changing the class of the content divs
-		var $content = $tab.parent().siblings();
-		$content.removeClass('current');
-		$content.filter('#' + $tab.attr('data-content')).addClass('current');
-		// moving the tab slider
-		var position = $tab.attr('data-contentid');
-		$tab.parent().siblings('#tab_slider').animate({
-			left: (position*25) + '%'
-		}, 175);
-	});
-
-	// click listener for add buttons
-	$('.add, #cancel').on('click', function() {
-		var type = $(this).attr('data-source');
-		console.log(type);
-		$('#darken').toggle();
-		$('.add_dialog').hide();
-		$('#add_' + type).show();
-	});
-
-	// submit listener for the form that adds a new objective
-	$('#add_objective_form').on('submit', function(e) {
-		e.preventDefault();
-		add_obj_proj('objective');
-	});
-
-	// submit listener for the form that adds a new objective
-	$('#add_project_form').on('submit', function(e) {
-		e.preventDefault();
-		add_obj_proj('project');
-	});
-
-	// submit listener for the form that adds a new task
-	$('#add_task_form').on('submit', function(e) {
-		e.preventDefault();
-		add_obj_proj('task');
-	});
-});
