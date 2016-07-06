@@ -156,19 +156,25 @@ $(function() {
 	// submit listener for the form that adds a new objective
 	$('#add_objective_form').on('submit', function(e) {
 		e.preventDefault();
-		add_obj_proj('objective');
+		add_obj_proj_task('objective');
 	});
 
 	// submit listener for the form that adds a new objective
 	$('#add_project_form').on('submit', function(e) {
 		e.preventDefault();
-		add_obj_proj('project');
+		add_obj_proj_task('project');
 	});
 
 	// submit listener for the form that adds a new task
 	$('#add_task_form').on('submit', function(e) {
 		e.preventDefault();
-		add_obj_proj('task');
+		add_obj_proj_task('task');
+	});
+
+	// submit listener for the form that adds a new meeting
+	$('#add_meeting_form').on('submit', function(e) {
+		e.preventDefault();
+
 	});
 });
 
@@ -506,7 +512,7 @@ function sort_by_priority(source_array, index) {
 }
 
 // function used to add objectives, projects and tasks (in from listeners bellow)
-function add_obj_proj(type) {
+function add_obj_proj_task(type) {
 	var info = {
 		type: type + 's',
 		description: $('#' + type + '_description').val().trim(),

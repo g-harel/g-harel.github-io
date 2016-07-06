@@ -126,7 +126,7 @@ table {
 }
 
 .content {
-	height: calc(100% - 36px);
+	height: calc(100% - 28px);
 	display: none;
 	background-color: white;
 	width: 100%;
@@ -319,6 +319,17 @@ ul {
 #meetings_table {
 	height: 100%;
 	overflow-y: scroll;
+}
+
+.add_dialog .time_dropdown {
+	width: 176px;
+	margin-right: 6px;
+}
+
+.sublabel {
+	font-size: 20px;
+	float: right;
+	margin-right: 2px;
 }
 
 #timers {
