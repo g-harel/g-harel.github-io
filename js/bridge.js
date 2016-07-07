@@ -174,7 +174,35 @@ $(function() {
 	// submit listener for the form that adds a new meeting
 	$('#add_meeting_form').on('submit', function(e) {
 		e.preventDefault();
-
+		var info = {
+			description: $('#meeting_description').val().trim(),
+			objective: $('#dropdown_objectives_meeting').val(),
+			project: $('#dropdown_projects_meeting').val(),
+			start: $('#start_hour').val() + ':' + $('#start_min').val(),
+			end: $('#end_hour').val() + ':' + $('#end_min').val()
+		};
+		for (var key in info) {
+			if (info.hasOwnProperty(key)) {
+				if (!info[key]) {
+					message('please fill in all the fields');
+					return;
+				}
+			}
+		}
+		$.post('../php_helper/meeting.php', info, function(add_response) {
+			if (add_response.status == 'success') {
+				var target = user['meetings'],
+					length = target.length;
+				$('#darken').toggle();
+				$('#add_meeting_form').children('input').not('.button').val('');
+				target.push([add_response.id, '',info.description, info.objective, info.project, info.start, info.end]);
+				target[length].push(length)
+				console.log(user);
+				drawme['meetings']();
+			} else {
+				message(add_response.status);
+			}
+		}, 'JSON');
 	});
 });
 
@@ -516,20 +544,20 @@ function add_obj_proj_task(type) {
 	var info = {
 		type: type + 's',
 		description: $('#' + type + '_description').val().trim(),
-		priority: $('#' + type + '_priority').val().trim(),
+		priority: $('#' + type + '_priority').val().trim()
 	};
 	for (var key in info) {
 		if (info.hasOwnProperty(key)) {
-			if (info[key] === '') {
+			if (!info[key]) {
 				message('please fill in all the fields');
 				return;
 			}
 		}
 	}
 	if (type == 'task') {
-		info.objective = $('#dropdown_objectives').val();
-		info.project = $('#dropdown_projects').val();
-		if (!info.objective || ! info.project) {
+		info.objective = $('#dropdown_objectives_task').val();
+		info.project = $('#dropdown_projects_task').val();
+		if (!info.objective || !info.project) {
 			message('please select a project/objective');
 			return;
 		}
