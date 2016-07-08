@@ -156,19 +156,90 @@ $(function() {
 	// submit listener for the form that adds a new objective
 	$('#add_objective_form').on('submit', function(e) {
 		e.preventDefault();
-		add_obj_proj_task('objective');
+		var info = {
+			type: 'objectives',
+			description: $('#objective_description').val().trim(),
+			priority: $('#objective_priority').val().trim()
+		};
+		for (var key in info) {
+			if (info.hasOwnProperty(key)) {
+				if (!info[key]) {
+					message('please fill in all the fields');
+					return;
+				}
+			}
+		}
+		$.post('../php_helper/objective.php', info, function(add_response) {
+			if (add_response.status == 'success') {
+				var target = user.objectives;
+				$('#darken').toggle();
+				$('#add_objective_form').children('input').not('.button').val('');
+				target.push([add_response.id, '', info.description, info.priority, target.length]);
+				drawme.objectives();
+			} else {
+				message(add_response.status);
+			}
+		}, 'JSON');
 	});
 
 	// submit listener for the form that adds a new objective
 	$('#add_project_form').on('submit', function(e) {
 		e.preventDefault();
-		add_obj_proj_task('project');
+		var info = {
+			type: 'projects',
+			description: $('#project_description').val().trim(),
+			priority: $('#project_priority').val().trim()
+		};
+		for (var key in info) {
+			if (info.hasOwnProperty(key)) {
+				if (!info[key]) {
+					message('please fill in all the fields');
+					return;
+				}
+			}
+		}
+		$.post('../php_helper/project.php', info, function(add_response) {
+			if (add_response.status == 'success') {
+				var target = user.projects;
+				$('#darken').toggle();
+				$('#add_project_form').children('input').not('.button').val('');
+				target.push([add_response.id, '', info.description, info.priority, target.length]);
+				drawme.projects();
+			} else {
+				message(add_response.status);
+			}
+		}, 'JSON');
 	});
 
 	// submit listener for the form that adds a new task
 	$('#add_task_form').on('submit', function(e) {
 		e.preventDefault();
-		add_obj_proj_task('task');
+		var info = {
+			type: tasks,
+			description: $('#task_description').val().trim(),
+			priority: $('#task_priority').val().trim(),
+			objective: $('#dropdown_objectives_task').val(),
+			project: $('#dropdown_projects_task').val()
+		};
+		for (var key in info) {
+			if (info.hasOwnProperty(key)) {
+				if (!info[key]) {
+					message('please fill in all the fields');
+					return;
+				}
+			}
+		}
+		$.post('../php_helper/task.php', info, function(add_response) {
+			if (add_response.status == 'success') {
+				var target = user.tasks;
+				$('#darken').toggle();
+				$('#add_task_form').children('input').not('.button').val('');
+				target.push([add_response.id, '', info.description, info.priority, info.objective, info.project, null, null, target.lenght]);
+				drawme.tasks();
+			} else {
+				message(add_response.status);
+			}
+		}, 'JSON');
 	});
 
 	// submit listener for the form that adds a new meeting
@@ -191,14 +262,14 @@ $(function() {
 		}
 		$.post('../php_helper/meeting.php', info, function(add_response) {
 			if (add_response.status == 'success') {
-				var target = user['meetings'],
+				var target = user.meetings,
 					length = target.length;
 				$('#darken').toggle();
 				$('#add_meeting_form').children('input').not('.button').val('');
 				target.push([add_response.id, '',info.description, info.objective, info.project, info.start, info.end]);
-				target[length].push(length)
+				target[length].push(length);
 				console.log(user);
-				drawme['meetings']();
+				drawme.meetings();
 			} else {
 				message(add_response.status);
 			}
@@ -338,13 +409,15 @@ function bind_active() {
 	$('.move').off().on('click', function() {
 		var $row = $(this).closest('tr'),
 			index = $row.attr('data-responseid'),
-			target = $(this).attr('data-target');
+			target = $(this).attr('data-target'),
+			source_index,
+			target_index;
 		if (target == 'week') {
-			var source_index = 3,
-				target_index = 6;
+			source_index = 3;
+			target_index = 6;
 		} else if (target == 'day') {
-			var source_index = 6,
-				target_index = 7;
+			source_index = 6;
+			target_index = 7;
 		}
 		// execution stops if the tasks has already been moved
 		if (user.tasks[index][target_index]) {
@@ -354,14 +427,14 @@ function bind_active() {
 		// creating in the object to be passed to backend
 		var data = {
 			type: 'tasks',
-			field: db_struct['tasks'][target_index],
-			id: user['tasks'][index][0],
+			field: db_struct.tasks[target_index],
+			id: user.tasks[index][0],
 			value: user.tasks[index][source_index]
 		};
 		$.post('../php_helper/edit.php', data, function(edit_response) {
 			if (edit_response == 'success') {
 				user.tasks[index][target_index] = data.value;
-				drawme['tasks']();
+				drawme.tasks();
 			} else {
 				message(edit_response);
 			}
@@ -382,10 +455,18 @@ function bind_active() {
 		live_edit.focus();
 		live_edit.val(oldvalue); // setting after to have cursor at the end
 		live_edit.on('blur', function() {
-			var newvalue = live_edit.val();
+			var newvalue = live_edit.val().trim();
 			// resets if the new value is empty or has not been changed
 			if (!newvalue || newvalue == oldvalue) {
 				live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+				bind_active();
+				return;
+			}
+			// resets if the time format is not proper for the meeting times
+			console.log(type, position, newvalue, newvalue.match(/^\d{2}:\d{2}$/));
+			if (type == 'meetings' && (position == 5 || position == 6) && !newvalue.match(/^\d{2}:\d{2}$/)) {
+				live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+				message('incorrect time format (HH:MM)');
 				bind_active();
 				return;
 			}
@@ -416,7 +497,7 @@ function bind_active() {
 			index = element.closest('tr').attr('data-responseid');
 		// execution stops if the task is used in week table
 		if (element.parent().closest('div').attr('id') == 'tasks_main' && user.tasks[index][6]) {
-			message('task is being used in week, cannot be removed')
+			message('task is being used in week, cannot be removed');
 			return;
 		}
 		// creating in the object to be passed to backend
@@ -428,7 +509,7 @@ function bind_active() {
 			if (remove_response == 'success') {
 				element.closest('tr').remove();
 				user[type][index] = undefined;
-				drawme['tasks']();
+				drawme.tasks();
 			} else {
 				message(remove_response);
 			}
@@ -442,20 +523,20 @@ function bind_active() {
 			type = $(this).attr('data-source');
 		// execution stops if the task is also in the day table
 		if (type == 'week_priority' && user.tasks[index][7]) {
-			message('task is being used in day, cannot be removed from week')
+			message('task is being used in day, cannot be removed from week');
 			return;
 		}
 		// creating in the object to be passed to backend
 		var data = {
 			type: 'tasks',
 			field: type,
-			id: user['tasks'][index][0],
+			id: user.tasks[index][0],
 			value: 'NULL'
 		};
 		$.post('../php_helper/edit.php', data, function(edit_response) {
 			if (edit_response == 'success') {
 				user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
-				drawme['tasks']();
+				drawme.tasks();
 			} else {
 				message(edit_response);
 			}
@@ -482,7 +563,7 @@ function table(settings) {
 	// headers
 	if (settings.titles) {
 		table += '<tr>';
-		for (var i = 0; i < settings.titles.length; i++) {
+		for (i = 0; i < settings.titles.length; i++) {
 			table += '<th>' + settings.titles[i] + '</th>';
 		}
 		table += '<th></th></tr>';
@@ -490,7 +571,7 @@ function table(settings) {
 	// rows with data
 	var data_rows = settings.data.length || 0,
 		columns = settings.cols.length || 0;
-	for (var i = 0; i < data_rows; i++) {
+	for (i = 0; i < data_rows; i++) {
 		table += '<tr data-responseid="' + settings.data[i][settings.responseid] + '">';
 		for (var j = 0; j < columns; j++) {
 			table += '<td data-datapos="' + settings.cols[j] + '"><div ' + (settings.edit_cols[j] && 'class="editable"' || '') + '>' + settings.data[i][settings.cols[j]] + '</div></td>';
@@ -530,58 +611,11 @@ function sort_by_priority(source_array, index) {
 	}
 	// concatenating all the arrays into one
 	var sorted_array = [];
-	for (var i = 0; i <= highest_priority; i++) {
+	for (i = 0; i <= highest_priority; i++) {
 		// check if there is a value at the index
 		if (week_temp_tasks[i]) {
 			sorted_array = sorted_array.concat(week_temp_tasks[i]);
 		}
 	}
 	return sorted_array;
-}
-
-// function used to add objectives, projects and tasks (in from listeners bellow)
-function add_obj_proj_task(type) {
-	var info = {
-		type: type + 's',
-		description: $('#' + type + '_description').val().trim(),
-		priority: $('#' + type + '_priority').val().trim()
-	};
-	for (var key in info) {
-		if (info.hasOwnProperty(key)) {
-			if (!info[key]) {
-				message('please fill in all the fields');
-				return;
-			}
-		}
-	}
-	if (type == 'task') {
-		info.objective = $('#dropdown_objectives_task').val();
-		info.project = $('#dropdown_projects_task').val();
-		if (!info.objective || !info.project) {
-			message('please select a project/objective');
-			return;
-		}
-	} else {
-		info.objective = '';
-		info.project = '';
-	}
-	$.post('../php_helper/add.php', info, function(add_response) {
-		if (add_response.status == 'success') {
-			var target = user[type + 's'],
-				length = target.length;
-			$('#darken').toggle();
-			$('#add_' + type + '_form').children('input').not('.button').val('');
-			target.push([add_response.id, '', info.description, info.priority]);
-			if (type == 'task') {
-				target[length].push(info.objective);
-				target[length].push(info.project);
-				target[length].push(null);
-				target[length].push(null);
-			}
-			target[length].push(length)
-			drawme[type + 's']();
-		} else {
-			message(add_response.status);
-		}
-	}, 'JSON');
 }
