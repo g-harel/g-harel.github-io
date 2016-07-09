@@ -321,8 +321,8 @@ ul {
 	overflow-y: scroll;
 }
 
-.add_dialog .time_dropdown {
-	width: 176px;
+.add_dialog .time {
+	width: 168px;
 	margin-right: 6px;
 }
 

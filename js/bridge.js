@@ -463,8 +463,7 @@ function bind_active() {
 				return;
 			}
 			// resets if the time format is not proper for the meeting times
-			console.log(type, position, newvalue, newvalue.match(/^\d{2}:\d{2}$/));
-			if (type == 'meetings' && (position == 5 || position == 6) && !newvalue.match(/^\d{2}:\d{2}$/)) {
+			if (type == 'meetings' && (position == 5 || position == 6) && !newvalue.match(/^\d{1,2}:\d{2}$/)) {
 				live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
 				message('incorrect time format (HH:MM)');
 				bind_active();
