@@ -259,7 +259,7 @@ ul {
 	z-index: 1;
 }
 
-.content, .subcontent, #meetings_table {
+.content, .subcontent, #meetings_table, #schedule_frame {
 	background-image: repeating-linear-gradient(180deg, transparent, transparent 23px,#f1f1f1 23px, #f1f1f1 46px);
 }
 
@@ -302,18 +302,19 @@ ul {
 	background-color: white;
 }
 
-#seperator {
+.seperator {
 	height: 2px;
 	width: 100%;
 	background-color: #00E26B;
 }
 
-#meetings_title {
+.title {
 	color: #00E26B;
 	padding-top: 3px;
 	width: 25%;
 	font-weight: 500;
 	height: 23px;
+	margin-left: 6px;
 }
 
 #meetings_table {
@@ -352,5 +353,10 @@ ul {
 }
 
 #tasks {
+	overflow-y: scroll;
+}
+
+#schedule_frame {
+	height: 100%;
 	overflow-y: scroll;
 }

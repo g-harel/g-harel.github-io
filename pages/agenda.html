@@ -51,7 +51,7 @@
 	<img src="../res/icon_white_small.png" height="65%" width="auto" class='button'>
 </div>
 <div id='main' class='main_nav dropshadow'>
-	<div id='disable_day'>&nbsp;</div>
+	<div id='disable_day'></div>
 	<ul>
 		<li class='tab current' data-content='objproj' data-contentid='0'>Objectives/Projects
 		</li><li class='tab' data-content='tasks' data-contentid='1'>Tasks
@@ -75,11 +75,15 @@
 		<div id='tasks_day_source' class='subcontent' data-source='tasks'></div><div id='tasks_day' class='subcontent' data-source='tasks'></div>
 	</div>
 </div>
-<div id='timeline' class='main_nav dropshadow'>&nbsp;</div>
+<div id='timeline' class='main_nav dropshadow'>
+	<div class='title'>SCHEDULE</div>
+	<div class='seperator'></div>
+	<div id='schedule_frame'></div>
+</div>
 <div id='meetings' class='main_nav dropshadow'>
 	<img id='add_meeting_icon' data-source='meetings' src="../res/add_icon2.png" height="40px" width="auto" class='button add'>
-	<div id='meetings_title'>&nbsp;MEETINGS</div>
-	<div id='seperator'></div>
+	<div class='title'>MEETINGS</div>
+	<div class='seperator'></div>
 	<div id='meetings_table' data-source='meetings'></div>
 </div>
-<div id='timers' class='main_nav dropshadow'>&nbsp;</div>
+<div id='timers' class='main_nav dropshadow'></div>

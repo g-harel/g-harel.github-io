@@ -582,8 +582,6 @@ function table(settings) {
 }
 
 // sorts the source array according to the value of each element at the index
-// this function might seem unnecessarily complicated, but since it is being called so many times,
-// I wanted to avoid using nested loops to keep it quick on large arrays
 function sort_by_priority(source_array, index) {
 	// initializing some variables at the start rather than in the loop
 	var week_temp_tasks = {},
