@@ -50,7 +50,9 @@ body {
 }
 
 label {
+	display: block;
     font-size: 25px;
+	width: 100%;
 }
 
 input.login {
@@ -59,7 +61,7 @@ input.login {
     height: 26px;
     width: 430px;
     border-radius: 1px;
-    background-color: rgba(34,34,34,0.2);
+    background-color: rgba(34,34,34,0.1);
     color: #222222;
 }
 
@@ -161,12 +163,11 @@ table {
 
 .add_dialog select {
 	padding: 4px;
-    padding-left: 8px;
     margin-top: 10px;
 	height: 26px;
     width: 438px;
     border-radius: 1px;
-    background-color: rgba(34,34,34,0.2);
+    background-color: rgba(34,34,34,0.1);
 }
 
 .add_dialog select:disabled {
@@ -328,9 +329,12 @@ ul {
 }
 
 .sublabel {
-	font-size: 20px;
+	font-size: 16px;
 	float: right;
 	margin-right: 2px;
+	text-align: left;
+	left: 12px;
+	margin-top: 5px;
 }
 
 #timers {
@@ -359,4 +363,8 @@ ul {
 #schedule_frame {
 	height: 100%;
 	overflow-y: scroll;
+}
+
+.sublabel input, .sublabel select {
+	margin-top: 0px;
 }

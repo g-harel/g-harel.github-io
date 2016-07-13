@@ -2,8 +2,8 @@
 	<div id='add_objectives' class='add_dialog dropshadow'>
 		<form id='add_objective_form'>
 			<label class='new_label'>CREATE NEW OBJECTIVE</label>
-			<input type='text' placeholder='description' autocomplete='off' class='login'id='objective_description'/>
-			<input type='number' placeholder='priority' min='1' class='login' id='objective_priority'/>
+			<label class='sublabel'>Description<input type='text' autocomplete='off' class='login'id='objective_description'/></label>
+			<label class='sublabel'>Priority<input type='number' min='1' class='login' id='objective_priority'/></label>
 			<input type='submit' value='ADD' class='button login'/><hr/>
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
 		</form>
@@ -11,8 +11,8 @@
 	<div id='add_projects' class='add_dialog dropshadow'>
 		<form id='add_project_form'>
 			<label class='new_label'>CREATE NEW PROJECT</label>
-			<input type='text' placeholder='description' autocomplete='off' class='login' id='project_description'/>
-			<input type='number' placeholder='priority' min='1' class='login' id='project_priority'/>
+			<label class='sublabel'>Description<input type='text' autocomplete='off' class='login' id='project_description'/></label>
+			<label class='sublabel'>Priority<input type='number' min='1' class='login' id='project_priority'/></label>
 			<input type='submit' value='ADD' class='button login'/><hr/>
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
 		</form>
@@ -20,10 +20,10 @@
 	<div id='add_tasks' class='add_dialog dropshadow'>
 		<form id='add_task_form'>
 			<label class='new_label'>CREATE NEW TASK</label>
-			<input type='text' placeholder='description' autocomplete='off' id='task_description' class='login'/>
-			<input type='number' placeholder='priority' min='1' id='task_priority' class='login'/>
-			<select class='dropdown_objectives' id='dropdown_objectives_task'></select>
-			<select class='dropdown_projects' id='dropdown_projects_task'></select>
+			<label class='sublabel'>Description<input type='text' autocomplete='off' id='task_description' class='login'/></label>
+			<label class='sublabel'>Priority<input type='number' min='1' id='task_priority' class='login'/></label>
+			<label class='sublabel'>Objective<select class='dropdown_objectives' id='dropdown_objectives_task'></select></label>
+			<label class='sublabel'>Project<select class='dropdown_projects' id='dropdown_projects_task'></select></label>
 			<input type='submit' value='ADD' class='button login'/><hr/>
 			<input type='button' value='CANCEL' id='cancel' class='button login'/>
 		</form>
@@ -31,9 +31,9 @@
 	<div id='add_meetings' class='add_dialog dropshadow'>
 		<form id='add_meeting_form'>
 			<label class='new_label'>CREATE NEW MEETING</label>
-			<input type='text' placeholder='description' autocomplete='off' id='meeting_description' class='login'/>
-			<select class='dropdown_objectives' id='dropdown_objectives_meeting'></select>
-			<select class='dropdown_projects' id='dropdown_projects_meeting'></select>
+			<label class='sublabel'>Description<input type='text' autocomplete='off' id='meeting_description' class='login'/></label>
+			<label class='sublabel'>Objective<select class='dropdown_objectives' id='dropdown_objectives_meeting'></select></label>
+			<label class='sublabel'>Project<select class='dropdown_projects' id='dropdown_projects_meeting'></select></label>
 			<label class='sublabel'>START :
 				<input id='start_hour' class='time login' type='number' min='0' max='23' placeholder='hour'/>
 				<input id='start_min' class='time login' type='number' min='0' max='59' placeholder='minute'/>

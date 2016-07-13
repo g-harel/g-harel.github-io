@@ -28,7 +28,7 @@
 					button: '<td><span class="remove button">❌</span></td>'
 				}));
 				bind_active();
-				var dropdown = '<option disabled selected> -- select an objective -- </option>';
+				var dropdown = '';
 				for (var i = 0; i < user.objectives.length; i++) {
 					if (!user.objectives[i]) {
 						continue;
@@ -49,7 +49,7 @@
 					button: '<td><span class="remove button">❌</span></td>'
 				}));
 				bind_active();
-				var dropdown = '<option disabled selected> -- select a project -- </option>';
+				var dropdown = '';
 				for (var i = 0; i < user.projects.length; i++) {
 					if (!user.projects[i]) {
 						continue;
@@ -280,6 +280,9 @@
 			button: ""			> additional html code appended to the end of each row
 		}*/
 	function table(settings) {
+		if(!settings) {
+			return;
+		}
 		var table = '<table cellspacing="0">';
 		// custom column widths
 		for (var i = 0; i < (settings.col_width && settings.col_width.length); i++) {
@@ -309,6 +312,9 @@
 
 	// sorts the source array according to the value of each element at the index
 	function sort_by_priority(source_array, index) {
+		if(!source_array || (!index && index !== 0)) {
+			return;
+		}
 		// initializing some variables at the start rather than in the loop
 		var week_temp_tasks = {},
 			current_priority = 0,
@@ -345,6 +351,9 @@
 
 	// function to show messages to the user
 	function message(message) {
+		if(!message) {
+			return;
+		}
 	    $('#message').stop().html(message).slideToggle(20).delay(2000).slideToggle(20);
 	    console.log(message);
 	}
@@ -484,7 +493,6 @@
 		// click listener for add buttons
 		$('.add, #cancel').on('click', function() {
 			var type = $(this).attr('data-source');
-			console.log(type);
 			$('#darken').toggle();
 			$('.add_dialog').hide();
 			$('#add_' + type).show();
