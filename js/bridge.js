@@ -366,6 +366,34 @@
 
 	// on ready
 	$(function() {
+
+		// fills the times on the scheduling window
+		(function() {
+			var contents = '',
+				// values in minutes since 0 am
+				start = 480,
+				end = 1200,
+				// in minutes
+				increment = 15,
+				current = start;
+			while(current <= end) {
+				console.log(current);
+				contents += '<tr><td>' + Math.floor(current/60) + ':' + (current%60 || '00') + '</td></tr>';
+				current += increment;
+			}
+			$('#schedule_frame').on('scroll', function() {
+				var $this = $(this),
+					top = $this.scrollTop();
+			    if ($this.data('scrollTimeout')) {
+			      clearTimeout($this.data('scrollTimeout'));
+			    }
+			    $this.data('scrollTimeout', setTimeout(function() {
+					$this.scrollTop(Math.floor(($this.scrollTop()+8)/23)*23);
+				}, 50));
+			});
+			$('#times').html(contents);
+		}());
+
 		// requests all the information for the user
 		$.post('../php_helper/retreive.php', {}, function(response) {
 			console.log(response);

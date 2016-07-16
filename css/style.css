@@ -42,7 +42,6 @@ body {
     width: 440px;
     margin: auto;
     padding: 15px;
-    padding-bottom: 24px;
     border-radius: 2px;
     background-color: white;
     text-align: center;
@@ -361,8 +360,12 @@ ul {
 }
 
 #schedule_frame {
-	height: 100%;
 	overflow-y: scroll;
+	height: calc(100% - 28px);
+}
+
+#times {
+	width: 70px;
 }
 
 .sublabel input, .sublabel select {
