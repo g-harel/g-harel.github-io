@@ -359,7 +359,7 @@ ul {
 	overflow-y: scroll;
 }
 
-#schedule_frame {
+#schedule_wrapper {
 	overflow-y: scroll;
 	height: calc(100% - 28px);
 }
@@ -370,4 +370,25 @@ ul {
 
 .sublabel input, .sublabel select {
 	margin-top: 0px;
+}
+
+.event {
+	z-index: 3;
+	position: absolute;
+	left: 70px;
+	width: calc(100% - 80px);
+	border-left: 2px solid #00E26B;
+	background-image: repeating-linear-gradient(-45deg, white 0px, white 4px,#fbfbfb 4px, #fbfbfb 6px);
+	border-radius: 1px;
+}
+
+.event_title {
+	font-weight: 800;
+	margin-left: 10px;
+	top: 2px;
+}
+
+.event_description {
+	top: 2px;
+	margin-left: 10px;
 }
