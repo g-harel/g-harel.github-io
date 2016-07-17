@@ -9,8 +9,8 @@ isset($_POST['description']) &&
 isset($_POST['priority']) &&
 isset($_POST['objective']) &&
 isset($_POST['project']))) {
-	echo json_encode(array('status'=>'user not logged in or query missing information'));
-	exit();
+    echo json_encode(array('status'=>'user not logged in or query missing information'));
+    exit();
 }
 //connecting to the database and picking the table to read from
 require_once('connect.php');
@@ -24,7 +24,7 @@ $result = mysqli_stmt_execute($stmt);
 if($result) {
     $response = array('status'=>'success','id'=>mysqli_insert_id($conn));
 } else {
-	$response = array('status'=>'unable to add to the database');
+    $response = array('status'=>'unable to add to the database');
 }
 // closing the statement and the connection
 mysqli_stmt_close($stmt);

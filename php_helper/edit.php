@@ -12,12 +12,12 @@ isset($_POST['value']) &&
 preg_match('/'.$_POST['type'].'/', 'objectives projects tasks meetings') &&
 preg_match('/'.$_POST['field'].'/', 'description priority objective project week_priority day_priority start end')) ||
 (($_POST['field'] == 'start' || $_POST['field'] == 'end') && !preg_match('/^\d{1,2}:\d{2}$/', $_POST['value']))) {
-	echo 'user not logged in or query missing information';
-	exit();
+    echo 'user not logged in or query missing information';
+    exit();
 }
 // checking if the value is intended to be null
 if ($_POST['value'] == 'NULL') {
-	$_POST['value'] = NULL;
+    $_POST['value'] = NULL;
 }
 //connecting to the database and picking the type to read from
 require_once('connect.php');

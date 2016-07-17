@@ -3,8 +3,8 @@
 session_start();
 
 if(!(isset($_POST['identifier']) && isset($_POST['password']))) {
-	echo 'too little information to log in';
-	exit();
+    echo 'too little information to log in';
+    exit();
 }
 //connecting to the database and picking the table to read from
 require_once('connect.php');
@@ -22,17 +22,17 @@ $array = mysqli_fetch_array($result);
 if(empty($array)) {
     $response = 'username/email not found';
 } else if(password_verify($_POST['password'], $array['hash'])) {
-	// destroying the current session if it is already being used
-	if(isset($_SESSION['username']) || isset($_SESSION['password'])) {
-		session_destroy();
-		session_start();
-	}
-	// sets the session variables if the user entered the right credentials
-	$_SESSION['username'] = $array['username'];
-	$_SESSION['password'] = $_POST['password'];
+    // destroying the current session if it is already being used
+    if(isset($_SESSION['username']) || isset($_SESSION['password'])) {
+        session_destroy();
+        session_start();
+    }
+    // sets the session variables if the user entered the right credentials
+    $_SESSION['username'] = $array['username'];
+    $_SESSION['password'] = $_POST['password'];
     $response = 'success';
 } else {
-	$response = 'username/email and password do not match';
+    $response = 'username/email and password do not match';
 }
 // closing the statement and the connection
 mysqli_stmt_close($stmt);

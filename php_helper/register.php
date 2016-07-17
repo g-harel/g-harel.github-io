@@ -5,7 +5,7 @@ $required_fields = array('username', 'email', 'password');
 foreach($required_fields as $field) {
     if(empty($_POST[$field])) {
         $response = 'missing information';
-		exit();
+        exit();
     }
 }
 

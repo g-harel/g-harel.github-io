@@ -8,8 +8,8 @@ isset($_SESSION['password']) &&
 isset($_POST['id']) &&
 isset($_POST['type']) &&
 preg_match('/'.$_POST['type'].'/', 'objectives projects tasks meetings'))) {
-	echo 'user not logged in or query missing information';
-	exit();
+    echo 'user not logged in or query missing information';
+    exit();
 }
 //connecting to the database and picking the type to read from
 require_once('connect.php');
@@ -21,9 +21,9 @@ mysqli_stmt_bind_param($stmt, 'is', $_POST['id'], $_SESSION['username']);
 $result = mysqli_stmt_execute($stmt);
 // adding a status key to $array to pass information to the output
 if($result) {
-	$response = 'success';
+    $response = 'success';
 } else {
-	$response = 'delete operation failed';
+    $response = 'delete operation failed';
 }
 // closing the statement and the connection
 mysqli_stmt_close($stmt);
