@@ -51,12 +51,10 @@ body {
 label {
     display: block;
     font-size: 25px;
-    width: 100%;
 }
 
 input.login {
     padding-left: 8px;
-    margin-top: 10px;
     height: 26px;
     width: 430px;
     border-radius: 1px;
@@ -88,6 +86,7 @@ input.login {
     background-color: #222222;
     width: 438px;
     color: white;
+    margin-top: 10px;
 }
 
 /* main interface starting here */
@@ -162,7 +161,6 @@ table {
 
 .add_dialog select {
     padding: 4px;
-    margin-top: 10px;
     height: 26px;
     width: 438px;
     border-radius: 1px;
@@ -323,13 +321,13 @@ ul {
 }
 
 .add_dialog .time {
-    width: 168px;
+    width: 50px;
     margin-right: 6px;
 }
 
 .sublabel {
     font-size: 16px;
-    float: right;
+    float: left;
     margin-right: 2px;
     text-align: left;
     left: 12px;
@@ -368,17 +366,14 @@ ul {
     width: 70px;
 }
 
-.sublabel input, .sublabel select {
-    margin-top: 0px;
-}
-
 .event {
-    z-index: 3;
+    z-index: 2;
     position: absolute;
     left: 70px;
     width: calc(100% - 80px);
+    border: 1px solid #f1f1f1;
     border-left: 2px solid #00E26B;
-    background-image: repeating-linear-gradient(-45deg, white 0px, white 4px,#fbfbfb 4px, #fbfbfb 6px);
+    background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 4px,#fbfbfb 4px, #fbfbfb 6px);
     border-radius: 1px;
 }
 
@@ -391,4 +386,8 @@ ul {
 .event_description {
     top: 2px;
     margin-left: 10px;
+}
+
+.time_label {
+    margin-top: 10px;
 }

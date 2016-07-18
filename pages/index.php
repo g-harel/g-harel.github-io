@@ -15,12 +15,14 @@
         <div id='message'></div>
 
 <?php
+
 if(isset($_SESSION['username']) && isset($_SESSION['password'])) {
     // include('login.html');
     include('agenda.html');
 } else {
     include('login.html');
 }
+
 ?>
 
     </body>

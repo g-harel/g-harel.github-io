@@ -34,13 +34,13 @@
             <label class='sublabel'>Description<input type='text' autocomplete='off' id='meeting_description' class='login'/></label>
             <label class='sublabel'>Objective<select class='dropdown_objectives' id='dropdown_objectives_meeting'></select></label>
             <label class='sublabel'>Project<select class='dropdown_projects' id='dropdown_projects_meeting'></select></label>
-            <label class='sublabel'>START :
-                <input id='start_hour' class='time login' type='number' min='0' max='23' placeholder='hour'/>
-                <input id='start_min' class='time login' type='number' min='0' max='59' placeholder='minute'/>
+            <label class='sublabel time_label'>Start
+                <input id='start_hour' class='time login' type='number' min='0' max='23'/>:
+                <input id='start_min' class='time login' type='number' min='0' max='59'/>
             </label>
-            <label class='sublabel'>END :
-                <input id='end_hour' class='time login' type='number' min='0' max='23' placeholder='hour'/>
-                <input id='end_min' class='time login' type='number' min='0' max='59' placeholder='minute'/>
+            <label class='sublabel time_label'>End
+                <input id='end_hour' class='time login' type='number' min='0' max='23'/>:
+                <input id='end_min' class='time login' type='number' min='0' max='59'/>
             </label>
             <input type='submit' value='ADD' class='button login'/><hr/>
             <input type='button' value='CANCEL' id='cancel' class='button login'/>

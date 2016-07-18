@@ -381,7 +381,7 @@
 
         // test to add an event to the timeline
         setTimeout(function() {add_event('Meeting','Going over the stuff for the thing',123,450);}, 1000);
-        setTimeout(function() {add_event('Meeting','Going over the stuff for the thing',66,470);}, 2000);
+        setTimeout(function() {add_event('Meeting','Going over the stuff for the thing',66,200);}, 2000);
 
         // fills the times on the scheduling window
         (function() {
