@@ -2,6 +2,8 @@
     var
         // the user object that will store all the user data
         user = {},
+        // the events object will keep track of all events on the schedule
+        events = [],
         // regex patterns for form validation
         usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g,
         emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g,
@@ -349,16 +351,25 @@
         return sorted_array;
     }
 
-    // adds new events to the schedule
-    function add_event(title, description, height, position) {
+    // adds new events to the interface and the storage structures
+    function add_event(event, new_event) {
         var contents = '';
         contents += '<div class="event dropshadow" ';
-        contents += 'style="top:' + (position || 46 ) + 'px;height:' + (height || 46) + 'px">';
-        contents += '<span class="event_title">' + title + '</span>';
-        contents += '<span class="event_description">' + description + '</span>';
+        contents += 'style="top:' + (event.position || 46 ) + 'px;height:' + (event.height || 46) + 'px">';
+        contents += '<span class="event_title">' + (event.title || '') + '</span>';
+        contents += '<span class="event_description">' + (event.description || '') + '</span>';
         contents += '</div>';
         $('#schedule_wrapper').append(contents);
-        $('#schedule_wrapper').scrollTop(position-100);
+        if(new_event) {
+            $('#schedule_wrapper').scrollTop(event.position-100);
+            events.push({
+                'title':event.title,
+                'description':event.description,
+                'height':event.height,
+                'position':event.position
+            });
+            document.cookie = 'events=' + JSON.stringify(events);
+        }
     }
 
     // function to show messages to the user
@@ -379,9 +390,25 @@
     // on ready
     $(function() {
 
+        /*
         // test to add an event to the timeline
-        setTimeout(function() {add_event('Meeting','Going over the stuff for the thing',123,450);}, 1000);
-        setTimeout(function() {add_event('Meeting','Going over the stuff for the thing',66,200);}, 2000);
+        setTimeout(function() {add_event({"title":"Meeting","description":"Going over the stuff for the thing","height":123,"position":450}, false);}, 1000);
+        setTimeout(function() {add_event({"title":"Meeting","description":"Going over the stuff for the thing","height":60,"position":300}, false);}, 2000);
+        */
+
+        // reads the document cookie to find the stored events for the schedule
+        (function(){
+            try {
+                // regex pattern from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
+                events = JSON.parse(document.cookie.replace(/(?:(?:^|.*;\s*)events\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
+                for (var i = 0; i < events.length; i++) {
+                    add_event(events[i], false);
+                }
+            } catch(e) {
+                document.cookie = 'events=[]';
+                events = [];
+            }
+        }());
 
         // fills the times on the scheduling window
         (function() {
