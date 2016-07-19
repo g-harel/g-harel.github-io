@@ -18,6 +18,15 @@
         },
         // functions that update the tables according to the contents of "user"
         draw = {
+            all: function() {
+                draw.objectives();
+                draw.projects();
+                draw.tasks();
+                draw.meetings();
+                return function() {
+                    bind.all();
+                };
+            },
             objectives: function() {
                 var objectives = sort_by_priority(user.objectives, 3);
                 $('#objectives').html(table({
@@ -29,7 +38,6 @@
                     edit_cols: [true, true],
                     button: '<td><span class="remove button">❌</span></td>'
                 }));
-                bind_active();
                 var dropdown = '';
                 for (var i = 0; i < user.objectives.length; i++) {
                     if (!user.objectives[i]) {
@@ -38,6 +46,10 @@
                     dropdown += '<option value="' + user.objectives[i][2] + '">' + user.objectives[i][2] + '</option>';
                 }
                 $('.dropdown_objectives').html(dropdown);
+                return function() {
+                    bind.edit();
+                    bind.remove();
+                };
             },
             projects: function() {
                 var projects = sort_by_priority(user.projects, 3);
@@ -50,7 +62,6 @@
                     edit_cols: [true, true],
                     button: '<td><span class="remove button">❌</span></td>'
                 }));
-                bind_active();
                 var dropdown = '';
                 for (var i = 0; i < user.projects.length; i++) {
                     if (!user.projects[i]) {
@@ -59,6 +70,10 @@
                     dropdown += '<option value="' + user.projects[i][2] + '">' + user.projects[i][2] + '</option>';
                 }
                 $('.dropdown_projects').html(dropdown);
+                return function() {
+                    bind.edit();
+                    bind.remove();
+                };
             },
             tasks: function() {
                 var tasks_all = sort_by_priority(user.tasks, 3),
@@ -114,7 +129,9 @@
                 } else {
                     $('#disable_day').show();
                 }
-                bind_active();
+                return function() {
+                    bind.all();
+                };
             },
             meetings: function() {
                 var meetings = sort_by_priority(user.meetings, 0);
@@ -127,149 +144,158 @@
                     edit_cols: [true, true, true, true, true],
                     button: '<td><span class="remove button">❌</span></td>'
                 }));
-                bind_active();
+                return function() {
+                    bind.edit();
+                    bind.remove();
+                };
+            }
+        },
+        // collection of functions that add listeners to generated html elements
+        bind =  {
+            all: function() {
+                bind.move();
+                bind.edit();
+                bind.remove();
+                bind.remove_shallow();
+            },
+            move: function() {
+                $('.move').off().on('click', function() {
+                    var $row = $(this).closest('tr'),
+                        index = $row.attr('data-responseid'),
+                        target = $(this).attr('data-target'),
+                        source_index,
+                        target_index;
+                    if (target == 'week') {
+                        source_index = 3;
+                        target_index = 6;
+                    } else if (target == 'day') {
+                        source_index = 6;
+                        target_index = 7;
+                    }
+                    // execution stops if the tasks has already been moved
+                    if (user.tasks[index][target_index]) {
+                        message('task has already been moved');
+                        return;
+                    }
+                    // creating in the object to be passed to backend
+                    var data = {
+                        type: 'tasks',
+                        field: db_struct.tasks[target_index],
+                        id: user.tasks[index][0],
+                        value: user.tasks[index][source_index]
+                    };
+                    $.post('../php_helper/edit.php', data, function(edit_response) {
+                        if (edit_response == 'success') {
+                            user.tasks[index][target_index] = data.value;
+                            draw.tasks()();
+                        } else {
+                            message(edit_response);
+                        }
+                    }, 'text');
+                });
+            },
+            edit: function() {
+                $('.editable').off().on('dblclick', function() {
+                    var element = $(this),
+                        oldvalue = element.html(),
+                        type = element.parent().closest('div').attr('data-source'),
+                        index = element.closest('tr').attr('data-responseid'),
+                        position = element.closest('td').attr('data-datapos');
+                    // replacing the text inside the clicked div with a text input element
+                    element.closest('td').html('<input type="text" id="live_edit"></input>');
+                    // setting focus to the new input and adding a blur listener to store the value
+                    var live_edit = $('#live_edit');
+                    live_edit.focus();
+                    live_edit.val(oldvalue); // setting after to have cursor at the end
+                    live_edit.on('blur', function() {
+                        var newvalue = live_edit.val().trim();
+                        // resets if the new value is empty or has not been changed
+                        if (!newvalue || newvalue == oldvalue) {
+                            live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+                            bind.edit();
+                            return;
+                        }
+                        // resets if the time format is not proper for the meeting times
+                        if (type == 'meetings' && (position == 5 || position == 6) && !newvalue.match(/^\d{1,2}:\d{2}$/)) {
+                            live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+                            message('incorrect time format (HH:MM)');
+                            bind.edit();
+                            return;
+                        }
+                        // creating in the object to be passed to backend
+                        var data = {
+                            type: type,
+                            field: db_struct[type][position],
+                            id: user[type][index][0],
+                            value: newvalue
+                        };
+                        $.post('../php_helper/edit.php', data, function(edit_response) {
+                            if (edit_response == 'success') {
+                                user[type][index][position] = newvalue;
+                                draw[type]()();
+                            } else {
+                                message(edit_response);
+                                live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+                                bind.edit();
+                            }
+                        }, 'text');
+                    });
+                });
+            },
+            remove: function() {
+                $('.remove').off().on('click', function() {
+                    var element = $(this),
+                        type = element.parent().closest('div').attr('data-source'),
+                        index = element.closest('tr').attr('data-responseid');
+                    // execution stops if the task is used in week table
+                    if (element.parent().closest('div').attr('id') == 'tasks_main' && user.tasks[index][6]) {
+                        message('task is being used in week, cannot be removed');
+                        return;
+                    }
+                    // creating in the object to be passed to backend
+                    var data = {
+                        type: type,
+                        id: user[type][index][0],
+                    };
+                    $.post('../php_helper/remove.php', data, function(remove_response) {
+                        if (remove_response == 'success') {
+                            element.closest('tr').remove();
+                            user[type][index] = undefined;
+                            draw.tasks()();
+                        } else {
+                            message(remove_response);
+                        }
+                    }, 'text');
+                });
+            },
+            remove_shallow: function() {
+                $('.remove_shallow').off().on('click', function() {
+                    var $row = $(this).closest('tr'),
+                        index = $row.attr('data-responseid'),
+                        type = $(this).attr('data-source');
+                    // execution stops if the task is also in the day table
+                    if (type == 'week_priority' && user.tasks[index][7]) {
+                        message('task is being used in day, cannot be removed from week');
+                        return;
+                    }
+                    // creating in the object to be passed to backend
+                    var data = {
+                        type: 'tasks',
+                        field: type,
+                        id: user.tasks[index][0],
+                        value: 'NULL'
+                    };
+                    $.post('../php_helper/edit.php', data, function(edit_response) {
+                        if (edit_response == 'success') {
+                            user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
+                            draw.tasks()();
+                        } else {
+                            message(edit_response);
+                        }
+                    }, 'text');
+                });
             }
         };
-
-    // binds listeners to generated html elements
-    function bind_active() {
-        // moves the task to week or day (by giving it a week/day priority)
-        $('.move').off().on('click', function() {
-            var $row = $(this).closest('tr'),
-                index = $row.attr('data-responseid'),
-                target = $(this).attr('data-target'),
-                source_index,
-                target_index;
-            if (target == 'week') {
-                source_index = 3;
-                target_index = 6;
-            } else if (target == 'day') {
-                source_index = 6;
-                target_index = 7;
-            }
-            // execution stops if the tasks has already been moved
-            if (user.tasks[index][target_index]) {
-                message('task has already been moved');
-                return;
-            }
-            // creating in the object to be passed to backend
-            var data = {
-                type: 'tasks',
-                field: db_struct.tasks[target_index],
-                id: user.tasks[index][0],
-                value: user.tasks[index][source_index]
-            };
-            $.post('../php_helper/edit.php', data, function(edit_response) {
-                if (edit_response == 'success') {
-                    user.tasks[index][target_index] = data.value;
-                    draw.tasks();
-                } else {
-                    message(edit_response);
-                }
-            }, 'text');
-        });
-
-        // allows the user to live edit the contents of the tables when the cells are doubleclicked
-        $('.editable').off().on('dblclick', function() {
-            var element = $(this),
-                oldvalue = element.html(),
-                type = element.parent().closest('div').attr('data-source'),
-                index = element.closest('tr').attr('data-responseid'),
-                position = element.closest('td').attr('data-datapos');
-            // replacing the text inside the clicked div with a text input element
-            element.closest('td').html('<input type="text" id="live_edit"></input>');
-            // setting focus to the new input and adding a blur listener to store the value
-            var live_edit = $('#live_edit');
-            live_edit.focus();
-            live_edit.val(oldvalue); // setting after to have cursor at the end
-            live_edit.on('blur', function() {
-                var newvalue = live_edit.val().trim();
-                // resets if the new value is empty or has not been changed
-                if (!newvalue || newvalue == oldvalue) {
-                    live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
-                    bind_active();
-                    return;
-                }
-                // resets if the time format is not proper for the meeting times
-                if (type == 'meetings' && (position == 5 || position == 6) && !newvalue.match(/^\d{1,2}:\d{2}$/)) {
-                    live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
-                    message('incorrect time format (HH:MM)');
-                    bind_active();
-                    return;
-                }
-                // creating in the object to be passed to backend
-                var data = {
-                    type: type,
-                    field: db_struct[type][position],
-                    id: user[type][index][0],
-                    value: newvalue
-                };
-                $.post('../php_helper/edit.php', data, function(edit_response) {
-                    if (edit_response == 'success') {
-                        user[type][index][position] = newvalue;
-                        draw[type]();
-                    } else {
-                        message(edit_response);
-                        live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
-                        bind_active();
-                    }
-                }, 'text');
-            });
-        });
-
-        // removes data from the database
-        $('.remove').off().on('click', function() {
-            var element = $(this),
-                type = element.parent().closest('div').attr('data-source'),
-                index = element.closest('tr').attr('data-responseid');
-            // execution stops if the task is used in week table
-            if (element.parent().closest('div').attr('id') == 'tasks_main' && user.tasks[index][6]) {
-                message('task is being used in week, cannot be removed');
-                return;
-            }
-            // creating in the object to be passed to backend
-            var data = {
-                type: type,
-                id: user[type][index][0],
-            };
-            $.post('../php_helper/remove.php', data, function(remove_response) {
-                if (remove_response == 'success') {
-                    element.closest('tr').remove();
-                    user[type][index] = undefined;
-                    draw.tasks();
-                } else {
-                    message(remove_response);
-                }
-            }, 'text');
-        });
-
-        // removes the priority for the week/day, this will prevent it from being displayed
-        $('.remove_shallow').off().on('click', function() {
-            var $row = $(this).closest('tr'),
-                index = $row.attr('data-responseid'),
-                type = $(this).attr('data-source');
-            // execution stops if the task is also in the day table
-            if (type == 'week_priority' && user.tasks[index][7]) {
-                message('task is being used in day, cannot be removed from week');
-                return;
-            }
-            // creating in the object to be passed to backend
-            var data = {
-                type: 'tasks',
-                field: type,
-                id: user.tasks[index][0],
-                value: 'NULL'
-            };
-            $.post('../php_helper/edit.php', data, function(edit_response) {
-                if (edit_response == 'success') {
-                    user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
-                    draw.tasks();
-                } else {
-                    message(edit_response);
-                }
-            }, 'text');
-        });
-    }
 
     /* creates html table
         settings = {
@@ -381,12 +407,6 @@
         console.log(message);
     }
 
-    // changes the form being shown and clears the values from both
-    function changeForm() {
-        $('.form').toggle();
-        $('input').not('.button').val('');
-    }
-
     // on ready
     $(function() {
 
@@ -431,14 +451,14 @@
             console.log(response);
             if (response.status == 'success') {
                 user = response;
-                // adding an index to each element to reference it in the response object and creating the table for that datatype
+                // adding an index to each element to reference it in the response object
                 for (var i = 0; i < db_struct.tables.length; i++) {
                     var current_table = db_struct.tables[i];
                     for (var j = 0; j < user[current_table].length; j++) {
                         user[current_table][j].push(j);
                     }
-                    draw[current_table]();
                 }
+                draw.all()();
             } else {
                 message(response.status);
             }
@@ -447,7 +467,8 @@
         // click listener for the utility buttons
         $('.utility').on('click', function() {
             // toggle which form is shown
-            changeForm();
+            $('.form').toggle();
+            $('input').not('.button').val('');
         });
 
         // click listener for the signin button
@@ -525,7 +546,9 @@
             $.post('../php_helper/register.php', info, function(register_response) {
                 // testing if the user has been successfully added
                 if (register_response == 'success') {
-                    changeForm();
+                    // toggle which form is shown
+                    $('.form').toggle();
+                    $('input').not('.button').val('');
                     message('account created!');
                 } else {
                     message(register_response);
@@ -580,7 +603,7 @@
                     $('#darken').toggle();
                     $('#add_objective_form').children('input').not('.button').val('');
                     target.push([add_response.id, '', info.description, info.priority, target.length]);
-                    draw.objectives();
+                    draw.objectives()();
                 } else {
                     message(add_response.status);
                 }
@@ -609,7 +632,7 @@
                     $('#darken').toggle();
                     $('#add_project_form').children('input').not('.button').val('');
                     target.push([add_response.id, '', info.description, info.priority, target.length]);
-                    draw.projects();
+                    draw.projects()();
                 } else {
                     message(add_response.status);
                 }
@@ -640,7 +663,7 @@
                     $('#darken').toggle();
                     $('#add_task_form').children('input').not('.button').val('');
                     target.push([add_response.id, '', info.description, info.priority, info.objective, info.project, null, null, target.lenght]);
-                    draw.tasks();
+                    draw.tasks()();
                 } else {
                     message(add_response.status);
                 }
@@ -674,7 +697,7 @@
                     target.push([add_response.id, '',info.description, info.objective, info.project, info.start, info.end]);
                     target[length].push(length);
                     console.log(user);
-                    draw.meetings();
+                    draw.meetings()();
                 } else {
                     message(add_response.status);
                 }
