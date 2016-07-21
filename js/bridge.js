@@ -1,9 +1,11 @@
+// TODO implement modular forms that are only associated to the table they represent
+
 (function() {
     var
         // the user object that will store all the user data
         user = {},
         // the events object will keep track of all events on the schedule
-        events = [],
+        events = {},
         // regex patterns for form validation
         usernameRegEx = /^[a-zA-Z][a-zA-z0-9_]{2,19}$/g,
         emailRegEx = /^[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}$/g,
@@ -148,6 +150,42 @@
                     bind.edit();
                     bind.remove();
                 };
+            },
+            events: function() {
+                console.log(events);
+                window.events = events;
+                for (var i in events) {
+                    if (events.hasOwnProperty(i)) {
+                        events[i].key = i;
+                        draw.event(events[i]);
+                    }
+                }
+                return function() {
+                    bind.remove_event();
+                };
+            },
+            event: function(event) {
+                while (!event.key) {
+                    event.key = Math.floor(Math.random()*10000) + 1;
+                }
+                var contents = '<div class="event dropshadow" data-key="' + event.key + '" ';
+                contents += 'style="top:' + (event.position || 46 ) + 'px;height:' + (event.height || 46) + 'px">';
+                contents += '<span class="event_title">' + (event.title || '') + '</span>';
+                contents += '<span class="event_description">' + (event.description || '') + '</span>';
+                contents += '</div>';
+                $('#schedule_wrapper').append(contents);
+                return function() {
+                    events[event.key] = {
+                        'title':event.title,
+                        'description':event.description,
+                        'height':event.height,
+                        'position':event.position,
+                        'key': event.key
+                    };
+                    bind.remove_event();
+                    $('#schedule_wrapper').scrollTop(event.position-100);
+                    document.cookie = 'events=' + JSON.stringify(events);
+                };
             }
         },
         // collection of functions that add listeners to generated html elements
@@ -157,6 +195,7 @@
                 bind.edit();
                 bind.remove();
                 bind.remove_shallow();
+                bind.remove_event();
             },
             move: function() {
                 $('.move').off().on('click', function() {
@@ -294,6 +333,13 @@
                         }
                     }, 'text');
                 });
+            },
+            remove_event: function() {
+                $('.event').off().on('dblclick', function() {
+                    delete events[$(this).attr('data-key')];
+                    document.cookie = 'events=' + JSON.stringify(events);
+                    $(this).hide();
+                });
             }
         };
 
@@ -377,27 +423,6 @@
         return sorted_array;
     }
 
-    // adds new events to the interface and the storage structures
-    function add_event(event, new_event) {
-        var contents = '';
-        contents += '<div class="event dropshadow" ';
-        contents += 'style="top:' + (event.position || 46 ) + 'px;height:' + (event.height || 46) + 'px">';
-        contents += '<span class="event_title">' + (event.title || '') + '</span>';
-        contents += '<span class="event_description">' + (event.description || '') + '</span>';
-        contents += '</div>';
-        $('#schedule_wrapper').append(contents);
-        if(new_event) {
-            $('#schedule_wrapper').scrollTop(event.position-100);
-            events.push({
-                'title':event.title,
-                'description':event.description,
-                'height':event.height,
-                'position':event.position
-            });
-            document.cookie = 'events=' + JSON.stringify(events);
-        }
-    }
-
     // function to show messages to the user
     function message(message) {
         if(!message) {
@@ -410,27 +435,26 @@
     // on ready
     $(function() {
 
-        /*
-        // test to add an event to the timeline
-        setTimeout(function() {add_event({"title":"Meeting","description":"Going over the stuff for the thing","height":123,"position":450}, false);}, 1000);
-        setTimeout(function() {add_event({"title":"Meeting","description":"Going over the stuff for the thing","height":60,"position":300}, false);}, 2000);
-        */
-
         // reads the document cookie to find the stored events for the schedule
         (function(){
             try {
                 // regex pattern from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
                 events = JSON.parse(document.cookie.replace(/(?:(?:^|.*;\s*)events\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
-                for (var i = 0; i < events.length; i++) {
-                    add_event(events[i], false);
-                }
+                draw.events()();
             } catch(e) {
-                document.cookie = 'events=[]';
-                events = [];
+                document.cookie = 'events={}';
             }
         }());
 
-        // fills the times on the scheduling window
+        // test to add an event to the timeline each page load
+        draw.event({
+            title:"Meeting",
+            description:"Going over the stuff for the thing",
+            height:(Math.random()*200),
+            position:(Math.random()*600)
+        })();
+
+        // fills the time column on the scheduling window
         (function() {
             var contents = '',
                 // values in minutes since 0 am
