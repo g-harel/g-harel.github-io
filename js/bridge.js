@@ -1,4 +1,5 @@
 // TODO implement modular forms that are only associated to the table they represent
+
 (function() {
     var
         // the user object that will store all the user data
