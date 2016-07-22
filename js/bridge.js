@@ -165,6 +165,7 @@
                 };
             },
             event: function(event) {
+                console.log(event);
                 while (!event.key) {
                     event.key = Math.floor(Math.random()*10000) + 1;
                 }
@@ -446,13 +447,13 @@
             }
         }());
 
-        // test to add an event to the timeline each page load
+        /*// test to add an event to the timeline each page load
         draw.event({
             title:"Meeting",
             description:"Going over the stuff for the thing",
             height:(Math.random()*200),
             position:(Math.random()*600)
-        })();
+        })();*/
 
         // fills the time column on the scheduling window
         (function() {
@@ -697,13 +698,17 @@
         // submit listener for the form that adds a new meeting
         $('#add_meeting_form').on('submit', function(e) {
             e.preventDefault();
-            var info = {
-                description: $('#meeting_description').val().trim(),
-                objective: $('#dropdown_objectives_meeting').val(),
-                project: $('#dropdown_projects_meeting').val(),
-                start: $('#start_hour').val() + ':' + $('#start_min').val(),
-                end: $('#end_hour').val() + ':' + $('#end_min').val()
-            };
+            var starth = $('#start_hour').val(),
+                startm = $('#start_min').val(),
+                endh = $('#end_hour').val(),
+                endm = $('#end_min').val(),
+                info = {
+                    description: $('#meeting_description').val().trim(),
+                    objective: $('#dropdown_objectives_meeting').val(),
+                    project: $('#dropdown_projects_meeting').val(),
+                    start: starth + ':' + startm,
+                    end: endh + ':' + endm
+                };
             for (var key in info) {
                 if (info.hasOwnProperty(key)) {
                     if (!info[key]) {
@@ -722,6 +727,13 @@
                     target[length].push(length);
                     console.log(user);
                     draw.meetings()();
+                    console.log(starth,startm,endh,endm);
+                    draw.event({
+                        title: 'Meeting',
+                        description: info.description,
+                        height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
+                        position: (starth*60 + Number(startm) - 480)/15*23
+                    })();
                 } else {
                     message(add_response.status);
                 }
