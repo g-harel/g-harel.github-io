@@ -35,11 +35,26 @@
             <label class='sublabel'>Objective<select class='dropdown_objectives' id='dropdown_objectives_meeting'></select></label>
             <label class='sublabel'>Project<select class='dropdown_projects' id='dropdown_projects_meeting'></select></label>
             <label class='sublabel time_label'>Start
-                <input id='start_hour' class='time login' type='number' min='0' max='23'/>:
+                <input id='start_hour' class='time login' type='number' min='8' max='19'/>:
                 <input id='start_min' class='time login' type='number' min='0' max='59'/>
             </label>
             <label class='sublabel time_label'>End
-                <input id='end_hour' class='time login' type='number' min='0' max='23'/>:
+                <input id='end_hour' class='time login' type='number' min='8' max='19'/>:
+                <input id='end_min' class='time login' type='number' min='0' max='59'/>
+            </label>
+            <input type='submit' value='ADD' class='button login'/><hr/>
+            <input type='button' value='CANCEL' id='cancel' class='button login'/>
+        </form>
+    </div>
+    <div id='add_task_event' class='add_dialog dropshadow'>
+        <form id='add_task_event_form'>
+            <label class='new_label'>SCHEDULE TASK</label>
+            <label class='sublabel time_label'>Start
+                <input id='start_hour' class='time login' type='number' min='8' max='19'/>:
+                <input id='start_min' class='time login' type='number' min='0' max='59'/>
+            </label>
+            <label class='sublabel time_label'>End
+                <input id='end_hour' class='time login' type='number' min='8' max='19'/>:
                 <input id='end_min' class='time login' type='number' min='0' max='59'/>
             </label>
             <input type='submit' value='ADD' class='button login'/><hr/>

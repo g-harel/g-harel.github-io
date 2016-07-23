@@ -124,7 +124,7 @@
                     cols: [7,2],
                     col_width: ['75px', '100%', '30px', '29px'],
                     edit_cols: [true, false],
-                    button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move2 button" data-target="timeline">➤</span></td>'
+                    button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move_task button" data-target="timeline">➤</span></td>'
                 }));
                 if (tasks_week.length) {
                     $('#disable_day').hide();
@@ -142,18 +142,17 @@
                     data: meetings,
                     responseid: 7,
                     cols: [5,6,2,3,4],
-                    col_width: ['60px', '60px', '50%', '25%', '25%', '30px'],
+                    col_width: ['60px', '60px', '50%', '25%', '25%', '30px', '30px'],
                     edit_cols: [true, true, true, true, true],
-                    button: '<td><span class="remove button">❌</span></td>'
+                    button: '<td><span class="remove button">❌</span></td><td><span class="move_meeting button" data-target="timeline">➤</span></td>'
                 }));
                 return function() {
                     bind.edit();
                     bind.remove();
+                    bind.move_meeting();
                 };
             },
             events: function() {
-                console.log(events);
-                window.events = events;
                 for (var i in events) {
                     if (events.hasOwnProperty(i)) {
                         events[i].key = i;
@@ -165,7 +164,6 @@
                 };
             },
             event: function(event) {
-                console.log(event);
                 while (!event.key) {
                     event.key = Math.floor(Math.random()*10000) + 1;
                 }
@@ -197,6 +195,8 @@
                 bind.remove();
                 bind.remove_shallow();
                 bind.remove_event();
+                bind.move_task();
+                bind.move_meeting();
             },
             move: function() {
                 $('.move').off().on('click', function() {
@@ -340,6 +340,43 @@
                     delete events[$(this).attr('data-key')];
                     document.cookie = 'events=' + JSON.stringify(events);
                     $(this).hide();
+                });
+            },
+            move_task: function() {
+                $('.move_task').off().on('click', function() {
+                    var index = $(this).closest('tr').attr('data-responseid');
+                    $('#darken').toggle();
+                    $('.add_dialog').hide();
+                    $('#add_task_event').show();
+                    $('#add_task_event').on('submit', function(e) {
+                        e.preventDefault();
+                        var starth = $('#add_task_event #start_hour').val(),
+                            startm = $('#add_task_event #start_min').val(),
+                            endh = $('#add_task_event #end_hour').val(),
+                            endm = $('#add_task_event #end_min').val();
+                        draw.event({
+                            title: 'Task',
+                            description: user.tasks[index][2],
+                            height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
+                            position: (starth*60 + Number(startm) - 480)/15*23
+                        })();
+                        $('#darken').toggle();
+                    });
+                });
+            },
+            move_meeting: function() {
+                $('.move_meeting').off().on('click', function() {
+                    var meeting = user.meetings[$(this).closest('tr').attr('data-responseid')],
+                        starth = meeting[5].split(':')[0],
+                        startm = meeting[5].split(':')[1],
+                        endh = meeting[6].split(':')[0],
+                        endm = meeting[6].split(':')[1];
+                    draw.event({
+                        title: 'Meeting',
+                        description: meeting[2],
+                        height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
+                        position: (starth*60 + Number(startm) - 480)/15*23
+                    })();
                 });
             }
         };
@@ -626,7 +663,6 @@
                 if (add_response.status == 'success') {
                     var target = user.objectives;
                     $('#darken').toggle();
-                    $('#add_objective_form').children('input').not('.button').val('');
                     target.push([add_response.id, '', info.description, info.priority, target.length]);
                     draw.objectives()();
                 } else {
@@ -655,7 +691,6 @@
                 if (add_response.status == 'success') {
                     var target = user.projects;
                     $('#darken').toggle();
-                    $('#add_project_form').children('input').not('.button').val('');
                     target.push([add_response.id, '', info.description, info.priority, target.length]);
                     draw.projects()();
                 } else {
@@ -686,7 +721,6 @@
                 if (add_response.status == 'success') {
                     var target = user.tasks;
                     $('#darken').toggle();
-                    $('#add_task_form').children('input').not('.button').val('');
                     target.push([add_response.id, '', info.description, info.priority, info.objective, info.project, null, null, target.lenght]);
                     draw.tasks()();
                 } else {
@@ -698,10 +732,10 @@
         // submit listener for the form that adds a new meeting
         $('#add_meeting_form').on('submit', function(e) {
             e.preventDefault();
-            var starth = $('#start_hour').val(),
-                startm = $('#start_min').val(),
-                endh = $('#end_hour').val(),
-                endm = $('#end_min').val(),
+            var starth = $('#add_meetings #start_hour').val(),
+                startm = $('#add_meetings #start_min').val(),
+                endh = $('#add_meetings #end_hour').val(),
+                endm = $('#add_meetings #end_min').val(),
                 info = {
                     description: $('#meeting_description').val().trim(),
                     objective: $('#dropdown_objectives_meeting').val(),
@@ -722,12 +756,9 @@
                     var target = user.meetings,
                         length = target.length;
                     $('#darken').toggle();
-                    $('#add_meeting_form').children('input').not('.button').val('');
                     target.push([add_response.id, '',info.description, info.objective, info.project, info.start, info.end]);
                     target[length].push(length);
-                    console.log(user);
                     draw.meetings()();
-                    console.log(starth,startm,endh,endm);
                     draw.event({
                         title: 'Meeting',
                         description: info.description,

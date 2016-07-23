@@ -270,7 +270,7 @@ ul {
     width: 100%;
 }
 
-.remove, .remove_shallow, .move, .move2 {
+.remove, .remove_shallow, .move, .move_task, .move_meeting {
     color: #00E26B;
     font-size: 14px;
 }
