@@ -250,12 +250,6 @@
                             bind.edit();
                             return;
                         }
-                        // creating in the object to be passed to backend
-                        var data = {
-                            type: type,
-                            field: db_struct[type][position],
-                            value: newvalue
-                        };
                         user[type][index][position] = newvalue;
                         draw[type]()();
                     });
@@ -286,12 +280,6 @@
                         message('task is being used in day, cannot be removed from week');
                         return;
                     }
-                    // creating in the object to be passed to backend
-                    var data = {
-                        type: 'tasks',
-                        field: type,
-                        value: 'NULL'
-                    };
                     user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
                     draw.tasks()();
                 });
