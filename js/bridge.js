@@ -212,7 +212,6 @@
                         source_index = 6;
                         target_index = 7;
                     }
-                    user.tasks[index][target_index] = 1;
                     draw.tasks()();
                 });
             },
