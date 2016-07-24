@@ -212,12 +212,6 @@
                         source_index = 6;
                         target_index = 7;
                     }
-                    // creating in the object to be passed to backend
-                    var data = {
-                        type: 'tasks',
-                        field: db_struct.tasks[target_index],
-                        value: user.tasks[index][source_index]
-                    };
                     user.tasks[index][target_index] = data.value;
                     draw.tasks()();
                 });
