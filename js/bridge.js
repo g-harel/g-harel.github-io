@@ -216,7 +216,6 @@
                     var data = {
                         type: 'tasks',
                         field: db_struct.tasks[target_index],
-                        id: user.tasks[index][0],
                         value: user.tasks[index][source_index]
                     };
                     user.tasks[index][target_index] = data.value;
@@ -255,7 +254,6 @@
                         var data = {
                             type: type,
                             field: db_struct[type][position],
-                            id: user[type][index][0],
                             value: newvalue
                         };
                         user[type][index][position] = newvalue;
@@ -273,11 +271,6 @@
                         message('task is being used in week, cannot be removed');
                         return;
                     }
-                    // creating in the object to be passed to backend
-                    var data = {
-                        type: type,
-                        id: user[type][index][0],
-                    };
                     element.closest('tr').remove();
                     user[type][index] = undefined;
                     draw.tasks()();
@@ -297,7 +290,6 @@
                     var data = {
                         type: 'tasks',
                         field: type,
-                        id: user.tasks[index][0],
                         value: 'NULL'
                     };
                     user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
