@@ -212,11 +212,6 @@
                         source_index = 6;
                         target_index = 7;
                     }
-                    // execution stops if the tasks has already been moved
-                    if (user.tasks[index][target_index]) {
-                        message('task has already been moved');
-                        return;
-                    }
                     // creating in the object to be passed to backend
                     var data = {
                         type: 'tasks',
