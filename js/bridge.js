@@ -38,7 +38,7 @@
                     cols: [3,2],
                     col_width: ['75px', '100%', '30px'],
                     edit_cols: [true, true],
-                    button: '<td><span class="remove button">❌</span></td>'
+                    button: '<td><span class="remove button">X</span></td>'
                 }));
                 var dropdown = '';
                 for (var i = 0; i < user.objectives.length; i++) {
@@ -62,7 +62,7 @@
                     cols: [3,2],
                     col_width: ['75px', '100%', '30px'],
                     edit_cols: [true, true],
-                    button: '<td><span class="remove button">❌</span></td>'
+                    button: '<td><span class="remove button">X</span></td>'
                 }));
                 var dropdown = '';
                 for (var i = 0; i < user.projects.length; i++) {
@@ -88,7 +88,7 @@
                     cols: [3,2,4,5],
                     col_width: ['75px', '36%', '32%', '32%', '30px'],
                     edit_cols: [true, true, true, true],
-                    button: '<td><span class="remove button">❌</span></td>'
+                    button: '<td><span class="remove button">X</span></td>'
                 }));
                 $('#tasks_week_source').html(table({
                     titles: ['priority', 'tasks'],
@@ -97,7 +97,7 @@
                     cols: [3,2],
                     col_width: ['75px', '100%', '29px'],
                     edit_cols: [false, false],
-                    button: '<td><span class="move button" data-target="week">➤</span></td>'
+                    button: '<td><span class="move button" data-target="week">></span></td>'
                 }));
                 $('#tasks_week').html(table({
                     titles: ['priority', 'tasks'],
@@ -106,7 +106,7 @@
                     cols: [6,2],
                     col_width: ['75px', '100%', '30px'],
                     edit_cols: [true, false],
-                    button: '<td><span class="remove_shallow button" data-source="week_priority">❌</span></td>'
+                    button: '<td><span class="remove_shallow button" data-source="week_priority">X</span></td>'
                 }));
                 $('#tasks_day_source').html(table({
                     titles: ['priority', 'tasks'],
@@ -115,7 +115,7 @@
                     cols: [6,2],
                     col_width: ['75px', '100%', '29px'],
                     edit_cols: [false, false],
-                    button: '<td><span class="move button" data-target="day">➤</span></td>'
+                    button: '<td><span class="move button" data-target="day">></span></td>'
                 }));
                 $('#tasks_day').html(table({
                     titles: ['priority', 'tasks'],
@@ -124,7 +124,7 @@
                     cols: [7,2],
                     col_width: ['75px', '100%', '30px', '29px'],
                     edit_cols: [true, false],
-                    button: '<td><span class="remove_shallow button" data-source="day_priority">❌</span></td><td><span class="move_task button" data-target="timeline">➤</span></td>'
+                    button: '<td><span class="remove_shallow button" data-source="day_priority">X</span></td><td><span class="move_task button" data-target="timeline">></span></td>'
                 }));
                 if (tasks_week.length) {
                     $('#disable_day').hide();
@@ -144,7 +144,7 @@
                     cols: [5,6,2,3,4],
                     col_width: ['60px', '60px', '50%', '25%', '25%', '30px', '30px'],
                     edit_cols: [true, true, true, true, true],
-                    button: '<td><span class="remove button">❌</span></td><td><span class="move_meeting button" data-target="timeline">➤</span></td>'
+                    button: '<td><span class="remove button">X</span></td><td><span class="move_meeting button" data-target="timeline">></span></td>'
                 }));
                 return function() {
                     bind.edit();
@@ -224,14 +224,8 @@
                         id: user.tasks[index][0],
                         value: user.tasks[index][source_index]
                     };
-                    $.post('../php_helper/edit.php', data, function(edit_response) {
-                        if (edit_response == 'success') {
-                            user.tasks[index][target_index] = data.value;
-                            draw.tasks()();
-                        } else {
-                            message(edit_response);
-                        }
-                    }, 'text');
+                    user.tasks[index][target_index] = data.value;
+                    draw.tasks()();
                 });
             },
             edit: function() {
@@ -269,16 +263,8 @@
                             id: user[type][index][0],
                             value: newvalue
                         };
-                        $.post('../php_helper/edit.php', data, function(edit_response) {
-                            if (edit_response == 'success') {
-                                user[type][index][position] = newvalue;
-                                draw[type]()();
-                            } else {
-                                message(edit_response);
-                                live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
-                                bind.edit();
-                            }
-                        }, 'text');
+                        user[type][index][position] = newvalue;
+                        draw[type]()();
                     });
                 });
             },
@@ -297,15 +283,9 @@
                         type: type,
                         id: user[type][index][0],
                     };
-                    $.post('../php_helper/remove.php', data, function(remove_response) {
-                        if (remove_response == 'success') {
-                            element.closest('tr').remove();
-                            user[type][index] = undefined;
-                            draw.tasks()();
-                        } else {
-                            message(remove_response);
-                        }
-                    }, 'text');
+                    element.closest('tr').remove();
+                    user[type][index] = undefined;
+                    draw.tasks()();
                 });
             },
             remove_shallow: function() {
@@ -325,14 +305,8 @@
                         id: user.tasks[index][0],
                         value: 'NULL'
                     };
-                    $.post('../php_helper/edit.php', data, function(edit_response) {
-                        if (edit_response == 'success') {
-                            user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
-                            draw.tasks()();
-                        } else {
-                            message(edit_response);
-                        }
-                    }, 'text');
+                    user.tasks[index][((type == 'week_priority')?6:7)] = undefined;
+                    draw.tasks()();
                 });
             },
             remove_event: function() {
@@ -509,113 +483,18 @@
         }());
 
         // requests all the information for the user
-        $.post('../php_helper/retreive.php', {}, function(response) {
-            console.log(response);
-            if (response.status == 'success') {
-                user = response;
-                // adding an index to each element to reference it in the response object
-                for (var i = 0; i < db_struct.tables.length; i++) {
-                    var current_table = db_struct.tables[i];
-                    for (var j = 0; j < user[current_table].length; j++) {
-                        user[current_table][j].push(j);
-                    }
-                }
-                draw.all()();
-            } else {
-                message(response.status);
-            }
-        }, 'JSON');
+        user = {
+            meetings: [],
+            objectives: [],
+            projects: [],
+            tasks: []
+        };
 
         // click listener for the utility buttons
         $('.utility').on('click', function() {
             // toggle which form is shown
             $('.form').toggle();
             $('input').not('.button').val('');
-        });
-
-        // click listener for the signin button
-        $('#login_form').on('submit', function(e) {
-            e.preventDefault();
-            // storing the values of the fields
-            var info = {
-                identifier: $('#login_identifier').val().trim(),
-                password: $('#login_password').val().trim()
-            };
-            // check that the fields are filled
-            for (var key in info) {
-                if (info.hasOwnProperty(key)) {
-                    if (info[key] === '') {
-                        message('please fill in all the fields');
-                        return;
-                    }
-                }
-            }
-            // check that the format of the identifier fields matches either the username or remail one
-            if (!info.identifier.match(emailRegEx) && !info.identifier.match(usernameRegEx)) {
-                message('invalid username/email');
-                return;
-            }
-            // sending a post request to the specified file with the info object
-            $.post('../php_helper/login.php', info, function(login_response) {
-                if (login_response == 'success') {
-                    location.reload();
-                } else {
-                    message(login_response);
-                }
-            }, 'text');
-        });
-
-        // click listener for the register button
-        $('#register_form').on('submit', function(e) {
-            e.preventDefault();
-            // storing the values of the fields
-            var info = {
-                username: $('#register_user').val().trim(),
-                email: $('#register_email').val().trim(),
-                password: $('#register_password').val().trim(),
-                checkpassword: $('#register_checkpassword').val().trim()
-            };
-            //checking that all fields are filled
-            for (var key in info) {
-                if (info.hasOwnProperty(key)) {
-                    if (info[key] === '') {
-                        message('please fill in all the fields');
-                        return;
-                    }
-                }
-            }
-            // checking that each of the field inputs are in the correct format
-            if (!info.username.match(usernameRegEx)) {
-                message('wrong username format');
-                return;
-            }
-            if (!info.email.match(emailRegEx)) {
-                message('wrong email format');
-                return;
-            }
-            if (!info.password.match(passwordRegEx)) {
-                message('wrong password format');
-                return;
-            }
-            // checking that the passwords match
-            if (info.password != info.checkpassword) {
-                message('passwords do not match');
-                return;
-            }
-            // removing the password check variable
-            delete info.checkpassword;
-            // sending a post request to the specified file with the info object
-            $.post('../php_helper/register.php', info, function(register_response) {
-                // testing if the user has been successfully added
-                if (register_response == 'success') {
-                    // toggle which form is shown
-                    $('.form').toggle();
-                    $('input').not('.button').val('');
-                    message('account created!');
-                } else {
-                    message(register_response);
-                }
-            }, 'text');
         });
 
         // click listener for the tab buttons
@@ -659,16 +538,10 @@
                     }
                 }
             }
-            $.post('../php_helper/objective.php', info, function(add_response) {
-                if (add_response.status == 'success') {
-                    var target = user.objectives;
-                    $('#darken').toggle();
-                    target.push([add_response.id, '', info.description, info.priority, target.length]);
-                    draw.objectives()();
-                } else {
-                    message(add_response.status);
-                }
-            }, 'JSON');
+            var target = user.objectives;
+            $('#darken').toggle();
+            target.push([Math.floor(Math.random()*10000), '', info.description, info.priority, target.length]);
+            draw.objectives()();
         });
 
         // submit listener for the form that adds a new objective
@@ -687,16 +560,10 @@
                     }
                 }
             }
-            $.post('../php_helper/project.php', info, function(add_response) {
-                if (add_response.status == 'success') {
-                    var target = user.projects;
-                    $('#darken').toggle();
-                    target.push([add_response.id, '', info.description, info.priority, target.length]);
-                    draw.projects()();
-                } else {
-                    message(add_response.status);
-                }
-            }, 'JSON');
+            var target = user.projects;
+            $('#darken').toggle();
+            target.push([Math.floor(Math.random()*10000), '', info.description, info.priority, target.length]);
+            draw.projects()();
         });
 
         // submit listener for the form that adds a new task
@@ -705,9 +572,7 @@
             var info = {
                 type: tasks,
                 description: $('#task_description').val().trim(),
-                priority: $('#task_priority').val().trim(),
-                objective: $('#dropdown_objectives_task').val(),
-                project: $('#dropdown_projects_task').val()
+                priority: $('#task_priority').val().trim()
             };
             for (var key in info) {
                 if (info.hasOwnProperty(key)) {
@@ -717,16 +582,12 @@
                     }
                 }
             }
-            $.post('../php_helper/task.php', info, function(add_response) {
-                if (add_response.status == 'success') {
-                    var target = user.tasks;
-                    $('#darken').toggle();
-                    target.push([add_response.id, '', info.description, info.priority, info.objective, info.project, null, null, target.lenght]);
-                    draw.tasks()();
-                } else {
-                    message(add_response.status);
-                }
-            }, 'JSON');
+            info.objective = $('#dropdown_objectives_task').val();
+            info.project = $('#dropdown_projects_task').val();
+            var target = user.tasks;
+            $('#darken').toggle();
+            target.push([Math.floor(Math.random()*10000), '', info.description, info.priority, info.objective, info.project, null, null, target.lenght]);
+            draw.tasks()();
         });
 
         // submit listener for the form that adds a new meeting
@@ -738,8 +599,6 @@
                 endm = $('#add_meetings #end_min').val(),
                 info = {
                     description: $('#meeting_description').val().trim(),
-                    objective: $('#dropdown_objectives_meeting').val(),
-                    project: $('#dropdown_projects_meeting').val(),
                     start: starth + ':' + startm,
                     end: endh + ':' + endm
                 };
@@ -751,24 +610,20 @@
                     }
                 }
             }
-            $.post('../php_helper/meeting.php', info, function(add_response) {
-                if (add_response.status == 'success') {
-                    var target = user.meetings,
-                        length = target.length;
-                    $('#darken').toggle();
-                    target.push([add_response.id, '',info.description, info.objective, info.project, info.start, info.end]);
-                    target[length].push(length);
-                    draw.meetings()();
-                    draw.event({
-                        title: 'Meeting',
-                        description: info.description,
-                        height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
-                        position: (starth*60 + Number(startm) - 480)/15*23
-                    })();
-                } else {
-                    message(add_response.status);
-                }
-            }, 'JSON');
+            info.objective = $('#dropdown_objectives_meeting').val();
+            info.project = $('#dropdown_projects_meeting').val();
+            var target = user.meetings,
+                length = target.length;
+            $('#darken').toggle();
+            target.push([Math.floor(Math.random()*10000), '',info.description, info.objective, info.project, info.start, info.end]);
+            target[length].push(length);
+            draw.meetings()();
+            draw.event({
+                title: 'Meeting',
+                description: info.description,
+                height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
+                position: (starth*60 + Number(startm) - 480)/15*23
+            })();
         });
     });
 }());
