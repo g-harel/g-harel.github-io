@@ -143,7 +143,7 @@ table {
 }
 
 .add_dialog {
-    border-top: 4px solid #00E26B;
+    border-top: 4px solid #5A0F96;
     text-align: center;
     position: fixed;
     display: none;
@@ -174,7 +174,7 @@ table {
 #header {
     width: calc(100% - 10px);
     height: 26px;
-    background-color: #00E26B;
+    background-color: #5A0F96;
     padding-left: 10px;
     margin-bottom: 10px;
 }
@@ -232,7 +232,7 @@ ul {
 }
 
 .tab {
-    color: #00E26B;
+    color: #5A0F96;
     text-align: center;
     cursor: pointer;
     background-color: white;
@@ -245,7 +245,7 @@ ul {
 #tab_slider {
     height: 2px;
     width: 25%;
-    background-color: #00E26B;
+    background-color: #5A0F96;
 }
 
 #disable_day {
@@ -271,7 +271,7 @@ ul {
 }
 
 .remove, .remove_shallow, .move, .move_task, .move_meeting {
-    color: #00E26B;
+    color: #5A0F96;
     font-size: 14px;
 }
 
@@ -303,11 +303,11 @@ ul {
 .seperator {
     height: 2px;
     width: 100%;
-    background-color: #00E26B;
+    background-color: #5A0F96;
 }
 
 .title {
-    color: #00E26B;
+    color: #5A0F96;
     padding-top: 3px;
     width: 25%;
     font-weight: 500;
@@ -372,7 +372,7 @@ ul {
     left: 70px;
     width: calc(100% - 80px);
     border: 1px solid #f1f1f1;
-    border-left: 2px solid #00E26B;
+    border-left: 2px solid #5A0F96;
     background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 4px,#fbfbfb 4px, #fbfbfb 6px);
     border-radius: 1px;
 }
