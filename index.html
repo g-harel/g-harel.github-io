@@ -4,12 +4,12 @@
 <html>
     <head>
         <title>Agenda</title>
-        <link rel='icon' href='res/favicon.ico'>
+        <link rel="icon" href="favicon.ico">
         <link href='https://fonts.googleapis.com/css?family=Roboto:700,500,400' rel='stylesheet' type='text/css'>
         <link href='https://fonts.googleapis.com/css?family=Open+Sans:800,700,600' rel='stylesheet' type='text/css'>
         <script src='https://code.jquery.com/jquery-3.0.0.min.js' integrity='sha256-JmvOoLtYsmqlsWxa7mDSLMwa6dZ9rrIdtrrVYRnDRH0=' crossorigin='anonymous'></script>
-        <script src='js/bridge.js'></script>
-        <link rel='stylesheet' href='css/style.css'>
+        <script src='bridge.js'></script>
+        <link rel='stylesheet' href='style.css'>
     </head>
     <body>
         <div id='message'></div>
@@ -78,7 +78,9 @@
             </div>
         </div>
         <div id='header' class='dropshadow'>
-            <img src="res/icon_white_small.png" height="65%" width="auto" class='button'>
+            <svg height="65%" class='button' id="corner_icon" viewBox="0 0 200 200">
+                <path class="svg_white" d="M100,0H0v100c0,55.2,44.8,100,100,100s100-44.8,100-100C200,44.8,155.2,0,100,0z"/>
+            </svg>
         </div>
         <div id='main' class='main_nav dropshadow'>
             <div id='disable_day'></div>
@@ -90,12 +92,24 @@
             </ul>
             <div id='tab_slider'></div>
             <div id='objproj' class='content current'>
-                <img id='add_objective_icon' data-source='objectives' src="res/add_icon2.png" height="40px" width="auto" class='button add'>
-                <img id='add_project_icon' data-source='projects' src="res/add_icon2.png" height="40px" width="auto" class='button add'>
+                <svg id="add_objective_icon" class='button add' data-source='objectives' height='32px' viewBox="0 0 200 200">
+                    <circle id="circle" class="svg_color" cx="100" cy="100" r="100"/>
+                    <polygon id="cross" class="svg_white" points="143.8,92 108,92 108,56.3 92,56.3 92,92 56.3,92 56.3,108 92,108 92,143.8 108,143.8
+                	108,108 143.8,108 "/>
+                </svg>
+                <svg id="add_project_icon" class='button add' data-source='projects' height='32px' viewBox="0 0 200 200">
+                    <circle id="circle" class="svg_color" cx="100" cy="100" r="100"/>
+                    <polygon id="cross" class="svg_white" points="143.8,92 108,92 108,56.3 92,56.3 92,92 56.3,92 56.3,108 92,108 92,143.8 108,143.8
+                	108,108 143.8,108 "/>
+                </svg>
                 <div id='objectives' class='subcontent' data-source='objectives'></div><div id='projects' class='subcontent' data-source='projects'></div>
             </div>
             <div id='tasks' class='content'>
-                <img id='add_task_icon' data-source='tasks' src="res/add_icon2.png" height="40px" width="auto" class='button add'>
+                <svg id="add_task_icon" class='button add' data-source='tasks' height='32px' viewBox="0 0 200 200">
+                    <circle id="circle" class="svg_color" cx="100" cy="100" r="100"/>
+                    <polygon id="cross" class="svg_white" points="143.8,92 108,92 108,56.3 92,56.3 92,92 56.3,92 56.3,108 92,108 92,143.8 108,143.8
+                	108,108 143.8,108 "/>
+                </svg>
                 <div id='tasks_main' data-source='tasks'></div>
             </div>
             <div id='week' class='content'>
@@ -113,7 +127,11 @@
             </div>
         </div>
         <div id='meetings' class='main_nav dropshadow'>
-            <img id='add_meeting_icon' data-source='meetings' src="res/add_icon2.png" height="40px" width="auto" class='button add'>
+            <svg id="add_meeting_icon" class='button add' data-source='meetings' height='32px' viewBox="0 0 200 200">
+                <circle id="circle" class="svg_color" cx="100" cy="100" r="100"/>
+                <polygon id="cross" class="svg_white" points="143.8,92 108,92 108,56.3 92,56.3 92,92 56.3,92 56.3,108 92,108 92,143.8 108,143.8
+                108,108 143.8,108 "/>
+            </svg>
             <div class='title'>MEETINGS</div>
             <div class='seperator'></div>
             <div id='meetings_table' data-source='meetings'></div>

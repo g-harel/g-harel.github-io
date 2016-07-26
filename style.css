@@ -1,0 +1,401 @@
+/* some preferred defaults */
+* {
+    margin: 0px;
+    padding: 0px;
+    border-width: 0px;
+    position: relative;
+    outline: none;
+    font-family: 'Roboto';
+    font-size: 16px;
+    font-weight: 400;
+    color: #222222;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+html, body {
+    height: 100%;
+}
+
+body {
+    background-color: #f1f1f1;
+}
+
+#message {
+    position: fixed;
+    width: 100%;
+    z-index: 999;
+    padding: 3px;
+    height: 20px;
+    text-align: center;
+    display: none;
+    text-transform: uppercase;
+    background-color: #222222;
+    color: white;
+}
+
+#register {
+    display: none;
+}
+
+.form {
+    width: 440px;
+    margin: auto;
+    padding: 15px;
+    border-radius: 2px;
+    background-color: white;
+    text-align: center;
+    top: 28%;
+}
+
+label {
+    display: block;
+    font-size: 25px;
+}
+
+input.login {
+    padding-left: 8px;
+    height: 26px;
+    width: 430px;
+    border-radius: 1px;
+    background-color: rgba(34,34,34,0.1);
+    color: #222222;
+}
+
+/* placeholder text in text inputs (might not work on all browsers) */
+::-webkit-input-placeholder {
+    opacity: 0.6;
+    color: white;
+}
+
+.button {
+    cursor: pointer;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+.button:active {
+    top: 3px;
+}
+
+.login.button {
+    padding-left: 0px;
+    margin-left: 0px;
+    background-color: #222222;
+    width: 438px;
+    color: white;
+    margin-top: 10px;
+}
+
+/* main interface starting here */
+
+hr {
+    border-top: 1px solid rgba(34, 34, 34, 0.2);
+    margin-top: 10px;
+    margin-bottom: 0px;
+}
+
+table td + td {
+    border-left: 1px solid rgba(34,34,34,0.2);
+}
+
+td, th {
+    overflow: hidden;
+    height: 19px;
+    padding: 2px;
+    text-align: center;
+}
+
+th {
+    text-transform: uppercase;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-weight: 500;
+}
+
+table {
+    width: 100%;
+    white-space: nowrap;
+    table-layout: fixed;
+}
+
+.dropshadow {
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.content {
+    height: calc(100% - 28px);
+    display: none;
+    background-color: white;
+    width: 100%;
+    /*overflow-y: scroll;*/
+}
+
+#darken {
+    display: none;
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0,0,0,0.7);
+    z-index: 3;
+}
+
+.add_dialog {
+    border-top: 4px solid #5A0F96;
+    text-align: center;
+    position: fixed;
+    display: none;
+    top: 28%;
+    left: 32%;
+    width: 454px;
+    padding-bottom: 10px;
+    z-index: 4;
+    background-color: white;
+}
+
+.new_label {
+    top: 5px;
+}
+
+.add_dialog select {
+    padding: 4px;
+    height: 26px;
+    width: 438px;
+    border-radius: 1px;
+    background-color: rgba(34,34,34,0.1);
+}
+
+.add_dialog select:disabled {
+    color: rgba(255,255,255,0.6);
+}
+
+#header {
+    width: calc(100% - 10px);
+    height: 26px;
+    background-color: #5A0F96;
+    padding-left: 10px;
+    margin-bottom: 10px;
+}
+
+#corner_icon {
+    bottom: -16%;
+    float: left;
+}
+
+#main {
+    width: calc(70% - 20px);
+    height: calc(60% - 30px);
+    float: left;
+    left: 10px;
+    background-color: white;
+}
+
+ul {
+    text-transform: uppercase;
+}
+
+.add {
+    position: fixed;
+    display: inline;
+    z-index: 2;
+}
+
+#add_objective_icon {
+    top: calc(60% - 44px);
+    left: calc(35% - 68px);
+}
+
+#add_project_icon {
+    top: calc(60% - 44px);
+    left: calc(70% - 78px);
+}
+
+#add_task_icon {
+    top: calc(60% - 44px);
+    left: calc(70% - 78px);
+}
+
+
+#add_objective_icon:active, #add_project_icon:active, #add_task_icon:active {
+    top: calc(60% - 42px);
+}
+
+#add_meeting_icon {
+    top: calc(100% - 62px);
+    left: calc(70% - 78px);
+}
+
+#add_meeting_icon:active {
+    top: calc(100% - 60px);
+}
+
+.tab {
+    color: #5A0F96;
+    text-align: center;
+    cursor: pointer;
+    background-color: white;
+    display: inline-block;
+    padding-top: 3px;
+    width: 25%;
+    font-weight: 500;
+}
+
+#tab_slider {
+    height: 2px;
+    width: 25%;
+    background-color: #5A0F96;
+}
+
+#disable_day {
+    position: absolute;
+    background-color: rgba(255,255,255,0.7);
+    width: 25%;
+    height: 26px;
+    left: 75%;
+    z-index: 1;
+}
+
+.content, .subcontent, #meetings_table, #schedule_frame {
+    background-image: repeating-linear-gradient(180deg, transparent, transparent 23px,#f1f1f1 23px, #f1f1f1 46px);
+}
+
+.content.current {
+    display: inline-block;
+}
+
+.editable {
+    cursor: cell;
+    width: 100%;
+}
+
+.remove, .remove_shallow, .move, .move_task, .move_meeting {
+    color: #5A0F96;
+    font-size: 14px;
+}
+
+#live_edit {
+    background: transparent;
+    background-color: rgba(0, 0, 0, 0.05);;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+}
+
+#timeline {
+    width: calc(30% - 10px);
+    height: calc(100% - 50px);
+    float: right;
+    right: 10px;
+    background-color: white;
+}
+
+#meetings {
+    width: calc(70% - 20px);
+    height: calc(40% - 30px);
+    float: left;
+    left: 10px;
+    top: 10px;
+    background-color: white;
+}
+
+.seperator {
+    height: 2px;
+    width: 100%;
+    background-color: #5A0F96;
+}
+
+.title {
+    color: #5A0F96;
+    padding-top: 3px;
+    width: 25%;
+    font-weight: 500;
+    height: 23px;
+    margin-left: 6px;
+}
+
+#meetings_table {
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.add_dialog .time {
+    width: 50px;
+    margin-right: 6px;
+}
+
+.sublabel {
+    font-size: 16px;
+    float: left;
+    margin-right: 2px;
+    text-align: left;
+    left: 12px;
+    margin-top: 5px;
+}
+
+#timers {
+    display: none;
+    float: left;
+    width: calc(35% - 15px);
+    height: 30%;
+    top: 10px;
+    margin-left: 0;
+    background-color: white;
+    margin-left: 20px
+}
+
+.subcontent {
+    background-color: white;
+    width: 50%;
+    height: 100%;
+    overflow-y: scroll;
+    display: inline-block;
+}
+
+#tasks {
+    overflow-y: scroll;
+}
+
+#schedule_wrapper {
+    overflow-y: scroll;
+    height: calc(100% - 28px);
+}
+
+#times {
+    width: 70px;
+}
+
+.event {
+    z-index: 2;
+    position: absolute;
+    left: 70px;
+    width: calc(100% - 80px);
+    border: 1px solid #f1f1f1;
+    border-left: 2px solid #5A0F96;
+    background-image: repeating-linear-gradient(-45deg, rgba(255,255,255,0.8) 0px, rgba(255,255,255,0.8) 4px,#fbfbfb 4px, #fbfbfb 6px);
+    border-radius: 1px;
+}
+
+.event_title {
+    font-weight: 800;
+    margin-left: 10px;
+    top: 2px;
+}
+
+.event_description {
+    top: 2px;
+    margin-left: 10px;
+}
+
+.time_label {
+    margin-top: 10px;
+}
+
+.svg_white {
+    fill: white;
+}
+
+.svg_color {
+    fill: #5A0F96;
+}
