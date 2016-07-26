@@ -443,6 +443,7 @@ $(function() {
         } catch(e) {
             document.cookie = 'user={meetings:[], objectives:[], projects:[], tasks:[]}';
         }
+        draw.events()();
         draw.all()();
     }());
 
