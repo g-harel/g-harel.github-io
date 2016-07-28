@@ -88,9 +88,9 @@ var
                 data: tasks_all,
                 responseid: 8,
                 cols: [3,2,4,5],
-                col_width: ['75px', '36%', '32%', '32%', '30px'],
+                col_width: ['75px', '36%', '32%', '32%', '30px', '30px'],
                 edit_cols: [true, true, true, true],
-                button: '<td><span class="remove button">X</span></td>'
+                button: '<td><span class="strike button">--</span></td><td><span class="remove button">X</span></td>'
             }));
             $('#tasks_week_source').html(table({
                 titles: ['priority', 'tasks'],
@@ -199,6 +199,7 @@ var
             bind.remove_event();
             bind.move_task();
             bind.move_meeting();
+            bind.strike();
         },
         move: function() {
             $('.move').off().on('click', function() {
@@ -222,8 +223,12 @@ var
         edit: function() {
             $('.editable').off().on('dblclick', function() {
                 var element = $(this),
-                    oldvalue = element.html(),
-                    type = element.parent().closest('div').attr('data-source'),
+                    oldvalue = element.html();
+                if (oldvalue.match('^<s>') && oldvalue.match('</s>$')) {
+                    message('cannot edit completed task description');
+                    return;
+                }
+                var type = element.parent().closest('div').attr('data-source'),
                     index = element.closest('tr').attr('data-responseid'),
                     position = element.closest('td').attr('data-datapos');
                 // replacing the text inside the clicked div with a text input element
@@ -333,6 +338,21 @@ var
                     height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
                     position: (starth*60 + Number(startm) - 480)/15*23
                 })();
+            });
+        },
+        strike: function() {
+            $('.strike').off().on('click', function() {
+                var element = $(this),
+                    type = element.parent().closest('div').attr('data-source'),
+                    index = element.closest('tr').attr('data-responseid'),
+                    value = user[type][index][2];
+                if (value.match('<s>') && value.match('</s>')) {
+                    user[type][index][2] = value.replace('<s>', '').replace('</s>', '');
+                } else {
+                    user[type][index][2] = '<s>' + value + '</s>';
+                }
+                update_user_cookie();
+                draw.all()();
             });
         }
     };
