@@ -240,6 +240,13 @@ var
                         bind.edit();
                         return;
                     }
+                    // resets if the number entered should be a number but isnt
+                    if ((type != 'meetings' && position == 3) && !Number(newvalue)) {
+                        live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
+                        message('invalid number');
+                        bind.edit();
+                        return;
+                    }
                     // resets if the time format is not proper for the meeting times
                     if (type == 'meetings' && (position == 5 || position == 6) && !newvalue.match(/^\d{1,2}:\d{2}$/)) {
                         live_edit.closest('td').html('<div class="editable">' + oldvalue + '</div>');
