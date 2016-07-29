@@ -221,7 +221,7 @@ var
             });
         },
         edit: function() {
-            $('.editable').off().on('dblclick', function() {
+            $('.editable').off().on('click', function() {
                 var element = $(this),
                     oldvalue = element.html();
                 if (oldvalue.match('^<s>') && oldvalue.match('</s>$')) {
