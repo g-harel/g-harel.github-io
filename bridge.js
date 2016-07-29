@@ -155,8 +155,8 @@ var
             };
         },
         events: function() {
-            for (var i in events) {
-                if (events.hasOwnProperty(i)) {
+            for (var i = 0; i < events.length; i++) {
+                if (events[i]) {
                     events[i].key = i;
                     draw.event(events[i]);
                 }
@@ -166,26 +166,23 @@ var
             };
         },
         event: function(event) {
-            while (!event.key) {
-                event.key = Math.floor(Math.random()*10000) + 1;
-            }
-            var contents = '<div class="event dropshadow" data-key="' + event.key + '" ';
+            var contents = '<div class="event dropshadow" data-key="' + (event.key || '0') + '" ';
             contents += 'style="top:' + (event.position || 46 ) + 'px;height:' + (event.height || 46) + 'px">';
             contents += '<span class="event_title">' + (event.title || '') + '</span>';
             contents += '<span class="event_description">' + (event.description || '') + '</span>';
             contents += '</div>';
             $('#schedule_wrapper').append(contents);
             return function() {
-                events[event.key] = {
+                events.push({
                     'title':event.title,
                     'description':event.description,
                     'height':event.height,
                     'position':event.position,
-                    'key': event.key
-                };
+                    'key': events.length
+                });
                 bind.remove_event();
                 $('#schedule_wrapper').scrollTop(event.position-100);
-                document.cookie = 'events=' + JSON.stringify(events);
+                localStorage.events = JSON.stringify(events);
             };
         }
     },
@@ -299,7 +296,7 @@ var
         remove_event: function() {
             $('.event').off().on('dblclick', function() {
                 delete events[$(this).attr('data-key')];
-                document.cookie = 'events=' + JSON.stringify(events);
+                localStorage.events = JSON.stringify(events);
                 $(this).hide();
             });
         },
@@ -319,7 +316,7 @@ var
                         title: 'Task',
                         description: user.tasks[index][2],
                         height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
-                        position: (starth*60 + Number(startm) - 480)/15*23
+                        position: (starth*60 + Number(startm) - 360)/15*23
                     })();
                     $('#darken').toggle();
                 });
@@ -336,7 +333,7 @@ var
                     title: 'Meeting',
                     description: meeting[2],
                     height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
-                    position: (starth*60 + Number(startm) - 480)/15*23
+                    position: (starth*60 + Number(startm) - 360)/15*23
                 })();
             });
         },
@@ -390,7 +387,6 @@ function table(settings) {
     for (i = 0; i < data_rows; i++) {
         table += '<tr data-responseid="' + settings.data[i][settings.responseid] + '">';
         for (var j = 0; j < columns; j++) {
-            console.log(settings.data[i][settings.cols[j]], settings.edit_cols[j]);
             table += '<td data-datapos="' + settings.cols[j] + '"><div class=' + (settings.edit_cols[j]?'"editable"':'"not_editable"') + '>' + settings.data[i][settings.cols[j]] + '</div></td>';
         }
         table += (settings.button || '') + '</tr>';
@@ -449,27 +445,23 @@ function message(message) {
 
 function update_user_cookie() {
     console.log('saved');
-    document.cookie = 'user=' + JSON.stringify(user);
+    localStorage.user = JSON.stringify(user);
 }
 
 // on ready
 $(function() {
 
-    document.cookie = 'expires=Fri, 24 Jul 2026 21:09:23 GMT';
-
     // reads the document cookie to find the stored values for the schedule
     (function(){
         try {
-            // regex pattern from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
-            events = JSON.parse(document.cookie.replace(/(?:(?:^|.*;\s*)events\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
+            events = JSON.parse(localStorage.events);
         } catch(e) {
-            document.cookie = 'events={}';
+            events = [];
         }
         try {
-            // regex pattern from https://developer.mozilla.org/en-US/docs/Web/API/Document/cookie
-            user = JSON.parse(document.cookie.replace(/(?:(?:^|.*;\s*)user\s*\=\s*([^;]*).*$)|^.*$/, "$1"));
+            user = JSON.parse(localStorage.user);
         } catch(e) {
-            document.cookie = 'user={meetings:[], objectives:[], projects:[], tasks:[]}';
+            user= {meetings:[], objectives:[], projects:[], tasks:[]};
         }
         draw.events()();
         draw.all()();
@@ -479,7 +471,7 @@ $(function() {
     (function() {
         var contents = '',
             // values in minutes since 0 am
-            start = 480,
+            start = 360,
             end = 1200,
             // in minutes
             increment = 15,
@@ -489,6 +481,7 @@ $(function() {
             current += increment;
         }
         $('#times').html(contents + '<tr><td></tr></td>');
+        $('#schedule_wrapper').scrollTop(184);
     }());
 
     // click listener for the tab buttons
@@ -621,7 +614,7 @@ $(function() {
             title: 'Meeting',
             description: info.description,
             height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
-            position: (starth*60 + Number(startm) - 480)/15*23
+            position: (starth*60 + Number(startm) - 360)/15*23
         })();
     });
 });
