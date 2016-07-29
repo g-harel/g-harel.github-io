@@ -102,7 +102,7 @@ var
                 button: '<td><span class="move button" data-target="week">></span></td>'
             }));
             $('#tasks_week').html(table({
-                titles: ['priority', 'tasks'],
+                titles: ['priority', 'week tasks'],
                 data: tasks_week,
                 responseid: 8,
                 cols: [6,2],
@@ -111,7 +111,7 @@ var
                 button: '<td><span class="remove_shallow button" data-source="week_priority">X</span></td>'
             }));
             $('#tasks_day_source').html(table({
-                titles: ['priority', 'tasks'],
+                titles: ['priority', 'week tasks'],
                 data: tasks_week,
                 responseid: 8,
                 cols: [6,2],
@@ -120,7 +120,7 @@ var
                 button: '<td><span class="move button" data-target="day">></span></td>'
             }));
             $('#tasks_day').html(table({
-                titles: ['priority', 'tasks'],
+                titles: ['priority', 'day tasks'],
                 data: tasks_day,
                 responseid: 8,
                 cols: [7,2],
@@ -236,7 +236,7 @@ var
                 // setting focus to the new input and adding a blur listener to store the value
                 var live_edit = $('#live_edit');
                 live_edit.focus();
-                live_edit.val(oldvalue); // setting after to have cursor at the end
+                live_edit.val(oldvalue).select();
                 live_edit.on('blur', function() {
                     var newvalue = live_edit.val().trim();
                     // resets if the new value is empty or has not been changed
@@ -390,7 +390,8 @@ function table(settings) {
     for (i = 0; i < data_rows; i++) {
         table += '<tr data-responseid="' + settings.data[i][settings.responseid] + '">';
         for (var j = 0; j < columns; j++) {
-            table += '<td data-datapos="' + settings.cols[j] + '"><div ' + (settings.edit_cols[j] && 'class="editable"' || '') + '>' + settings.data[i][settings.cols[j]] + '</div></td>';
+            console.log(settings.data[i][settings.cols[j]], settings.edit_cols[j]);
+            table += '<td data-datapos="' + settings.cols[j] + '"><div class=' + (settings.edit_cols[j]?'"editable"':'"not_editable"') + '>' + settings.data[i][settings.cols[j]] + '</div></td>';
         }
         table += (settings.button || '') + '</tr>';
     }
@@ -513,6 +514,7 @@ $(function() {
         $('#darken').toggle();
         $('.add_dialog').hide();
         $('#add_' + type).show();
+        $('input').not('input[type="button"], input[type="submit"]').val('');
     });
 
     // submit listener for the form that adds a new objective

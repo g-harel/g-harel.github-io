@@ -399,3 +399,7 @@ ul {
 .svg_color {
     fill: #5A0F96;
 }
+
+.not_editable s, .not_editable{
+    color: rgb(170,170,170);
+}
