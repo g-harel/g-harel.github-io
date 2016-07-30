@@ -1,2 +1,7 @@
 # Agenda
-This version is static and is intended to be used for testing
+
+A static version of my agenda project that has become the main branch.
+
+Uses localStorage to save all data
+
+[Agenda](https://g-harel.github.io)
