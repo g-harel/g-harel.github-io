@@ -318,7 +318,9 @@ var
                         height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
                         position: (starth*60 + Number(startm) - 360)/15*23
                     })();
-                    $('#darken').toggle();
+                    console.log('sds');
+                    $('input').not('input[type="button"], input[type="submit"]').val('');
+                    $('#darken').hide();
                 });
             });
         },
