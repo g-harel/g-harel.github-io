@@ -106,9 +106,9 @@ var
                 data: tasks_week,
                 responseid: 8,
                 cols: [6,2],
-                col_width: ['75px', '100%', '30px'],
+                col_width: ['75px', '100%', '30px', '30px'],
                 edit_cols: [true, false],
-                button: '<td><span class="remove_shallow button" data-source="week_priority">X</span></td>'
+                button: '<td><span class="strike button">--</span></td><td><span class="remove_shallow button" data-source="week_priority">X</span></td>'
             }));
             $('#tasks_day_source').html(table({
                 titles: ['priority', 'week tasks'],
@@ -124,9 +124,9 @@ var
                 data: tasks_day,
                 responseid: 8,
                 cols: [7,2],
-                col_width: ['75px', '100%', '30px', '29px'],
+                col_width: ['75px', '100%', '30px', '30px', '30px'],
                 edit_cols: [true, false],
-                button: '<td><span class="remove_shallow button" data-source="day_priority">X</span></td><td><span class="move_task button" data-target="timeline">></span></td>'
+                button: '<td><span class="strike button">--</span></td><td><span class="remove_shallow button" data-source="day_priority">X</span></td><td><span class="move_task button" data-target="timeline">></span></td>'
             }));
             if (tasks_week.length) {
                 $('#disable_day').hide();
