@@ -303,22 +303,22 @@ var
         move_task: function() {
             $('.move_task').off().on('click', function() {
                 var index = $(this).closest('tr').attr('data-responseid');
+                console.log(index);
                 $('#darken').toggle();
                 $('.add_dialog').hide();
                 $('#add_task_event').show();
-                $('#add_task_event').on('submit', function(e) {
+                $('#add_task_event').off().on('submit', function(e) {
                     e.preventDefault();
                     var starth = $('#add_task_event #start_hour').val(),
-                        startm = $('#add_task_event #start_min').val(),
+                        startm = $('#add_task_event #start_min').val() || 0,
                         endh = $('#add_task_event #end_hour').val(),
-                        endm = $('#add_task_event #end_min').val();
+                        endm = $('#add_task_event #end_min').val() || 0;
                     draw.event({
                         title: 'Task',
                         description: user.tasks[index][2],
                         height: (endh*60 + Number(endm) - starth*60 - Number(startm))/15*23,
                         position: (starth*60 + Number(startm) - 360)/15*23
                     })();
-                    console.log('sds');
                     $('input').not('input[type="button"], input[type="submit"]').val('');
                     $('#darken').hide();
                 });
