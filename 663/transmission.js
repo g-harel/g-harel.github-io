@@ -112,7 +112,7 @@ var root;
     // returns the node at the specified indicies in the Root's children (left to right)
     Root.prototype.access = function(indecies) {
         temp = this;
-        while (indecies.length !== 0 && this.children.length >= indecies[0]) {
+        while (indecies.length !== 0 && temp.children.length >= indecies[0]) {
             temp = temp.children[indecies.shift()];
         }
         return temp;
