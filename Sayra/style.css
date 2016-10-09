@@ -57,9 +57,9 @@ li {
 }
 
 .blocks {
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.05);
+    /*box-shadow: 3px 3px 0 rgba(0,0,0,0.05);
     border: 1px solid #ccc;
-    border-radius: 2px;
+    border-radius: 2px;*/
     padding: 10px 20px 0;
     margin: 30px 0;
 }
@@ -141,7 +141,7 @@ li {
     opacity: 0.1;
 }
 
-@media (max-width: 1763px) {
+@media (max-width: 1239px) {
   #menu {
     padding: 0;
   }
