@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", function() {
     
     // fade in menu
     setTimeout(function() {
-        document.getElementById('menu').style.opacity = 0.95;
+        document.getElementById('menu').style.opacity = 1;
     }, 0);
 
     // scrolls to the begining of content

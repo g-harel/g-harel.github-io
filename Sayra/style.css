@@ -2,6 +2,29 @@
     font-family: "Open Sans";
 }
 
+div, p, a, li, td { -webkit-text-size-adjust:none; }
+
+@media (max-device-width: 1025px) {
+    #menu {
+        display: none !important;
+    }
+    #hero_banner {
+        height: 240px !important;
+    }
+    body {  
+        background: #fff !important;
+        background-size: 100% auto !important;
+    }
+    #logo_main {
+        filter: invert(100%);
+        width: 400px !important;
+        padding-top: 40px;
+    }
+    #content {
+        border: none !important;
+    }
+}
+
 html, body {
     height: 100%;
     margin: 0px;
@@ -10,8 +33,9 @@ html, body {
 }
 
 body {
-    background: url(res/full.jpg) no-repeat center center fixed;
+    background: url(res/full.jpg) #fff center 50% no-repeat;
     background-size: cover;
+    min-width: 1000px;
 }
 
 table {
@@ -31,6 +55,7 @@ h2 {
 
 p {
     text-align: justify;
+    font-size:16px !important;
 }
 
 td h2 {
@@ -40,6 +65,7 @@ td h2 {
 li {
     text-align: left;
     list-style: none;
+    font-size:16px !important;
 }
 
 #content li:before {
@@ -121,7 +147,7 @@ li {
 
 #menu {
     opacity: 0;
-    transition: opacity 1s ease-in-out;
+    transition: opacity 0.5s ease-in-out;
     background-color: white;
     border-bottom: 1px solid #ccc;
     min-width: 1000px;
@@ -141,7 +167,7 @@ li {
     opacity: 0.1;
 }
 
-@media (max-width: 1239px) {
+@media (max-width: 1117px) {
   #menu {
     padding: 0;
   }
@@ -150,6 +176,7 @@ li {
 #more {
     text-align: center;
     position: absolute;
+    min-width: 1000px;
     padding: 10px 0;
     cursor: pointer;
     color: white;
@@ -162,7 +189,7 @@ li {
     border: 1px solid #ccc;*/
     border-radius: 2px;
     margin: 0 auto;
-    width: 95%;
+    width: 100%;
 }
 
 #content {
