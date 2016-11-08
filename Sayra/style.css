@@ -33,7 +33,7 @@ html, body {
 }
 
 body {
-    background: url(res/full.jpg) #fff center 50% no-repeat;
+    background: url(res/full.jpg) #fff center 40% no-repeat;
     background-size: cover;
     min-width: 1000px;
 }
