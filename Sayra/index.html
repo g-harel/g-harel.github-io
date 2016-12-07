@@ -4,6 +4,7 @@
     <meta name=”description” content=”As a personal styling wardrobe consultant, we will develop your own personal style and curate a wardrobe that will help you take on all your lifestyle needs.” />
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600" rel="stylesheet">
     <link rel='stylesheet' href='style.css' />
+    <link type="image/x-icon" rel="icon" href="favicon.ico">
     <script src='script.js'></script>
 </head>
 <body>
@@ -11,26 +12,26 @@
         <div id="hero_elements">
             <img id="logo_main" src="res/LogoW.svg" alt="logo for Unapologetic Stylist" />
         </div>
-        <div id="more">EXPLORE</div>
+        <div onclick="scrollTo('need',1000);">EXPLORE</div>
         <ul id="menu">
-            <li onclick="scrollTo(0,1000)">HOME</li>
-            <li onclick="scrollTo(400,1000)">WHY YOU NEED US</li>
-            <li onclick="scrollTo(800,1000)">WHAT WE DO</li>
-            <li onclick="scrollTo(1200,1000)">SAYRA WHO?</li>
-            <li onclick="scrollTo(1600,1000)">THE GOSSIP</li>
-            <li onclick="scrollTo(1600,1000)">THE PRICE</li>
-            <li onclick="scrollTo(1600,1000)">THE HOTLINE</li>
+            <li onclick="scrollTo('hero_banner',1000);">HOME</li>
+            <li onclick="scrollTo('need',1000);">WHY YOU NEED US</li>
+            <li onclick="scrollTo('what',1000);">WHAT WE DO</li>
+            <li onclick="scrollTo('who',1000);">SAYRA WHO?</li>
+            <li onclick="scrollTo('gossip',1000);">THE GOSSIP</li>
+            <li onclick="scrollTo('price',1000);">THE PRICE</li>
+            <li onclick="scrollTo('hotline',1000);">THE HOTLINE</li>
         </ul>
     </div>
     <div id="content">
         <div id="content_wrapper">
-            <div class="blocks">
+            <div class="blocks" id="need">
                 <h1>Why You Need Us</h1>
                 <p>Now some people think hiring a stylist is unnecessary, but in reality, many of us don't have time or energy to clean out our closets or buy that one white t-shirt, we always say we need. Free time is limited today and we rather spend these opportunities with our family and friends, going to the beach with our kids, going out to that new restaurant in the city, or even squeezing in that extra 2 hours of sleep .. I mean don't all those things sound WAY more exciting than wasting time in and overly air conditioned mall or in your disheveled closet???</p>
                 <p>Whether you are; starting a new job and unsure of what to wear, a baby making machine with a body that doesn't stop changing or someone who travels for work so often that they can't even plan what they're doing the next day- we don't discriminate. Every client of ours have different commitments and lifestyles but in the end, the one commonality they do have, is that they all value feeling good inside and out, and know that confidence is key in handling whatever life obstacles present themselves. Whoever you are and whatever category you fall into, we're here to help all your fashion and styling needs so you have ONE less thing to worry about. You'll thank us later!</p>
             </div>
             <img src="./res/wardrobe2.png" style="padding:0px;width:calc(100% - 40px);margin:0px;">
-            <div class="blocks">
+            <div class="blocks" id="what">
                 <h1>What We Do</h1>
                 <p class="italics">As a personal stylist and wardrobe consultant, we will work together to develop your own personal style and curate a wardrobe that will help you feel confident in taking on your lifestyle needs.</p>
                 <div id="services_window">
@@ -128,7 +129,7 @@
                     </div>
                 </div>
             </div>
-            <div class="blocks">
+            <div class="blocks" id="who">
                 <h1>Sayra Who?</h1>
                 <img id="aboutme" src="res/red.jpg" alt="portrait of Sayra Ashqar from unapologetic stylist in a red dress"/>
                 <p>I'm Sayra Ashqar, born in the effortlessly cool city of Montreal, Canada into a family of die hard garment industry entrepreneurs. After attending grad school in Miami, Florida, I moved to Manhattan to begin a career managing a well known, mental health treatment center for people with Co-Occurring disorders. My friends and family, never understood how I fell into that line of work. I had always been the girl with the outspoken personality and bold sense of style, far better suited towards the family business. Looking back at those years, I knew I wanted a challenge and despite the grueling hours, constant political setbacks and little pay, the reason I stayed in that industry was solely a result of an overwhelming sense of happiness that came over me after watching one client after another achieve their personal milestones.</p>
@@ -136,7 +137,7 @@
                 <p>I created Unapologetic Stylist, after realizing that many of us go through similar life transitions and lose ourselves or stop prioritizing our sense of style as a result. Sometimes it's inevitable, while we try balancing multiple duties between our personal and professional lives. Life just gets complicated and messy but let's just be honest here- it's way easier to deal with crap when you don't look like it yourself!</p>
             </div>
             <img src="./res/store2.png" style="padding:0px;width:calc(100% - 40px);margin:0px;">
-            <div class="blocks">
+            <div class="blocks" id="gossip">
                 <h1>The Gossip</h1>
                 <p class="italics center_align">We have been honored to work with some amazing women in the past, all from different backgrounds and various careers. Check out what they have to say:</p>
                 <div id="testimonials" style="text-align:left;">
@@ -158,7 +159,7 @@
                     </div>
                 </div>
             </div>
-            <div class="blocks" style="padding: 10px 0;">
+            <div class="blocks" id="price" style="padding: 10px 0;">
                 <h1>The Price</h1>
                 <table id="pricing_table" cellspacing="0" cellpadding="0">
                     <tr>
@@ -179,8 +180,8 @@
                         <td>Wardrobe Editing</td>
                         <td>Closet organiation. <br/>Wish list of missing pieces to add. <br/>Outfit pairings of existing items.</td>
                         <td>In-person</td>
-                        <td>$100/hour for additional hours.</td>
-                        <td>$450 for up to 5 hours service.<br>$100 for each additional hour/person</td>
+                        <td>$450 up to 5 hours of service, $100 for additional hours/people</td>
+                        <td>$650 for 5 hours plus 2 hours of personal shopping</td>
                     </tr>
                     <tr>
                         <td>Personal Shopping</td>
@@ -211,82 +212,8 @@
                         <td></td>
                     </tr>
                 </table>
-                <!--<table id="package_pricing" cellspacing="0" cellpadding="0">
-                    <tr>
-                        <td align="center" valign="top">
-                            <table class="package" cellspacing="0" cellpadding="0">
-                                <tr>
-                                    <td class="name">
-                                        THE CLEANUP
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="description">
-                                        <ul>
-                                            <li>Consultation</li>
-                                            <li>4 hours Wardrobe Editing</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="price">
-                                        <div>$500</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td align="center" valign="top">
-                            <table class="package" cellspacing="0" cellpadding="0">
-                                <tr>
-                                    <td class="name">
-                                        THE SIMPLE MAKEOVER
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="description">
-                                        <ul>
-                                            <li>Consultation</li>
-                                            <li>4 hours Wardrobe Editing</li>
-                                            <li>2 hours Personal Shopping (in-person or remote)</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="price">
-                                        <div>$750</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                        <td align="center" valign="top">
-                            <table class="package" cellspacing="0" cellpadding="0">
-                                <tr>
-                                    <td class="name">
-                                        THE FULL MONTY
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="description">
-                                        <ul>
-                                            <li>Consultation</li>
-                                            <li>4 hours Wardrobe Editing</li>
-                                            <li>2 hours Personal Shopping (in-person or remote)</li>
-                                            <li>4 hours Seasonal Update</li>
-                                            <li>2 Special Event Styling Sessions</li>
-                                        </ul>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="price">
-                                        <div>$1000</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                </table>-->
             </div>
-            <div class="blocks" style="box-shadow: 3px 3px 0 rgba(0,0,0,0.05);border: 1px solid #ccc;border-radius: 2px;">
+            <div class="blocks" id="hotline" style="box-shadow: 3px 3px 0 rgba(0,0,0,0.05);border: 1px solid #ccc;border-radius: 2px;">
                 <h1>The Hotline</h1>
                 <p class="italics">If you would like to go on this incredible fashion journey with our team, please fill out all requested information below and you can expect a follow up within 48 hours. Our preferred method of contact is via email in which, we will then coordinate a call time to discuss what you are looking to achieve and how we can best tailor our services to your needs.</p>
                 <form id="contactform">
@@ -317,9 +244,4 @@
             </div>
         </div>
     </div>
-    <!--<div id="footer">
-        <a class="social_media" href="https://google.ca">Facebook</a>
-        <a class="social_media" href="https://google.ca">Twitter</a>
-        <a class="social_media" href="https://google.ca">Instagram</a>
-    </div>-->
 </body>
