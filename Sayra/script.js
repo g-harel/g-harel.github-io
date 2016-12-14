@@ -1,20 +1,32 @@
 // code when DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
-    
+
     // fade in menu
     setTimeout(function() {
         document.getElementById('menu').style.opacity = 1;
     }, 0);
 
-    // send for data back to server
-    document.getElementById('logo_main').addEventListener('click', function() {
+    // send form data back to server
+    var form = document.getElementById('contactform');
+    form.addEventListener('submit', function(e) {
+        var body = '';
+        var fields = ['Name', 'Email', 'Telephone', 'Gender', 'Location', 'Description', 'Referral'];
+        for (let i = 0; i < fields.length; ++i) {
+            body += fields[i] + ':\n';
+            body += form.children[i].children[1].value || 'not specified';
+            body += '\n\n';
+        }
+        e.preventDefault();
         var xhr = new XMLHttpRequest();
-        xhr.open('POST', 'mail.php', true);
+        xhr.open('POST', '/mail.php', true);
         xhr.setRequestHeader('Content-Type', 'text/plain');
         xhr.onload = function() {
-            console.log(xhr.status, xhr.responseText);
+            if (xhr.status === 200 && xhr.responseText === '1') {
+                alert('Form submitted, I will be in contact with you shortly.');
+                window.location.reload(false);
+            }
         };
-        xhr.send('john');
+        xhr.send(body);
     });
 
     // services tab code
