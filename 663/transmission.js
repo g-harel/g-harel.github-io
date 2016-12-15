@@ -289,7 +289,7 @@ var root;
         });
     };
 
-    // delete this node
+    // delete the node
     Node.prototype.remove = function() {
         root.save_state();
         window.root.access(this.address.slice(0,-1)).children[this.address[this.address.length-1]] = undefined;
