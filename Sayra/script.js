@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", function() {
         xhr.setRequestHeader('Content-Type', 'text/plain');
         xhr.onload = function() {
             if (xhr.status === 200 && xhr.responseText === '1') {
-                alert('Form submitted, I will be in contact with you shortly.');
+                alert("We've received your inquiry and we will follow up with you in the next 48hours");
                 window.location.reload(false);
             }
         };

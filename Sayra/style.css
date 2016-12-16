@@ -2,9 +2,9 @@
     font-family: "Open Sans";
 }
 
-div, p, a, li, td { 
+div, p, a, li, td {
     -webkit-text-size-adjust:none;
-    font-size:16px;
+    font-size: 1.6rem;
 }
 
 html, body {
@@ -12,6 +12,10 @@ html, body {
     margin: 0px;
     width: 100%;
     color: #111;
+}
+
+html {
+    font-size: 60%;
 }
 
 body {
@@ -37,7 +41,7 @@ h2 {
 
 p {
     text-align: justify;
-    font-size:16px !important;
+    font-size: 1.6rem !important;
 }
 
 td h2 {
@@ -47,12 +51,12 @@ td h2 {
 li {
     text-align: left;
     list-style: none;
-    font-size:16px !important;
+    font-size: 1.665rem !important;
 }
 
 #content li:before {
     content: "\00B7";
-    font-size: 35px;
+    font-size: 3.5rem;
     vertical-align: middle;
     line-height: 20px;
     position: relative;
@@ -132,11 +136,11 @@ li {
     transition: opacity 0.5s ease-in-out;
     background-color: white;
     border-bottom: 1px solid #ccc;
+    user-select: none;
     min-width: 1000px;
     display: table-row;
     list-style: none;
-    font-size: 24px;
-    cursor: pointer;
+    font-size: 2.4rem;
     position: fixed;
     padding: 0 0 10px;
     margin: 0 auto;
@@ -222,6 +226,10 @@ li {
     width: 100%;
 }
 
+#price {
+    overflow-x: auto;
+}
+
 #pricing_table {
     border: 1px solid #ccc;
     margin: 16px 0 20px;
@@ -258,7 +266,7 @@ li {
     box-sizing: border-box;
     display: inline-block;
     border-radius: 2px;
-    font-size: 14px;
+    font-size: 1.4rem;
     margin: 3px 0;
     padding: 6px;
     width: 100%;
@@ -304,7 +312,7 @@ li {
     width: calc(100% - 32px);
     font-weight: 400;
     padding: 0 0 2px;
-    font-size: 20px;
+    font-size: 2.0rem;
     cursor: pointer;
     height: 40px;
     width: 150px;
@@ -315,7 +323,8 @@ li {
     vertical-align: middle;
     display: inline-block;
     text-align: center;
-    font-size: 18px;
+    cursor: pointer;
+    font-size: 1.8rem;
     height: 100%;
     width: 13%;
 }
@@ -345,26 +354,13 @@ li {
 
 .package .name {
     background-color: rgba(0,0,0,0.03);
-    font-size: 22px;
+    font-size: 2.2rem;
     font-weight: 400;
     padding: 10px 0;
 }
 
 .package .description {
-    font-size: 16px;
-}
-
-.package .price {
-    margin: 10px;
-    font-size: 22px;
-    font-weight: 400;
-}
-
-.package .price>div {
-    box-shadow: 3px 3px 0 rgba(0,0,0,0.05);
-    border: 1px solid #ccc;
-    padding: 10px;
-    margin: 20px;
+    font-size: 1.6rem;
 }
 
 @media (max-device-width: 1025px) {
@@ -374,7 +370,7 @@ li {
     #hero_banner {
         height: 240px !important;
     }
-    body {  
+    body {
         background: #fff !important;
         background-size: 100% auto !important;
     }
@@ -389,13 +385,7 @@ li {
     #more {
         display: none;
     }
-}
-
-@media (max-device-width: 600px) {
-    div, p, a, li, td {
-        font-size:40px;
-    }
-    h2 {
-        font-size: 20px;
-    }
+    /*html {
+        font-size: 90%;
+    }*/
 }
