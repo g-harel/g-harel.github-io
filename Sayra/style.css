@@ -408,7 +408,7 @@ li {
         display: none !important;
     }
     #hero_banner {
-        height: 600px !important;
+        height: 500px !important;
         background: url(res/full.jpg) #fff center 20% no-repeat;
         background-size: cover;
     }
@@ -417,7 +417,7 @@ li {
         background-size: 100% auto !important;
     }
     #logo_main {
-        width: 800px !important;
+        width: 500px !important;
         padding-top: 40px;
     }
     #content {
