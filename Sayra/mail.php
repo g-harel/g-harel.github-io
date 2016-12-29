@@ -1,7 +1,13 @@
 <?php
 
-$success = mail('pabombs@gmail.com', 'Unapologetic Stylist - Form', $HTTP_RAW_POST_DATA);
-echo $success;
-exit();
+$body = "";
+
+foreach ($_POST as $key => $value) {
+    $body .= $key.":\r\n".($value?$value:'not specified')."\r\n\r\n";
+}
+
+mail('gabrielj.harel@gmail.com', 'Unapologetic Stylist - Form', $body);
+/*mail('sayracashqar@gmail.com', 'Unapologetic Stylist - Form', $body);*/
+header('Location: http://unapologeticstylist.com/');
 
 ?>

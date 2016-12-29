@@ -1,62 +1,36 @@
 // code when DOM is loaded
 document.addEventListener("DOMContentLoaded", function() {
 
-    // fade in menu
-    setTimeout(function() {
-        document.getElementById('menu').style.opacity = 1;
-    }, 0);
+    // replacement DOM when js is enabled
+    document.querySelector('#menu').innerHTML =
+        '<li data-scrollto="hero_banner">HOME</li>' +
+        '<li data-scrollto="need">WHY YOU NEED US</li>' +
+        '<li data-scrollto="what">WHAT WE DO</li>' +
+        '<li data-scrollto="who">SAYRA WHO?</li>' +
+        '<li data-scrollto="gossip">THE GOSSIP</li>' +
+        '<li data-scrollto="price">THE PRICE</li>' +
+        '<li data-scrollto="hotline">THE HOTLINE</li>';
+    document.querySelector('#more').outerHTML =
+        '<div id="more" data-scrollto="need">EXPLORE</div>';
 
-    // send form data back to server
-    var form = document.getElementById('contactform');
-    form.addEventListener('submit', function(e) {
-        var body = '';
-        var fields = ['Name', 'Email', 'Telephone', 'Gender', 'Location', 'Description', 'Referral'];
-        for (let i = 0; i < fields.length; ++i) {
-            body += fields[i] + ':\n';
-            body += form.children[i].children[1].value || 'not specified';
-            body += '\n\n';
-        }
-        e.preventDefault();
-        var xhr = new XMLHttpRequest();
-        xhr.open('POST', '/mail.php', true);
-        xhr.setRequestHeader('Content-Type', 'text/plain');
-        xhr.onload = function() {
-            if (xhr.status === 200 && xhr.responseText === '1') {
-                alert("We've received your inquiry and we will follow up with you in the next 48hours");
-                window.location.reload(false);
-            }
-        };
-        xhr.send(body);
-    });
-
-    // services tab code
-    document.getElementById('tab_content').children[0].style.display = 'inline-block';
-    var tab = document.getElementById('services_tabs');
-    tab.children[0].children[0].children[0].id = 'active_tab';
-    tab.addEventListener('click', function(e) {
-        var content = document.getElementById('tab_content'),
-            tab_number = e.target.getAttribute('data-tab');
-        if (tab_number) {
-            for (var i = 0; i < content.children.length; i++) {
-                tab.children[0].children[0].children[i].id = '';
-                content.children[i].style.display = 'none';
-            }
-            tab.children[0].children[0].children[tab_number].id = 'active_tab';
-            content.children[tab_number].style.display = 'inline-block';
-        }
-    });
+    // add click event to all scroll buttons
+    var scroll = document.querySelectorAll('[data-scrollto]');
+    for (var i = 0; i < scroll.length; ++i) {
+        (function(i) {
+            scroll[i].addEventListener('click', function() {
+                scrollTo(scroll[i].getAttribute('data-scrollto'), 1000);
+            });
+        }(i))
+    }
 
     // scrolls to target in duration with easing
-    window.scrollTo = function(target, duration) {
-        // finding place to scroll to
+    scrollTo = function(target, duration) {
         var element = document.getElementById(target);
         if (!element) {
             return 0;
         }
-        target = (element.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop) - 45;
-        // defaults
+        target = (element.getBoundingClientRect().top + window.pageYOffset || document.documentElement.scrollTop) - 40;
         duration = duration || 1000;
-        // does not use animations if browser is too old
         if (!window.requestAnimationFrame && !(window.scrollY || document.documentElement.scrollTop)) {
             console.log('please update your browser for best experience');
             if (window.scoll) {
@@ -64,11 +38,9 @@ document.addEventListener("DOMContentLoaded", function() {
             }
             return;
         }
-        // variables
         var Xscroll = window.scrollX || document.documentElement.scrollLeft || 0,
             Yscroll = window.scrollY || document.documentElement.scrollTop || 0,
             startTime;
-        // animates the scroll to the target value
         window.requestAnimationFrame(scrolldown);
         function scrolldown(time) {
             startTime = startTime || time;
