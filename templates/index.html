@@ -5,14 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    {{range .Style -}}
+    {{range index .Files "style"}}
         <style>{{.}}</style>
-    {{- end}}
+    {{end}}
 </head>
 <body>
-    <h1>{{.Name}}</h1>
-    {{range .Script -}}
+    {{range index .Files "script"}}
         <script>{{.}}</script>
-    {{- end}}
+    {{end}}
 </body>
 </html>

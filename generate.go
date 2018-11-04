@@ -1,58 +1,68 @@
 package main
 
 import (
+	"bytes"
+	"io"
 	"io/ioutil"
 	"os"
+	"path"
+	"path/filepath"
 	"text/template"
 )
 
 // Config references the file sources for the data.
 type Config struct {
-	Out      string
-	Template string
-	Style    []string
-	Script   []string
+	Out   string
+	Src   string
+	Entry string
+	Files map[string]string
 }
 
 // Data represents the template data being rendered.
 type Data struct {
-	Name   string
-	Style  []string
-	Script []string
+	Files map[string][]string
 }
 
 func main() {
 	c := Config{
-		Out:      "index.html",
-		Template: "templates/index.html",
-		Style:    []string{"templates/style.css"},
-		Script:   []string{"templates/script.js"},
-	}
-	d := Data{
-		Name: "g-harel.github.io",
+		Out:   "index.html",
+		Src:   "templates",
+		Entry: "index.html",
+		Files: map[string]string{
+			"style":  "*.css",
+			"script": "*.js",
+		},
 	}
 
-	t, err := ioutil.ReadFile(c.Template)
+	d := Data{
+		Files: map[string][]string{},
+	}
+
+	for k, v := range c.Files {
+		paths, err := filepath.Glob(path.Join(c.Src, v))
+		if err != nil {
+			panic(err)
+		}
+		contents := make([]string, len(paths))
+		for i, path := range paths {
+			b, err := ioutil.ReadFile(path)
+			if err != nil {
+				panic(err)
+			}
+			contents[i] = string(b)
+		}
+		d.Files[k] = contents
+	}
+
+	tmpl, err := template.ParseGlob(path.Join(c.Src, c.Entry))
 	if err != nil {
 		panic(err)
 	}
 
-	d.Script = make([]string, len(c.Script))
-	for i, path := range c.Script {
-		b, err := ioutil.ReadFile(path)
-		if err != nil {
-			panic(err)
-		}
-		d.Script[i] = string(b)
-	}
-
-	d.Style = make([]string, len(c.Style))
-	for i, path := range c.Style {
-		b, err := ioutil.ReadFile(path)
-		if err != nil {
-			panic(err)
-		}
-		d.Style[i] = string(b)
+	var b bytes.Buffer
+	err = tmpl.Execute(&b, d)
+	if err != nil {
+		panic(err)
 	}
 
 	f, err := os.Create(c.Out)
@@ -60,10 +70,19 @@ func main() {
 		panic(err)
 	}
 
-	tmpl, err := template.New("Entry").Parse(string(t))
-	if err != nil {
-		panic(err)
+	eof := false
+	for {
+		line, err := b.ReadBytes('\n')
+		eof = err == io.EOF
+		if err != nil && !eof {
+			panic(err)
+		}
+		_, err = f.Write(bytes.TrimSpace(line))
+		if err != nil {
+			panic(err)
+		}
+		if eof {
+			break
+		}
 	}
-
-	tmpl.Execute(f, d)
 }
