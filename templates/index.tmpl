@@ -5,13 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-    {{range index .Files "style"}}
-        <style>{{.}}</style>
-    {{end}}
+    <style>{{template "style.css"}}</style>
 </head>
 <body>
-    {{range index .Files "script"}}
-        <script>{{.}}</script>
-    {{end}}
+    <script>{{template "script.js"}}</script>
 </body>
 </html>
