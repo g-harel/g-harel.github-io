@@ -8,19 +8,36 @@
     <style>{{template "style.css"}}</style>
 </head>
 <body>
-    <div class="content">
+    <div class="page">
         <div class="info">
-            <img src="https://avatars0.githubusercontent.com/u/9319710?s=460&v=4" />
+            <img src="{{.Icon}}" />
             <h1>{{.Name}}</h1>
             <h3>{{.Username}}</h3>
             <p>{{.Description}}</p>
             <hr/>
             <i>{{template "assets/location.svg"}}</i> <span>{{.Location}}</span>
         </div>
+        <div class="tabs">
+            <div class="nav">
+                <a class="item projects hash-active" href="#projects">
+                    Projects
+                </a>
+                <a class="item contributions" href="#contributions">
+                    Contributions
+                </a>
+            </div>
+            <div class="content projects hash-active">
+                <div class="card">pro</div>
+                <div class="card">pro</div>
+            </div>
+            <div class="content contributions">
+                <div class="card">con</div>
+            </div>
+        </div>
     </div>
 
     <div class="github-icon">
-        <a href="https://github.com/g-harel/g-harel.github.io" target="_blank">
+        <a href="{{.Repo}}" target="_blank">
             {{template "assets/github.svg"}}
         </a>
     </div>

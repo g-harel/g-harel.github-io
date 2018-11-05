@@ -14,15 +14,19 @@ var config = Config{
 	OutPath:   "index.html",
 	Data: struct {
 		Title       string
+		Icon        string
 		Name        string
 		Username    string
 		Description string
 		Location    string
+		Repo        string
 	}{
-		Title:       "Gabriel Harel",
-		Name:        "Gabriel Harel",
-		Username:    "g-harel",
-		Description: "Software Engineering student at Concordia University",
-		Location:    "Montreal",
+		Title:       "Test Name",
+		Icon:        "https://avatars0.githubusercontent.ca/u/9319710?s=460&v=4",
+		Name:        "Test Name",
+		Username:    "user-name",
+		Description: "Lorem Ipsum",
+		Location:    "Antarctica",
+		Repo:        "https://github.com/g-harel/g-harel.github.io",
 	},
 }
