@@ -1,3 +1,87 @@
 body {
-    color: darkblue;
+    background-color: #ffffff;
+    color: #24292e;
+    font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    margin: 0;
+}
+
+.content {
+    margin: 178px auto 0;
+    width: calc(230px + 2*360px + 5*16px)
+}
+
+/* info panel */
+
+.content .info {
+    display: inline-block;
+    width: 230px;
+}
+
+.content .info img {
+    border-radius: 10px;
+    display: block;
+    height: 230px;
+    width: 230px;
+}
+
+.content .info h1 {
+    font-size: 26px;
+    line-height: 30px;
+    margin-bottom: 0;
+}
+
+.content .info h3 {
+    color: #666666;
+    font-size: 20px;
+    font-weight: 300;
+    line-height: 24px;
+    margin: 0;
+}
+
+.content .info p {
+    color: #6a737d;
+    font-size: 14px;
+    font-weight: 300;
+    margin: 16px 0 0;
+}
+
+.content .info hr {
+    border: none;
+    border-top: 1px solid #eaecef;
+    height: 1px;
+    margin: 11px 0;
+}
+
+.content .info span {
+    font-size: 14px;
+}
+
+.content .info i {
+    display: inline-block;
+    padding: 2px 2px 16px 1px;
+    transform: translate(0, 3px);
+}
+
+/* footer */
+
+.github-icon {
+    bottom: 0;
+    display: inline-block;
+    margin: 30px 0;
+    position: fixed;
+    text-align: center;
+    width: 100%;
+}
+
+.github-icon svg {
+    width: 32px;
+}
+
+.github-icon svg path {
+    fill: #e0e0e0;
+}
+
+.github-icon svg:hover path {
+    fill: #d6d6d6;
 }

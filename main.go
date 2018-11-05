@@ -65,31 +65,29 @@ func WriteOut(path string, b bytes.Buffer) error {
 	return nil
 }
 
-func main() {
-	config := struct {
-		Templates string
-		RootName  string
-		OutPath   string
-		Data      interface{}
-	}{
-		Templates: "templates",
-		RootName:  "index.tmpl",
-		OutPath:   "index.html",
-		Data:      nil,
-	}
-
-	tmpl, err := ReadTemplates(config.Templates)
+// Generate generates the static files from the config.
+func Generate(c Config) error {
+	tmpl, err := ReadTemplates(c.Templates)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	b := bytes.Buffer{}
-	err = tmpl.ExecuteTemplate(&b, config.RootName, config.Data)
+	err = tmpl.ExecuteTemplate(&b, c.RootName, c.Data)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
-	err = WriteOut(config.OutPath, b)
+	err = WriteOut(c.OutPath, b)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func main() {
+	err := Generate(config)
 	if err != nil {
 		panic(err)
 	}

@@ -4,10 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>{{.Title}}</title>
     <style>{{template "style.css"}}</style>
 </head>
 <body>
+    <div class="content">
+        <div class="info">
+            <img src="https://avatars0.githubusercontent.com/u/9319710?s=460&v=4" />
+            <h1>{{.Name}}</h1>
+            <h3>{{.Username}}</h3>
+            <p>{{.Description}}</p>
+            <hr/>
+            <i>{{template "assets/location.svg"}}</i> <span>{{.Location}}</span>
+        </div>
+    </div>
+
+    <div class="github-icon">
+        <a href="https://github.com/g-harel/g-harel.github.io" target="_blank">
+            {{template "assets/github.svg"}}
+        </a>
+    </div>
+
     <script>{{template "script.js"}}</script>
 </body>
 </html>
