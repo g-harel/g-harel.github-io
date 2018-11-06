@@ -1,0 +1,22 @@
+query {
+    {{range .Projects}}
+        {{.Name}}: repository(owner: "{{.Owner}}", name: "{{.Name}}") {
+            ...RepoInfo
+        }
+    {{end}}
+}
+
+fragment RepoInfo on Repository {
+    nameWithOwner
+    description
+    url
+    stargazers {
+        totalCount
+    }
+    languages(first: 3, orderBy: {field: SIZE, direction: DESC}) {
+        nodes {
+            name
+            color
+        }
+    }
+}

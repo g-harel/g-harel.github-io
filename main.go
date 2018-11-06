@@ -2,11 +2,16 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"html/template"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strconv"
+	"time"
+
+	"github.com/g-harel/g-harel.github.io/queries"
 )
 
 // ReadTemplates reads all files in the given directory as templates.
@@ -87,8 +92,35 @@ func Generate(c Config) error {
 }
 
 func main() {
+	start := time.Now()
+
 	err := Generate(config)
 	if err != nil {
 		panic(err)
 	}
+
+	token, ok := os.LookupEnv("GITHUB_API_TOKEN")
+	if !ok {
+		return
+	}
+	c := queries.Client{
+		Token: token,
+		URL:   "https://api.github.com/graphql",
+	}
+
+	user, err := c.User(config.Username)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(user.Name)
+
+	projects, err := c.Projects(config.Projects)
+	if err != nil {
+		panic(err)
+	}
+	for _, project := range *projects {
+		fmt.Println(project.FullName + " " + strconv.Itoa(project.Stargazers.Count))
+	}
+
+	fmt.Printf("%s\n", time.Since(start))
 }

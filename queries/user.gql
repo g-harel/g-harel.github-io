@@ -1,0 +1,10 @@
+query {
+    user(login: "{{.Username}}") {
+        avatarUrl
+        email
+        bio
+        name
+        login
+        location
+    }
+}
