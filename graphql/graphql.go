@@ -33,6 +33,7 @@ type response struct {
 }
 
 func Do(query *Query) error {
+	// TODO documentation
 	tmpl, err := template.ParseFiles(query.Query)
 	if err != nil {
 		return err

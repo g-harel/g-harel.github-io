@@ -76,6 +76,7 @@ body {
 
             .page .tabs .nav a.item {
                 color: #586069;
+                border-bottom: 2px solid transparent;
                 display: inline-block;
                 font-size: 14px;
                 margin-right: 16px;
@@ -84,8 +85,20 @@ body {
                 text-decoration: none;
             }
 
+            .page .tabs .nav a.item:after {
+                /* TODO bold width pop */
+                content: "";
+            }
+
+            .page .tabs .nav a.item:hover {
+                border-bottom-color: #d1d5da;
+                color: #24292e;
+                text-decoration: none;
+                transition: .2s ease;
+            }
+
             .page .tabs .nav a.item.hash-active {
-                border-bottom: 2px solid #e36209;
+                border-color: #e36209;
                 color: #24292e;
                 font-weight: 600;
             }
@@ -136,3 +149,7 @@ body {
         .github-icon svg:hover path {
             fill: #d6d6d6;
         }
+
+a:focus {
+    outline: none;
+}
