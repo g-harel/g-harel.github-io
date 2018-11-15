@@ -1,6 +1,6 @@
 query {
     {{range .Projects}}
-        {{.Name}}: repository(owner: "{{.Owner}}", name: "{{.Name}}") {
+        {{.Key}}: repository(owner: "{{.Owner}}", name: "{{.Name}}") {
             ...RepoInfo
         }
     {{end}}
@@ -8,6 +8,10 @@ query {
 
 fragment RepoInfo on Repository {
     nameWithOwner
+    name
+    owner {
+        login
+    }
     description
     url
     stargazers {

@@ -20,7 +20,7 @@ type Agent struct {
 
 	Title    string
 	User     *query.User
-	Projects *query.ProjectDest
+	Projects []*query.Project
 }
 
 // Execute generates the static files from the config.

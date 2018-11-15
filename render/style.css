@@ -139,7 +139,28 @@ body {
                 margin-left: 16px;
             }
 
-/* footer */
+                .page .tabs .content .card .name {
+                    color: #0366d6;
+                    display: block;
+                    font-size: 14px;
+                    font-weight: 600;
+                    text-decoration: none;
+                }
+
+                .page .tabs .content .card .name:hover {
+                    text-decoration: underline;
+                }
+
+                    .page .tabs .content .card .name .owner {
+                        font-weight: 400;
+                    }
+
+                .page .tabs .content .card .description {
+                    color: #6a737d;
+                    display: block;
+                    font-size: 12px;
+                    margin: 8px 0 16px;
+                }
 
 .github-icon {
   bottom: 0;

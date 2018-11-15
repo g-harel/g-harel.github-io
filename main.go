@@ -45,5 +45,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("%s\n", time.Since(start))
+	fmt.Printf("Built from fresh data in %s\n", time.Since(start))
 }
