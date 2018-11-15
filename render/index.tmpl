@@ -4,31 +4,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>{{.Title}}</title>
+    <title>{{.User.Name}}</title>
     <style>{{template "style.css"}}</style>
 </head>
 <body>
     <div class="page">
         <div class="info">
-            <img src="{{.Icon}}" />
-            <h1>{{.Name}}</h1>
-            <h3>{{.Username}}</h3>
-            <p>{{.Description}}</p>
+            <img src="{{.User.Icon}}" />
+            <h1>{{.User.Name}}</h1>
+            <h3>{{.User.Username}}</h3>
+            <p>{{.User.Description}}</p>
             <hr/>
-            <i>{{template "assets/location.svg"}}</i> <span>{{.Location}}</span>
+            <i>{{template "assets/location.svg"}}</i> <span>{{.User.Location}}</span>
         </div>
         <div class="tabs">
             <div class="nav">
                 <a class="item projects hash-active" href="#projects">
-                    Projects&nbsp;2 <!-- TODO add number pill -->
+                    Projects
+                    <span class="counter">{{len .Projects}}</span>
                 </a>
                 <a class="item contributions" href="#contributions">
-                    Contributions&nbsp;1
+                    Contributions
+                    <span class="counter">12</span>
                 </a>
             </div>
             <div class="content projects hash-active">
-                <div class="card">pro</div>
-                <div class="card">pro</div>
+                {{range .Projects}}
+                    <div class="card">{{.FullName}}</div>
+                {{end}}
             </div>
             <div class="content contributions">
                 <div class="card">con</div>
@@ -37,7 +40,7 @@
     </div>
 
     <div class="github-icon">
-        <a href="{{.Repo}}" target="_blank">
+        <a href="https://github.com/{{.User.Username}}" target="_blank">
             {{template "assets/github.svg"}}
         </a>
     </div>

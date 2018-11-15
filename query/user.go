@@ -1,16 +1,10 @@
-package queries
-
-import (
-	"github.com/g-harel/g-harel.github.io/graphql"
-)
+package query
 
 // User queries for user data.
 func (c *Client) User(username string) (*User, error) {
 	dest := &User{}
-	return dest, graphql.Do(&graphql.Query{
-		URL:   c.URL,
-		Token: c.Token,
-		Query: "queries/user.gql",
+	return dest, c.Do(&Query{
+		Query: c.Queries + "/user.gql",
 		Data:  struct{ Username string }{username},
 		Dest: &struct {
 			User *User `json:"user"`

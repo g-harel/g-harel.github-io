@@ -1,9 +1,7 @@
-package queries
+package query
 
 import (
 	"strings"
-
-	"github.com/g-harel/g-harel.github.io/graphql"
 )
 
 type project struct {
@@ -12,7 +10,7 @@ type project struct {
 }
 
 // Projects queries for project data.
-func (c *Client) Projects(projects []string) (*ProjectDest, error) {
+func (c *Client) Projects(projects []string) ([]Project, error) {
 	data := struct {
 		Projects []*project
 	}{
@@ -29,18 +27,16 @@ func (c *Client) Projects(projects []string) (*ProjectDest, error) {
 		data.Projects = append(data.Projects, &project{owner, name})
 	}
 
-	dest := &ProjectDest{}
-	return dest, graphql.Do(&graphql.Query{
-		URL:   c.URL,
-		Token: c.Token,
-		Query: "queries/projects.gql",
+	dest := []Project{}
+	return dest, c.Do(&Query{
+		Query: c.Queries + "/projects.gql",
 		Data:  data,
 		Dest:  dest,
 	})
 }
 
-// ProjectDest represents the response data from the `projects.gql` query.
-type ProjectDest = map[string]struct {
+// Project represents the response data from the `projects.gql` query.
+type Project struct {
 	FullName    string `json:"nameWithOwner"`
 	Description string `json:"description"`
 	URL         string `json:"url"`
