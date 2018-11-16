@@ -18,9 +18,10 @@ type Agent struct {
 	RootName  string
 	OutPath   string
 
-	Title    string
-	User     *query.User
-	Projects []*query.Project
+	Title         string
+	User          *query.User
+	Projects      []*query.Project
+	Contributions []string
 }
 
 // Execute generates the static files from the config.

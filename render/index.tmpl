@@ -25,13 +25,13 @@
                 </a>
                 <a class="item contributions" href="#contributions">
                     Contributions
-                    <span class="counter">12</span>
+                    <span class="counter">{{len .Contributions}}</span>
                 </a>
             </div>
             <div class="content projects">
                 {{range .Projects}}
                     <div class="card">
-                        <a href="https://github.com/{{.FullName}}" class="name" target="_blank">
+                        <a href="https://github.com/{{.FullName}}" class="name">
                             {{if not (eq .Owner.Username $.User.Username)}}
                                 <span class="owner">
                                     {{.Owner.Username}}/
@@ -39,7 +39,21 @@
                             {{end}}
                             {{.Name}}
                         </a>
-                        <p class="description">{{.Description}}</p>
+                        <p class="description">
+                            {{.Description}}
+                        </p>
+                        {{range .Languages.Nodes}}
+                            <div class="language">
+                                <span class="color" style="background-color: {{.Color}}"></span>
+                                {{.Name}}
+                            </div>
+                        {{end}}
+                        {{if gt .Stargazers.Count 0}}
+                            <div class="stars">
+                                {{template "assets/star.svg"}}
+                                {{.Stargazers.Count}}
+                            </div>
+                        {{end}}
                     </div>
                 {{end}}
             </div>
@@ -50,7 +64,7 @@
     </div>
 
     <div class="github-icon">
-        <a href="https://github.com/{{.User.Username}}" target="_blank">
+        <a href="https://github.com/{{.User.Username}}">
             {{template "assets/github.svg"}}
         </a>
     </div>

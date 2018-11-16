@@ -1,26 +1,46 @@
+/*
+
+{{$TopGap := "13vh"}}
+{{$InfoWidth := "230px"}}
+{{$NavHeight := "54px"}}
+{{$ContentHeight := "512px"}}
+{{$CardWidth := "359px"}}
+{{$CardGap := "16px"}}
+
+*/
+
+html {
+    height: 100%;
+    min-height: 768px;
+    min-width: calc({{$InfoWidth}} + 2*{{$CardWidth}} + 7*{{$CardGap}});
+    width: 100%;
+}
+
 body {
     background-color: #ffffff;
     color: #24292e;
     font-family: -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif;
+    height: calc(100% - {{$TopGap}});
     line-height: 1.5;
     margin: 0;
+    position: relative;
 }
 
 .page {
-    margin: 178px auto 0;
-    width: calc(230px + 2*360px + 5*16px)
+    margin: {{$TopGap}} auto 0;
+    width: calc({{$InfoWidth}} + 2*{{$CardWidth}} + 3*{{$CardGap}});
 }
 
     .page .info {
         display: inline-block;
-        width: 230px;
+        width: {{$InfoWidth}};
     }
 
         .page .info img {
             border-radius: 8px;
             display: block;
-            height: 230px;
-            width: 230px;
+            height: {{$InfoWidth}};
+            width: {{$InfoWidth}};
         }
 
         .page .info h1 {
@@ -63,15 +83,16 @@ body {
 
     .page .tabs {
         display: inline-block;
-        margin-left: 32px;
+        margin-left: calc(2*{{$CardGap}});
+        margin-top: calc(-{{$NavHeight}} + 2px);
+        overflow-x: hidden;
         vertical-align: top;
-        width: calc(100% - 230px - 32px);
+        width: calc(100% - {{$InfoWidth}} - 2*{{$CardGap}});
     }
 
         .page .tabs .nav {
             border-bottom: 1px solid #d1d5da;
-            height: 54px;
-            margin-top: calc(-54px + 2px);
+            height: {{$NavHeight}};
         }
 
             .page .tabs .nav a.item {
@@ -117,8 +138,23 @@ body {
 
         .page .tabs .content {
             display: none;
-            padding-top: 32px;
-            width: 100%;
+            height: {{$ContentHeight}};
+            overflow-x: hidden;
+            overflow-y: scroll;
+            padding-top: calc(2*{{$CardGap}});
+            width: calc(100% + 17px);
+        }
+
+        .page .tabs .content:before {
+            background-image: linear-gradient(transparent, white);
+            background-image: -webkit-linear-gradient(transparent, white);
+            content: "\00a0";
+            height: calc(4*{{$CardGap}});
+            pointer-events: none;
+            position: absolute;
+            width: calc(2*{{$CardWidth}} + {{$CardGap}});
+            transform: translate(0, calc({{$ContentHeight}} - 4*{{$CardGap}}));
+            z-index: 1;
         }
 
         .page .tabs .content.hash-active {
@@ -130,14 +166,23 @@ body {
                 border-radius: 3px;
                 box-sizing: border-box;
                 display: inline-block;
-                margin-bottom: 16px;
+                margin-bottom: {{$CardGap}};
                 padding: 16px;
-                width: calc(50% - 8px);
+                vertical-align: top;
+                width: {{$CardWidth}};
             }
 
             .page .tabs .content .card:nth-child(2n) {
-                margin-left: 16px;
+                margin-left: {{$CardGap}};
             }
+
+            .page .tabs .content .card:last-child {
+                margin-bottom: calc(4*{{$CardGap}});
+            }
+
+                .page .tabs .content .card div:first-of-type {
+                    margin-left: 0;
+                }
 
                 .page .tabs .content .card .name {
                     color: #0366d6;
@@ -159,16 +204,48 @@ body {
                     color: #6a737d;
                     display: block;
                     font-size: 12px;
-                    margin: 8px 0 16px;
+                    margin: 8px 0 11px;
                 }
 
+                .page .tabs .content .card .language {
+                    color: #6a737d;
+                    display: inline-block;
+                    font-size: 12px;
+                    margin-left: 10px;
+                }
+
+                    .page .tabs .content .card .language .color {
+                        background-color: #cccccc;
+                        border-radius: 50%;
+                        display: inline-block;
+                        height: 12px;
+                        margin-right: 4px;
+                        position: relative;
+                        top: 2px;
+                        width: 12px;
+                    }
+
+                .page .tabs .content .card .stars {
+                    color: #6a737d;
+                    display: inline-block;
+                    font-size: 12px;
+                    margin-left: 20px;
+                }
+
+                    .page .tabs .content .card svg {
+                        margin-right: 3px;
+                        position: relative;
+                        top: 1px;
+                        vertical-align: text-bottom;
+                    }
+
 .github-icon {
-  bottom: 0;
-  display: inline-block;
-  margin: 30px 0;
-  position: fixed;
-  text-align: center;
-  width: 100%;
+    bottom: 0;
+    display: inline-block;
+    margin: 30px 0;
+    position: absolute;
+    text-align: center;
+    width: 100%;
 }
 
     .github-icon svg {
