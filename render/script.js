@@ -7,7 +7,7 @@ var activeClass = "hash-active";
 // Page contents are only made visible after tabbed navigation has
 // loaded to prevent flash of empty content.
 document.body.style.opacity = 0;
-window.addEventListener("load", () => {
+document.addEventListener("DOMContentLoaded", () => {
     document.body.style.opacity = 1;
 });
 
@@ -51,7 +51,7 @@ function updateActive() {
 }
 
 window.addEventListener("hashchange", updateActive);
-window.addEventListener("load", updateActive);
+document.addEventListener("DOMContentLoaded", updateActive);
 
 if (!isValidHash(document.location.hash)) {
     document.location.hash = defaultHash;

@@ -15,7 +15,7 @@
             <h3>{{.User.Username}}</h3>
             <p>{{.User.Description}}</p>
             <hr/>
-            <i>{{template "assets/location.svg"}}</i> <span>{{.User.Location}}</span>
+            <i>{{template "assets/location.svg"}}</i><span>{{.User.Location}}</span>
         </div>
         <div class="tabs">
             <div class="nav">
@@ -42,18 +42,24 @@
                         <p class="description">
                             {{.Description}}
                         </p>
-                        {{range .Languages.Nodes}}
-                            <div class="language">
-                                <span class="color" style="background-color: {{.Color}}"></span>
-                                {{.Name}}
-                            </div>
-                        {{end}}
-                        {{if gt .Stargazers.Count 0}}
-                            <div class="stars">
-                                {{template "assets/star.svg"}}
-                                {{.Stargazers.Count}}
-                            </div>
-                        {{end}}
+                        <div class="labels">
+                            {{$FullName := .FullName}}
+                            {{range .Languages.Nodes}}
+                                <a class="label" href="https://github.com/{{$FullName}}/search?l={{.Name}}">
+                                    <span class="color" style="background-color: {{.Color}}"></span>
+                                    {{.Name}}
+                                </a>
+                            {{end}}
+                            {{if gt (len .Languages.Nodes) 0}}
+                                <div class="gap"></div>
+                            {{end}}
+                            {{if gt .Stargazers.Count 0}}
+                                <a class="label" href="https://github.com/{{.FullName}}/stargazers">
+                                    {{template "assets/star.svg"}}
+                                    {{.Stargazers.Count}}
+                                </a>
+                            {{end}}
+                        </div>
                     </div>
                 {{end}}
             </div>
@@ -61,12 +67,6 @@
                 <div class="card">soon™</div>
             </div>
         </div>
-    </div>
-
-    <div class="github-icon">
-        <a href="https://github.com/{{.User.Username}}">
-            {{template "assets/github.svg"}}
-        </a>
     </div>
 
     <script>{{template "script.js"}}</script>
