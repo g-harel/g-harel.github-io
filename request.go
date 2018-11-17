@@ -21,8 +21,8 @@ type ContributionRequest struct {
 
 type Request struct {
 	Login         string
-	Projects      []ProjectRequest
-	Contributions []ContributionRequest
+	Projects      []*ProjectRequest
+	Contributions []*ContributionRequest
 }
 
 type GQLRequest struct {

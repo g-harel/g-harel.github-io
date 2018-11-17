@@ -71,15 +71,18 @@ type GQLResponse struct {
 	} `json:"errors"`
 }
 
-func (res *Response) Unmarshall(b []byte) error {
+func (res *Response) Unmarshall(b []byte) (*Response, error) {
 	queryResponse := &GQLResponse{}
 	err := json.Unmarshal(b, queryResponse)
 	if err != nil {
-		return fmt.Errorf("could not parse response data: %v", err)
+		return nil, fmt.Errorf("could not parse response data: %v", err)
 	}
 
+	if queryResponse.Data == nil {
+		return nil, fmt.Errorf("missing response data: %s", b)
+	}
 	if len(queryResponse.Errors) > 0 {
-		return fmt.Errorf("query error (1/%v): %v", len(queryResponse.Errors), queryResponse.Errors[0].Message)
+		return nil, fmt.Errorf("query error (1/%v): %v", len(queryResponse.Errors), queryResponse.Errors[0].Message)
 	}
 
 	res.User = &UserResponse{}
@@ -88,7 +91,7 @@ func (res *Response) Unmarshall(b []byte) error {
 
 	err = json.Unmarshal(*queryResponse.Data["user"], res.User)
 	if err != nil {
-		return fmt.Errorf("could not parse user data: %v", err)
+		return nil, fmt.Errorf("could not parse user data: %v", err)
 	}
 
 	index := 0
@@ -101,7 +104,7 @@ func (res *Response) Unmarshall(b []byte) error {
 		project := &ProjectResponse{}
 		err = json.Unmarshal(*data, project)
 		if err != nil {
-			return fmt.Errorf("could not parse project data: %v", err)
+			return nil, fmt.Errorf("could not parse project data: %v", err)
 		}
 		res.Projects = append(res.Projects, project)
 
@@ -118,12 +121,12 @@ func (res *Response) Unmarshall(b []byte) error {
 		contribution := &ContributionResponse{}
 		err = json.Unmarshal(*data, contribution)
 		if err != nil {
-			return fmt.Errorf("could not parse contribution data: %v", err)
+			return nil, fmt.Errorf("could not parse contribution data: %v", err)
 		}
 		res.Contributions = append(res.Contributions, contribution)
 
 		index++
 	}
 
-	return nil
+	return res, nil
 }

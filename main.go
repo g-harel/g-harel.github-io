@@ -17,9 +17,22 @@ func fatal(format string, a ...interface{}) {
 func main() {
 	start := time.Now()
 
+	configReq, err := http.Get(os.Getenv("CONFIG_SRC"))
+	if err != nil {
+		fatal("could not fetch config: %v", err)
+	}
+
+	configData := &bytes.Buffer{}
+	_, err = io.Copy(configData, configReq.Body)
+	if err != nil {
+		fatal("could not read config response data: %v", err)
+	}
+
+	config := (&Config{}).Unmarshall(configData.Bytes())
+
 	requestData, err := config.Request.Marshall(config)
 	if err != nil {
-		panic(err)
+		fatal("could not marshal request: %v", err)
 	}
 
 	req, err := http.NewRequest("POST", config.Endpoint, bytes.NewReader(requestData))
@@ -27,9 +40,7 @@ func main() {
 		fatal("could not create http request: %v", err)
 	}
 
-	if config.Token != "" {
-		req.Header.Add("Authorization", fmt.Sprintf("bearer %v", config.Token))
-	}
+	req.Header.Add("Authorization", fmt.Sprintf("bearer %v", config.Token))
 
 	res, err := (&http.Client{}).Do(req)
 	if err != nil {
@@ -42,8 +53,7 @@ func main() {
 		fatal("could not read response data: %v", err)
 	}
 
-	response := &Response{}
-	err = response.Unmarshall(responseData.Bytes())
+	response, err := (&Response{}).Unmarshall(responseData.Bytes())
 	if err != nil {
 		fatal("could not parse response data: %v", err)
 	}
