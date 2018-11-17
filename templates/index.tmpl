@@ -82,14 +82,14 @@
                         </p>
                         <div class="labels">
                             {{if not (eq .Pull.Number 0)}}
-                                <a class="label" href="{{.Pull.URL}}">
+                                <a class="label fancy merged" href="{{.Pull.URL}}">
                                     {{template "assets/pull.svg"}}
                                     #{{.Pull.Number}}
                                 </a>
                                 <div class="gap"></div>
                             {{end}}
                             {{if not (eq .Issue.Number 0)}}
-                                <a class="label" href="{{.Issue.URL}}">
+                                <a class="label fancy closed" href="{{.Issue.URL}}">
                                     {{template "assets/issue.svg"}}
                                     #{{.Issue.Number}}
                                 </a>

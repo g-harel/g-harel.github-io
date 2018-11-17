@@ -17,7 +17,7 @@ func fatal(format string, a ...interface{}) {
 func main() {
 	start := time.Now()
 
-	requestData, err := config.Request.Marshall()
+	requestData, err := config.Request.Marshall(config)
 	if err != nil {
 		panic(err)
 	}

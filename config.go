@@ -10,6 +10,7 @@ type Config struct {
 	RootName  string
 	OutPath   string
 
+	Query    string
 	Endpoint string
 	Token    string
 
@@ -21,6 +22,7 @@ var config = &Config{
 	RootName:  "index.tmpl",
 	OutPath:   "index.html",
 
+	Query:    "query.gql",
 	Endpoint: "https://api.github.com/graphql",
 	Token:    os.Getenv("GITHUB_API_TOKEN"),
 

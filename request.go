@@ -29,8 +29,8 @@ type GQLRequest struct {
 	Query string `json:"query"`
 }
 
-func (req *Request) Marshall() ([]byte, error) {
-	tmpl, err := template.ParseFiles("query.gql")
+func (req *Request) Marshall(c *Config) ([]byte, error) {
+	tmpl, err := template.ParseFiles(c.Query)
 	if err != nil {
 		return nil, fmt.Errorf("could not parse query template: %v", err)
 	}
