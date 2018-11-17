@@ -15,7 +15,10 @@
             <h3>{{.User.Username}}</h3>
             <p>{{.User.Description}}</p>
             <hr/>
-            <i>{{template "assets/location.svg"}}</i><span>{{.User.Location}}</span>
+            <div class="links">
+                <div class="item"><i>{{template "assets/location.svg"}}</i>{{.User.Location}}</div>
+                <div class="item"><i>{{template "assets/mail.svg"}}</i><a href="mailto:{{.User.Email}}">{{.User.Email}}</a></div>
+            </div>
         </div>
         <div class="tabs">
             <div class="nav">
