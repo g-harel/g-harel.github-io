@@ -10,14 +10,16 @@
 <body>
     <div class="page">
         <div class="info">
-            <img src="{{.User.Icon}}" />
+            <a href="{{.User.URL}}">
+                <img src="{{.User.Icon}}" />
+            </a>
             <h1>{{.User.Name}}</h1>
-            <h3>{{.User.Username}}</h3>
+            <h3>{{.User.Login}}</h3>
             <p>{{.User.Description}}</p>
             <hr/>
             <div class="links">
-                <div class="item"><i>{{template "assets/location.svg"}}</i>{{.User.Location}}</div>
-                <div class="item"><i>{{template "assets/mail.svg"}}</i><a href="mailto:{{.User.Email}}">{{.User.Email}}</a></div>
+                <div class="item">{{template "assets/location.svg"}}{{.User.Location}}</div>
+                <div class="item">{{template "assets/mail.svg"}}<a href="mailto:{{.User.Email}}">{{.User.Email}}</a></div>
             </div>
         </div>
         <div class="tabs">
@@ -34,11 +36,11 @@
             <div class="content projects">
                 {{range .Projects}}
                     <div class="card">
-                        <a href="https://github.com/{{.FullName}}" class="name">
-                            {{if not (eq .Owner.Username $.User.Username)}}
+                        <a href="{{.URL}}" class="name">
+                            {{if not (eq .Owner.Login $.User.Login)}}
                                 <span class="owner">
-                                    {{.Owner.Username}}/
-                                </span>
+                                    {{.Owner.Login}}
+                                </span>/
                             {{end}}
                             {{.Name}}
                         </a>
@@ -46,9 +48,9 @@
                             {{.Description}}
                         </p>
                         <div class="labels">
-                            {{$FullName := .FullName}}
+                            {{$URL := .URL}}
                             {{range .Languages.Nodes}}
-                                <a class="label" href="https://github.com/{{$FullName}}/search?l={{.Name}}">
+                                <a class="label" href="{{$URL}}/search?l={{.Name}}">
                                     <span class="color" style="background-color: {{.Color}}"></span>
                                     {{.Name}}
                                 </a>
@@ -57,7 +59,7 @@
                                 <div class="gap"></div>
                             {{end}}
                             {{if gt .Stargazers.Count 0}}
-                                <a class="label" href="https://github.com/{{.FullName}}/stargazers">
+                                <a class="label" href="{{.URL}}/stargazers">
                                     {{template "assets/star.svg"}}
                                     {{.Stargazers.Count}}
                                 </a>
@@ -67,7 +69,34 @@
                 {{end}}
             </div>
             <div class="content contributions">
-                <div class="card">soon™</div>
+                {{range .Contributions}}
+                    <div class="card">
+                        <a href="{{.URL}}" class="name">
+                            <span class="owner">
+                                {{.Owner.Login}}
+                            </span>
+                            /{{.Name}}
+                        </a>
+                        <p class="description">
+                            {{.Pull.Title}}
+                        </p>
+                        <div class="labels">
+                            {{if not (eq .Pull.Number 0)}}
+                                <a class="label" href="{{.Pull.URL}}">
+                                    {{template "assets/pull.svg"}}
+                                    #{{.Pull.Number}}
+                                </a>
+                                <div class="gap"></div>
+                            {{end}}
+                            {{if not (eq .Issue.Number 0)}}
+                                <a class="label" href="{{.Issue.URL}}">
+                                    {{template "assets/issue.svg"}}
+                                    #{{.Issue.Number}}
+                                </a>
+                            {{end}}
+                        </div>
+                    </div>
+                {{end}}
             </div>
         </div>
     </div>

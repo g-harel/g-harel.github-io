@@ -79,7 +79,8 @@ body {
                 margin-bottom: 2px;
             }
 
-                .page .info .item i {
+                .page .info .item .icon {
+                    color: #6a737d;
                     display: inline-block;
                     margin-right: 6px;
                     padding: 2px 2px 0 1px;
@@ -222,7 +223,8 @@ body {
                         width: 12px;
                     }
 
-                    .page .tabs .content .card .label svg {
+                    .page .tabs .content .card .label .icon {
+                        color: #586069;
                         margin-right: 3px;
                         position: relative;
                         top: 1px;
